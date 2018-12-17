@@ -1,0 +1,2 @@
+/usr/bin/ar qc libeoc_relay_plugin.a  CMakeFiles/eoc_relay_plugin.dir/eoc_relay_plugin.cpp.o CMakeFiles/eoc_relay_plugin.dir/__/__/programs/cleos/httpc.cpp.o
+/usr/bin/ranlib libeoc_relay_plugin.a

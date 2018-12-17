@@ -1,0 +1,2 @@
+/usr/bin/ar qc libnet_difchain_plugin.a  CMakeFiles/net_difchain_plugin.dir/net_difchain_plugin.cpp.o CMakeFiles/net_difchain_plugin.dir/__/__/programs/cleos/httpc.cpp.o
+/usr/bin/ranlib libnet_difchain_plugin.a
