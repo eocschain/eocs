@@ -65,6 +65,7 @@ struct async_result_visitor : public fc::visitor<std::string> {
    }\
 }
 
+
 #ifdef EOC_RELAY_PLUGIN
    #define ICP_RELAY_RO_CALL(call_name, http_response_code) CALL(eoc_icp, ro_api, eoc_icp::read_only, call_name, http_response_code)
    #define ICP_RELAY_RW_CALL(call_name, http_response_code) CALL(eoc_icp, rw_api, eoc_icp::read_write, call_name, http_response_code)

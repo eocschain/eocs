@@ -211,7 +211,7 @@ namespace eosio {
           
       }
 
-      vector<chain::permission_level> get_account_permissions(const vector<string> &permissions)
+      vector<chain::permission_level> get_eoc_account_permissions(const vector<string> &permissions)
       {
           auto fixedPermissions = permissions | boost::adaptors::transformed([](const string &p) {
                                       vector<string> pieces;
@@ -309,7 +309,7 @@ namespace eosio {
                   relay_->local_contract_ = account_name(options.at("icp-relay-local-contract").as<string>());
                   relay_->peer_contract_ = account_name(options.at("icp-relay-peer-contract").as<string>());
                   relay_->peer_chain_id_ = chain_id_type(options.at("icp-relay-peer-chain-id").as<string>());
-                  relay_->signer_ = get_account_permissions(vector<string>{options.at("icp-relay-signer").as<string>()});
+                  relay_->signer_ = get_eoc_account_permissions(vector<string>{options.at("icp-relay-signer").as<string>()});
                    if( options.count( "agent-name" )) {
                      relay_->user_agent_name = options.at( "agent-name" ).as<string>();
                     }
