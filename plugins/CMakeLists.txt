@@ -22,7 +22,7 @@ add_subdirectory(login_plugin)
 add_subdirectory(test_control_plugin)
 add_subdirectory(test_control_api_plugin)
 
-#add_subdirectory(icp_relay_plugin)
+add_subdirectory(icp_relay_plugin)
 add_subdirectory(eoc_relay_plugin)
 add_subdirectory(icp_relay_api_plugin)
 
