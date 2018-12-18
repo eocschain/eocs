@@ -16,9 +16,9 @@ namespace eoc_icp {
    using icp_net_message_ptr = std::shared_ptr<icp_net_message>;
 
    extern  uint16_t icp_net_version_base ;
-  extern   uint16_t icp_net_version_range ;
-extern  uint16_t icp_proto_explicit_sync ;
-extern  uint16_t icp_net_version ;
+   extern   uint16_t icp_net_version_range ;
+   extern  uint16_t icp_proto_explicit_sync ;
+   extern  uint16_t icp_net_version ;
   
 void
    handshake_initializer::populate( icp_handshake_message &hello) {

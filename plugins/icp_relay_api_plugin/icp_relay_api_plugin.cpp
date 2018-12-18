@@ -11,9 +11,19 @@ static appbase::abstract_plugin& _icp_relay_api_plugin = app().register_plugin<i
 icp_relay_api_plugin::icp_relay_api_plugin() {}
 icp_relay_api_plugin::~icp_relay_api_plugin() {}
 
-void icp_relay_api_plugin::set_program_options(options_description&, options_description&) {}
+void icp_relay_api_plugin::set_program_options(options_description&, options_description&cfg) {
+   cfg.add_options()
+      ("relay_plugin_type", bpo::value<int32_t>()->default_value(1), "The plugin start up type");
+}
 
-void icp_relay_api_plugin::plugin_initialize(const variables_map&) {}
+void icp_relay_api_plugin::plugin_initialize(const variables_map& options) {
+   int32_t startuptype = options.at("relay_plugin_type").as<int32_t>();
+   if (startuptype == 1)
+   {
+      #define EOC_RELAY_PLUGIN 1
+   }
+   
+}
 
 void icp_relay_api_plugin::plugin_shutdown() {}
 
@@ -55,25 +65,26 @@ struct async_result_visitor : public fc::visitor<std::string> {
    }\
 }
 
-/*
-#define ICP_RELAY_RO_CALL(call_name, http_response_code) CALL(icp, ro_api, icp::read_only, call_name, http_response_code)
-#define ICP_RELAY_RW_CALL(call_name, http_response_code) CALL(icp, rw_api, icp::read_write, call_name, http_response_code)
-#define ICP_RELAY_RW_CALL_ASYNC(call_name, call_result, http_response_code) CALL_ASYNC(icp, rw_api, icp::read_write, call_name, call_result, http_response_code)
-*/
-
-#define ICP_RELAY_RO_CALL(call_name, http_response_code) CALL(eoc_icp, ro_api, eoc_icp::read_only, call_name, http_response_code)
-#define ICP_RELAY_RW_CALL(call_name, http_response_code) CALL(eoc_icp, rw_api, eoc_icp::read_write, call_name, http_response_code)
-#define ICP_RELAY_RW_CALL_ASYNC(call_name, call_result, http_response_code) CALL_ASYNC(eoc_icp, rw_api, eoc_icp::read_write, call_name, call_result, http_response_code)
+#ifdef EOC_RELAY_PLUGIN
+   #define ICP_RELAY_RO_CALL(call_name, http_response_code) CALL(eoc_icp, ro_api, eoc_icp::read_only, call_name, http_response_code)
+   #define ICP_RELAY_RW_CALL(call_name, http_response_code) CALL(eoc_icp, rw_api, eoc_icp::read_write, call_name, http_response_code)
+   #define ICP_RELAY_RW_CALL_ASYNC(call_name, call_result, http_response_code) CALL_ASYNC(eoc_icp, rw_api, eoc_icp::read_write, call_name, call_result, http_response_code)
+#else
+   #define ICP_RELAY_RO_CALL(call_name, http_response_code) CALL(icp, ro_api, icp::read_only, call_name, http_response_code)
+   #define ICP_RELAY_RW_CALL(call_name, http_response_code) CALL(icp, rw_api, icp::read_write, call_name, http_response_code)
+   #define ICP_RELAY_RW_CALL_ASYNC(call_name, call_result, http_response_code) CALL_ASYNC(icp, rw_api, icp::read_write, call_name, call_result, http_response_code)
+#endif
 
 void icp_relay_api_plugin::plugin_startup() {
    ilog( "starting icp_relay_api_plugin" );
-   /*
-   auto ro_api = app().get_plugin<icp_relay_plugin>().get_read_only_api();
-   auto rw_api = app().get_plugin<icp_relay_plugin>().get_read_write_api();
-	*/
+   
+	#ifdef EOC_RELAY_PLUGIN
    auto ro_api = app().get_plugin<eoc_relay_plugin>().get_read_only_api();
    auto rw_api = app().get_plugin<eoc_relay_plugin>().get_read_write_api();
-	
+   #else
+	auto ro_api = app().get_plugin<icp_relay_plugin>().get_read_only_api();
+   auto rw_api = app().get_plugin<icp_relay_plugin>().get_read_write_api();
+   #endif
    auto& _http_plugin = app().get_plugin<http_plugin>();
 
    _http_plugin.add_api({
