@@ -170,14 +170,14 @@ namespace eosio {
 
       void eoc_relay_plugin::set_program_options(options_description&, options_description& cfg) {
             cfg.add_options()
-          ("icp-relay-endpoint", bpo::value<string>()->default_value("0.0.0.0:8899"), "The endpoint upon which to listen for incoming connections")
-          ("icp-relay-address", bpo::value<string>()->default_value("localhost:8899"), "The localhost addr")
-       ("icp-relay-threads", bpo::value<uint32_t>(), "The number of threads to use to process network messages")
-       ("icp-relay-connect", bpo::value<vector<string>>()->composing(), "Remote endpoint of other node to connect to (may specify multiple times)")
-       ("icp-relay-peer-chain-id", bpo::value<string>(), "The chain id of icp peer")
-       ("icp-relay-peer-contract", bpo::value<string>()->default_value("cochainioicp"), "The peer icp contract account name")
-       ("icp-relay-local-contract", bpo::value<string>()->default_value("cochainioicp"), "The local icp contract account name")
-       ("icp-relay-signer", bpo::value<string>()->default_value("cochainrelay@active"), "The account and permission level to authorize icp transactions on local icp contract, as in 'account@permission'")
+          ("eoc-relay-endpoint", bpo::value<string>()->default_value("0.0.0.0:8899"), "The endpoint upon which to listen for incoming connections")
+          ("eoc-relay-address", bpo::value<string>()->default_value("localhost:8899"), "The localhost addr")
+       ("eoc-relay-threads", bpo::value<uint32_t>(), "The number of threads to use to process network messages")
+       ("eoc-relay-connect", bpo::value<vector<string>>()->composing(), "Remote endpoint of other node to connect to (may specify multiple times)")
+       ("eoc-relay-peer-chain-id", bpo::value<string>(), "The chain id of icp peer")
+       ("eoc-relay-peer-contract", bpo::value<string>()->default_value("cochainioicp"), "The peer icp contract account name")
+       ("eoc-relay-local-contract", bpo::value<string>()->default_value("cochainioicp"), "The local icp contract account name")
+       ("eoc-relay-signer", bpo::value<string>()->default_value("cochainrelay@active"), "The account and permission level to authorize icp transactions on local icp contract, as in 'account@permission'")
         ( "p2p-max-nodes-per-host", bpo::value<int>()->default_value(def_max_nodes_per_host), "Maximum number of client nodes from any single IP address")
         ( "agent-name", bpo::value<string>()->default_value("\"EOS Test Agent\""), "The name supplied to identify this node amongst the peers.")
         ( "icp-allowed-connection", bpo::value<vector<string>>()->multitoken()->default_value({"any"}, "any"), "Can be 'any' or 'producers' or 'specified' or 'none'. If 'specified', peer-key must be specified at least once. If only 'producers', peer-key is not required. 'producers' and 'specified' may be combined.")
@@ -249,8 +249,8 @@ namespace eosio {
 
          relay_->resolver = std::make_shared<tcp::resolver>( std::ref( app().get_io_service()));
          
-         if( options.count( "icp-relay-endpoint" )) {
-            relay_->p2p_address = options.at( "icp-relay-endpoint" ).as<string>();
+         if( options.count( "eoc-relay-endpoint" )) {
+            relay_->p2p_address = options.at( "eoc-relay-endpoint" ).as<string>();
             auto host = relay_->p2p_address.substr( 0, relay_->p2p_address.find( ':' ));
             auto port = relay_->p2p_address.substr( host.size() + 1, relay_->p2p_address.size());
             idump((host)( port ));
@@ -274,7 +274,7 @@ namespace eosio {
             }
          }
 
-         auto endpoint = options["icp-relay-endpoint"].as<string>();
+         auto endpoint = options["eoc-relay-endpoint"].as<string>();
                   relay_->endpoint_address_ = endpoint.substr(0, endpoint.find(':'));
                   relay_->endpoint_port_ = static_cast<uint16_t>(std::stoul(endpoint.substr(endpoint.find(':') + 1, endpoint.size())));
                   ilog("icp_relay_plugin listening on ${host}:${port}", ("host", relay_->endpoint_address_)("port", relay_->endpoint_port_));
@@ -299,17 +299,17 @@ namespace eosio {
               relay_->chain_plug = app().find_plugin<chain_plugin>();
                   EOS_ASSERT(relay_->chain_plug, chain::missing_chain_plugin_exception, "");
 
-                  if (options.count("icp-relay-connect"))
+                  if (options.count("eoc-relay-connect"))
                   {
-                      relay_->connect_to_peers_ = options.at("icp-relay-connect").as<vector<string>>();
+                      relay_->connect_to_peers_ = options.at("eoc-relay-connect").as<vector<string>>();
                       relay_->supplied_peers= relay_->connect_to_peers_;
                   }
 
-                  FC_ASSERT(options.count("icp-relay-peer-chain-id"), "option --icp-relay-peer-chain-id must be specified");
-                  relay_->local_contract_ = account_name(options.at("icp-relay-local-contract").as<string>());
-                  relay_->peer_contract_ = account_name(options.at("icp-relay-peer-contract").as<string>());
-                  relay_->peer_chain_id_ = chain_id_type(options.at("icp-relay-peer-chain-id").as<string>());
-                  relay_->signer_ = get_eoc_account_permissions(vector<string>{options.at("icp-relay-signer").as<string>()});
+                  FC_ASSERT(options.count("eoc-relay-peer-chain-id"), "option --icp-relay-peer-chain-id must be specified");
+                  relay_->local_contract_ = account_name(options.at("eoc-relay-local-contract").as<string>());
+                  relay_->peer_contract_ = account_name(options.at("eoc-relay-peer-contract").as<string>());
+                  relay_->peer_chain_id_ = chain_id_type(options.at("eoc-relay-peer-chain-id").as<string>());
+                  relay_->signer_ = get_eoc_account_permissions(vector<string>{options.at("eoc-relay-signer").as<string>()});
                    if( options.count( "agent-name" )) {
                      relay_->user_agent_name = options.at( "agent-name" ).as<string>();
                     }
