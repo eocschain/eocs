@@ -37,7 +37,7 @@ void icp_relay_plugin::set_program_options(options_description&, options_descrip
        ("icp-relay-endpoint", bpo::value<string>()->default_value("0.0.0.0:8765"), "The endpoint upon which to listen for incoming connections")
        ("icp-relay-threads", bpo::value<uint32_t>(), "The number of threads to use to process network messages")
        ("icp-relay-connect", bpo::value<vector<string>>()->composing(), "Remote endpoint of other node to connect to (may specify multiple times)")
-       ("icp-relay-peer-chain-id", bpo::value<string>(), "The chain id of icp peer")
+       ("icp-relay-peer-chain-id", bpo::value<string>()->default_value(""), "The chain id of icp peer")
        ("icp-relay-peer-contract", bpo::value<string>()->default_value("cochainioicp"), "The peer icp contract account name")
        ("icp-relay-local-contract", bpo::value<string>()->default_value("cochainioicp"), "The local icp contract account name")
        ("icp-relay-signer", bpo::value<string>()->default_value("cochainrelay@active"), "The account and permission level to authorize icp transactions on local icp contract, as in 'account@permission'")

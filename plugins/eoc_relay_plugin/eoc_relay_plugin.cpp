@@ -174,7 +174,7 @@ namespace eosio {
           ("eoc-relay-address", bpo::value<string>()->default_value("localhost:8899"), "The localhost addr")
        ("eoc-relay-threads", bpo::value<uint32_t>(), "The number of threads to use to process network messages")
        ("eoc-relay-connect", bpo::value<vector<string>>()->composing(), "Remote endpoint of other node to connect to (may specify multiple times)")
-       ("eoc-relay-peer-chain-id", bpo::value<string>(), "The chain id of icp peer")
+       ("eoc-relay-peer-chain-id", bpo::value<string>()->default_value(""), "The chain id of icp peer")
        ("eoc-relay-peer-contract", bpo::value<string>()->default_value("cochainioicp"), "The peer icp contract account name")
        ("eoc-relay-local-contract", bpo::value<string>()->default_value("cochainioicp"), "The local icp contract account name")
        ("eoc-relay-signer", bpo::value<string>()->default_value("cochainrelay@active"), "The account and permission level to authorize icp transactions on local icp contract, as in 'account@permission'")
