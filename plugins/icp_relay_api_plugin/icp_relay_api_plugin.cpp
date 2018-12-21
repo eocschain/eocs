@@ -3,11 +3,11 @@
 #include <eosio/chain/exceptions.hpp>
 
 #include <fc/io/json.hpp>
- 
+
 namespace eosio {
 
 static appbase::abstract_plugin& _icp_relay_api_plugin = app().register_plugin<icp_relay_api_plugin>();
-
+static bool _b_eoc_start = true;
 icp_relay_api_plugin::icp_relay_api_plugin() {}
 icp_relay_api_plugin::~icp_relay_api_plugin() {}
 
@@ -17,11 +17,15 @@ void icp_relay_api_plugin::set_program_options(options_description&, options_des
 }
 
 void icp_relay_api_plugin::plugin_initialize(const variables_map& options) {
-   int32_t startuptype = options.at("relay_plugin_type").as<int32_t>();
-   if (startuptype == 1)
-   {
-      #define EOC_RELAY_PLUGIN 1
-   }
+    int32_t startuptype = options.at("relay_plugin_type").as<int32_t>();
+       if (startuptype == 1)
+    { 
+      _b_eoc_start= true;
+    }
+    else
+    {
+      _b_eoc_start= false;
+    }
    
 }
 
@@ -66,33 +70,45 @@ struct async_result_visitor : public fc::visitor<std::string> {
 }
 
 
-#ifdef EOC_RELAY_PLUGIN
-   #define ICP_RELAY_RO_CALL(call_name, http_response_code) CALL(eoc_icp, ro_api, eoc_icp::read_only, call_name, http_response_code)
-   #define ICP_RELAY_RW_CALL(call_name, http_response_code) CALL(eoc_icp, rw_api, eoc_icp::read_write, call_name, http_response_code)
-   #define ICP_RELAY_RW_CALL_ASYNC(call_name, call_result, http_response_code) CALL_ASYNC(eoc_icp, rw_api, eoc_icp::read_write, call_name, call_result, http_response_code)
-#else
-   #define ICP_RELAY_RO_CALL(call_name, http_response_code) CALL(icp, ro_api, icp::read_only, call_name, http_response_code)
-   #define ICP_RELAY_RW_CALL(call_name, http_response_code) CALL(icp, rw_api, icp::read_write, call_name, http_response_code)
-   #define ICP_RELAY_RW_CALL_ASYNC(call_name, call_result, http_response_code) CALL_ASYNC(icp, rw_api, icp::read_write, call_name, call_result, http_response_code)
-#endif
+
+#define EOC_RELAY_RO_CALL(call_name, http_response_code) CALL(eoc_icp, ro_api, eoc_icp::read_only, call_name, http_response_code)
+#define EOC_RELAY_RW_CALL(call_name, http_response_code) CALL(eoc_icp, rw_api, eoc_icp::read_write, call_name, http_response_code)
+#define EOC_RELAY_RW_CALL_ASYNC(call_name, call_result, http_response_code) CALL_ASYNC(eoc_icp, rw_api, eoc_icp::read_write, call_name, call_result, http_response_code)
+
+
+#define ICP_RELAY_RO_CALL(call_name, http_response_code) CALL(icp, ro_api, icp::read_only, call_name, http_response_code)
+#define ICP_RELAY_RW_CALL(call_name, http_response_code) CALL(icp, rw_api, icp::read_write, call_name, http_response_code)
+#define ICP_RELAY_RW_CALL_ASYNC(call_name, call_result, http_response_code) CALL_ASYNC(icp, rw_api, icp::read_write, call_name, call_result, http_response_code)
+
 
 void icp_relay_api_plugin::plugin_startup() {
    ilog( "starting icp_relay_api_plugin" );
    
-	#ifdef EOC_RELAY_PLUGIN
-   auto ro_api = app().get_plugin<eoc_relay_plugin>().get_read_only_api();
-   auto rw_api = app().get_plugin<eoc_relay_plugin>().get_read_write_api();
-   #else
-	auto ro_api = app().get_plugin<icp_relay_plugin>().get_read_only_api();
-   auto rw_api = app().get_plugin<icp_relay_plugin>().get_read_write_api();
-   #endif
-   auto& _http_plugin = app().get_plugin<http_plugin>();
+	if(_b_eoc_start)
+   {
+      auto ro_api = app().get_plugin<eoc_relay_plugin>().get_read_only_api();
+      auto rw_api = app().get_plugin<eoc_relay_plugin>().get_read_write_api();
+      auto& _http_plugin = app().get_plugin<http_plugin>();
+      _http_plugin.add_api({
+         EOC_RELAY_RO_CALL(get_info, 200),
+         EOC_RELAY_RO_CALL(get_block, 200),
+         EOC_RELAY_RW_CALL(open_channel, 200)
+      });
+   }
+   else
+   {
+      auto ro_api = app().get_plugin<icp_relay_plugin>().get_read_only_api();
+      auto rw_api = app().get_plugin<icp_relay_plugin>().get_read_write_api();
+      auto& _http_plugin = app().get_plugin<http_plugin>();
 
-   _http_plugin.add_api({
-      ICP_RELAY_RO_CALL(get_info, 200),
-      ICP_RELAY_RO_CALL(get_block, 200),
-      ICP_RELAY_RW_CALL(open_channel, 200)
-   });
+      _http_plugin.add_api({
+         ICP_RELAY_RO_CALL(get_info, 200),
+         ICP_RELAY_RO_CALL(get_block, 200),
+         ICP_RELAY_RW_CALL(open_channel, 200)
+      });
+   }
+  
+  
 }
 
 }
