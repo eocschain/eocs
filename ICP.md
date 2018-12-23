@@ -30,16 +30,17 @@ ICP中继作为nodeos的插件，可随nodeos节点部署。部署模式上有�
 
 #### ICP Relay Plugin
 
-- [ICP Relay Plugin](https://github.com/eoscochain/eoscochain/tree/master/plugins/icp_relay_plugin)
-- [ICP Relay API Plugin](https://github.com/eoscochain/eoscochain/tree/master/plugins/icp_relay_api_plugin)
+- [ICP Relay Plugin](https://github.com/eocschain/eocs/tree/master/plugins/icp_relay_plugin): eos bnet 模式中继
+- [EOC_Relay_Plugin](https://github.com/eocschain/eocs/tree/master/plugins/eoc_relay_plugin): eos net 模式中继
+- [ICP Relay API Plugin](https://github.com/eocschain/eocs/tree/master/plugins/icp_relay_api_plugin)
 
 #### ICP Contract
 
-- [ICP Contract](https://github.com/eoscochain/eoscochain/tree/master/contracts/icp)
+- [ICP Contract](https://github.com/eocschain/eocs/tree/master/contracts/icp)
 
 #### ICP Token Contract
 
-- [ICP Token Contract](https://github.com/eoscochain/eoscochain/tree/master/contracts/icp.token): 跨链资产转移合约，是跨链交易的典型应用示例。
+- [ICP Token Contract](https://github.com/eocschain/eocs/tree/master/contracts/icp.token): 跨链资产转移合约，是跨链交易的典型应用示例。
 
 ## ICP Testnet Setup
 
