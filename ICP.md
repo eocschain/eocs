@@ -242,7 +242,7 @@ cleos1 set account permission eocseosioicp sendaction '{"threshold":1,"keys":[],
 cleos2 set account permission eocseosioicp sendaction '{"threshold":1,"keys":[], "accounts": [{"permission":{"actor":"eocseosioicp","permission":"eosio.code"},"weight":1}] }' "active" -p eocseosioicp
 ```
 
-设置 `cochainioicp` 的 `sendaction` 权限可以调用 `cochainioicp` 的 `sendaction` 操作接口：
+设置 `eocseosioicp` 的 `sendaction` 权限可以调用 `eocseosioicp` 的 `sendaction` 操作接口：
 ```
 cleos1 set action permission eocseosioicp eocseosioicp sendaction sendaction -p eocseosioicp
 cleos2 set action permission eocseosioicp eocseosioicp sendaction sendaction -p eocseosioicp
@@ -270,8 +270,8 @@ plugin = eosio::icp_relay_api_plugin
 
 部署ICP合约：
 ```
-cleos1 set contract cochainioicp /path/to/contracts/icp
-cleos2 set contract cochainioicp /path/to/contracts/icp
+cleos1 set contract eocseosioicp /path/to/contracts/icp
+cleos2 set contract eocseosioicp /path/to/contracts/icp
 ```
 
 向ICP合约设置对端ICP合约账户名：
