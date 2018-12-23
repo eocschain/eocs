@@ -189,7 +189,7 @@ cleos1 set contract eosio /path/to/contracts/eosio.bios/
 cleos2 set contract eosio /path/to/contracts/eosio.bios/
 ```
 
-设置原生token符号（**注意**：这是EOS Cochain的定制功能；如果是原生EOSIO，则需要在编译nodeos时指定）：
+设置原生token符号（**注意**：这是EOCS chain的定制功能；如果是原生EOSIO，则需要在编译nodeos时指定）：
 ```
 # 这里都设置为EOS
 cleos1 push action eosio setsymbol '["EOS"]' -p eosio
