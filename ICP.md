@@ -111,6 +111,10 @@ icp-relay-signer = eocseosrelay@active
 # 链1为0.0.0.0:9876，链2为0.0.0.0:9877
 p2p-listen-endpoint = 0.0.0.0:9876 # 或 0.0.0.0:9877
 
+# The icp relay api type. (eosio::icp_relay_api_plugin)
+# relay提供api类型 1为eoc_relay_plugin提供,不等于1 为icp_relay_plugin提供,默认为1
+relay_plugin_type = 2
+
 # Limits the maximum time (in milliseconds) that is allowed a pushed transaction's code to execute before being considered invalid (eosio::producer_plugin)
 # 设置足够大的最大交易执行时间，可参看ICP Challenges中关于计算量的说明
 max-transaction-time = 300
