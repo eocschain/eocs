@@ -65,7 +65,7 @@ EOSIO currently supports the following operating systems:
 1. [Website](http://eocs.io)
 1. [Developer Portal](https://developers.eos.io)
 1. [StackExchange for Q&A](https://eosio.stackexchange.com/)
-1. [Community Telegram Group]()
+1. [Community Telegram Group](https://t.me/eocschain)
 1. [Icp Document](https://github.com/eocschain/eocs/blob/master/ICP.md)
 
 
