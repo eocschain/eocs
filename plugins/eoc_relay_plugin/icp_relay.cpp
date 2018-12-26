@@ -92,6 +92,7 @@ void relay::start_monitors( )
    }
 
 void relay::start() {
+   /*
    on_applied_transaction_handle_ = app().get_channel<channels::applied_transaction>().subscribe([this](transaction_trace_ptr t) {
       on_applied_transaction(t);
    });
@@ -107,7 +108,7 @@ void relay::start() {
    on_bad_block_handle_ = app().get_channel<channels::rejected_block>().subscribe([this](signed_block_ptr b) {
       on_bad_block(b);
    });
-
+   */
    ioc_ = std::make_unique<boost::asio::io_context>(num_threads_);
 
    timer_ = std::make_shared<boost::asio::deadline_timer>(app().get_io_service());
