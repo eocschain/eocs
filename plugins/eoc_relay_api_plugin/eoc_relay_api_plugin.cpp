@@ -1,4 +1,4 @@
-#include "icp_relay_api_plugin.hpp"
+#include "eoc_relay_api_plugin.hpp"
 
 #include <eosio/chain/exceptions.hpp>
 
@@ -6,17 +6,17 @@
 
 namespace eosio {
 
-static appbase::abstract_plugin& _icp_relay_api_plugin = app().register_plugin<icp_relay_api_plugin>();
+static appbase::abstract_plugin& _eoc_relay_api_plugin = app().register_plugin<eoc_relay_api_plugin>();
 static bool _b_eoc_start = true;
-icp_relay_api_plugin::icp_relay_api_plugin() {}
-icp_relay_api_plugin::~icp_relay_api_plugin() {}
+eoc_relay_api_plugin::eoc_relay_api_plugin() {}
+eoc_relay_api_plugin::~eoc_relay_api_plugin() {}
 
-void icp_relay_api_plugin::set_program_options(options_description&, options_description&cfg) {
+void eoc_relay_api_plugin::set_program_options(options_description&, options_description&cfg) {
    cfg.add_options()
       ("relay_plugin_type", bpo::value<int32_t>()->default_value(1), "The plugin start up type");
 }
 
-void icp_relay_api_plugin::plugin_initialize(const variables_map& options) {
+void eoc_relay_api_plugin::plugin_initialize(const variables_map& options) {
     int32_t startuptype = options.at("relay_plugin_type").as<int32_t>();
        if (startuptype == 1)
     { 
@@ -29,7 +29,7 @@ void icp_relay_api_plugin::plugin_initialize(const variables_map& options) {
    
 }
 
-void icp_relay_api_plugin::plugin_shutdown() {}
+void eoc_relay_api_plugin::plugin_shutdown() {}
 
 struct async_result_visitor : public fc::visitor<std::string> {
    template<typename T>
@@ -69,24 +69,23 @@ struct async_result_visitor : public fc::visitor<std::string> {
    }\
 }
 
-#define ICP_RELAY_RO_CALL(call_name, http_response_code) CALL(icp, ro_api, icp::read_only, call_name, http_response_code)
-#define ICP_RELAY_RW_CALL(call_name, http_response_code) CALL(icp, rw_api, icp::read_write, call_name, http_response_code)
-#define ICP_RELAY_RW_CALL_ASYNC(call_name, call_result, http_response_code) CALL_ASYNC(icp, rw_api, icp::read_write, call_name, call_result, http_response_code)
 
 
-void icp_relay_api_plugin::plugin_startup() {
-   ilog( "starting icp_relay_api_plugin" );
+#define EOC_RELAY_RO_CALL(call_name, http_response_code) CALL(eoc_icp, ro_api, eoc_icp::read_only, call_name, http_response_code)
+#define EOC_RELAY_RW_CALL(call_name, http_response_code) CALL(eoc_icp, rw_api, eoc_icp::read_write, call_name, http_response_code)
+#define EOC_RELAY_RW_CALL_ASYNC(call_name, call_result, http_response_code) CALL_ASYNC(eoc_icp, rw_api, eoc_icp::read_write, call_name, call_result, http_response_code)
+
+void eoc_relay_api_plugin::plugin_startup() {
+   ilog( "starting eoc_relay_api_plugin" );
    
-	 auto ro_api = app().get_plugin<icp_relay_plugin>().get_read_only_api();
-   auto rw_api = app().get_plugin<icp_relay_plugin>().get_read_write_api();
-   auto& _http_plugin = app().get_plugin<http_plugin>();
-
-   _http_plugin.add_api({
-         ICP_RELAY_RO_CALL(get_info, 200),
-         ICP_RELAY_RO_CALL(get_block, 200),
-         ICP_RELAY_RW_CALL(open_channel, 200)
+   auto ro_api = app().get_plugin<eoc_relay_plugin>().get_read_only_api();
+      auto rw_api = app().get_plugin<eoc_relay_plugin>().get_read_write_api();
+      auto& _http_plugin = app().get_plugin<http_plugin>();
+      _http_plugin.add_api({
+         EOC_RELAY_RO_CALL(get_info, 200),
+         EOC_RELAY_RO_CALL(get_block, 200),
+         EOC_RELAY_RW_CALL(open_channel, 200)
       });
-  
 }
 
 }
