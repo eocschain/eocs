@@ -12,20 +12,11 @@ eoc_relay_api_plugin::eoc_relay_api_plugin() {}
 eoc_relay_api_plugin::~eoc_relay_api_plugin() {}
 
 void eoc_relay_api_plugin::set_program_options(options_description&, options_description&cfg) {
-   cfg.add_options()
-      ("relay_plugin_type", bpo::value<int32_t>()->default_value(1), "The plugin start up type");
+   
 }
 
 void eoc_relay_api_plugin::plugin_initialize(const variables_map& options) {
-    int32_t startuptype = options.at("relay_plugin_type").as<int32_t>();
-       if (startuptype == 1)
-    { 
-      _b_eoc_start= true;
-    }
-    else
-    {
-      _b_eoc_start= false;
-    }
+    
    
 }
 
