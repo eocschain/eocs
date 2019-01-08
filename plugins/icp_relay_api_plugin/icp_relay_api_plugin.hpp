@@ -1,8 +1,8 @@
 #pragma once
 
-#include <eosio/eoc_relay_plugin/eoc_relay_plugin.hpp>
-#include <eosio/http_plugin/http_plugin.hpp>
 #include <icp_relay_plugin.hpp>
+#include <eosio/http_plugin/http_plugin.hpp>
+
 #include <appbase/application.hpp>
 #include <eosio/chain/controller.hpp>
 
@@ -14,6 +14,7 @@ using namespace appbase;
 class icp_relay_api_plugin : public plugin<icp_relay_api_plugin> {
 public:
    APPBASE_PLUGIN_REQUIRES((icp_relay_plugin)(http_plugin))
+
    icp_relay_api_plugin();
    virtual ~icp_relay_api_plugin();
 

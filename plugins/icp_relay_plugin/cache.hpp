@@ -27,8 +27,8 @@ typedef boost::multi_index_container<block_header_state,
 
 struct send_transaction_internal {
    action_name peer_action;
-   action action_instance;
-   action_receipt action_receipt_instance;
+   action action;
+   action_receipt action_receipt;
 };
 struct send_transaction {
    transaction_id_type id;
