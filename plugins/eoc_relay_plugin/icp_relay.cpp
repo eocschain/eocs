@@ -502,13 +502,13 @@ void relay::handle_message( icp_connection_ptr c, const channel_seed &s )
    void relay::handle_message( icp_connection_ptr c, const head_notice &h )
    {
       ilog("received head_notice");
-      if (not h.head.valid()) return;
+      if (not h.head_instance.valid()) return;
 
    app().get_io_service().post([=, self=shared_from_this()] {
       if (not peer_head_.valid()) {
          clear_cache_block_state();
       }
-      peer_head_ = h.head; // TODO: check validity
+      peer_head_ = h.head_instance; // TODO: check validity
    });
 
    }
