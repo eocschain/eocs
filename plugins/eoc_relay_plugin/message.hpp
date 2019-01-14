@@ -104,7 +104,7 @@ struct block_header_with_merkle_path {
    vector<block_id_type> merkle_path;
 };
 struct icp_actions {
-   block_header block_header;
+   block_header block_header_instance;
    vector<digest_type> action_digests;
 
    uint64_t start_packet_seq = 0;
@@ -162,8 +162,8 @@ FC_REFLECT(eoc_icp::pong, (sent)(code))
 FC_REFLECT(eoc_icp::channel_seed, (seed))
 FC_REFLECT(eoc_icp::head_notice, (head_instance))
 FC_REFLECT(eoc_icp::block_header_with_merkle_path, (block_header)(merkle_path))
-FC_REFLECT(eoc_icp::send_transaction_internal, (peer_action)(action)(action_receipt))
-FC_REFLECT(eoc_icp::icp_actions, (block_header)(action_digests)(start_packet_seq)(start_receipt_seq)(packet_actions)(receipt_actions)(receiptend_actions))
+FC_REFLECT(eoc_icp::send_transaction_internal, (peer_action)(action_instance)(action_receipt_instance))
+FC_REFLECT(eoc_icp::icp_actions, (block_header_instance)(action_digests)(start_packet_seq)(start_receipt_seq)(packet_actions)(receipt_actions)(receiptend_actions))
 FC_REFLECT(eoc_icp::packet_receipt_request, (packet_seq)(receipt_seq)(finalised_receipt))
 
 FC_REFLECT(eoc_icp::icp_action, (action)(action_receipt)(block_id)(merkle_path))

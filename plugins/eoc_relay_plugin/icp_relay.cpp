@@ -549,14 +549,14 @@ void relay::handle_message( icp_connection_ptr c, const channel_seed &s )
    void relay::handle_message( icp_connection_ptr c, const icp_actions &ia )
    {
       //ilog("received icp_actions");
-      auto block_id = ia.block_header.id();
-   auto block_num = ia.block_header.block_num();
+      auto block_id = ia.block_header_instance.id();
+   auto block_num = ia.block_header_instance.block_num();
    recv_transaction rt{block_num, block_id, ia.start_packet_seq, ia.start_receipt_seq};
    ilog("received icp_actions ${b_num},${p_seq},${r_seq}",("b_num",block_num)("p_seq",ia.start_packet_seq)("r_seq",ia.start_receipt_seq));
    auto ro = get_read_only_api();
    auto r = ro.get_block(read_only::get_block_params{block_id});
    if (r.block.is_null()) { // not exist
-      auto data = fc::raw::pack(bytes_data{fc::raw::pack(ia.block_header)});
+      auto data = fc::raw::pack(bytes_data{fc::raw::pack(ia.block_header_instance)});
       action a;
       a.name = ACTION_ADDBLOCK;
       a.data = data;
@@ -567,20 +567,20 @@ void relay::handle_message( icp_connection_ptr c, const channel_seed &s )
       auto& s = p.second;
       action a;
       a.name = s.peer_action;
-      a.data = fc::raw::pack(icp_action{fc::raw::pack(s.action), fc::raw::pack(s.action_receipt), block_id, fc::raw::pack(ia.action_digests)});
+      a.data = fc::raw::pack(icp_action{fc::raw::pack(s.action_instance), fc::raw::pack(s.action_receipt_instance), block_id, fc::raw::pack(ia.action_digests)});
       rt.packet_actions.emplace_back(p.first, a);
    }
    for (auto& r: ia.receipt_actions) {
       auto& s = r.second;
       action a;
       a.name = s.peer_action;
-      a.data = fc::raw::pack(icp_action{fc::raw::pack(s.action), fc::raw::pack(s.action_receipt), block_id, fc::raw::pack(ia.action_digests)});
+      a.data = fc::raw::pack(icp_action{fc::raw::pack(s.action_instance), fc::raw::pack(s.action_receipt_instance), block_id, fc::raw::pack(ia.action_digests)});
       rt.receipt_actions.emplace_back(r.first, a);
    }
    for (auto& c: ia.receiptend_actions) {
       action a;
       a.name = c.peer_action;
-      a.data = fc::raw::pack(icp_action{fc::raw::pack(c.action), fc::raw::pack(c.action_receipt), block_id, fc::raw::pack(ia.action_digests)});
+      a.data = fc::raw::pack(icp_action{fc::raw::pack(c.action_instance), fc::raw::pack(c.action_receipt_instance), block_id, fc::raw::pack(ia.action_digests)});
       rt.receiptend_actions.emplace_back(a);
    }
 
@@ -799,7 +799,7 @@ void relay::on_irreversible_block(const block_state_ptr& s) {
    }
 
    icp_actions ia;
-   ia.block_header = static_cast<block_header>(s->header);
+   ia.block_header_instance = static_cast<block_header>(s->header);
    ia.action_digests = bit->action_digests;
 
    std::map<uint64_t, send_transaction_internal> packet_actions; // key is packet seq
