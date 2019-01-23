@@ -237,11 +237,13 @@ void relay::update_local_head(bool force) {
 
 void relay::on_applied_transaction(const transaction_trace_ptr& t) {
    //ilog("on applied transaction");
+   /*
    if (send_transactions_.find(t->id) != send_transactions_.end()) 
    {
       ilog("send_transactions has found");
       return; // has been handled
    }
+   */
    send_transaction st{t->id, t->block_num};
    ilog("on applied transaction action dumy,${id},${b_num}",("id",t->id)("b_num",t->block_num));
 
