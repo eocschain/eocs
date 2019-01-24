@@ -15,11 +15,7 @@ void dispatch_manager::retry_fetch (icp_connection_ptr conn)
 }
 
  icp_sync_manager::icp_sync_manager( uint32_t req_span )
-      :sync_known_lib_num( 0 )
-      ,sync_last_requested_num( 0 )
-      ,sync_next_expected_num( 1 )
-      ,sync_req_span( req_span )
-      ,source()
+      :source()
       ,state(in_sync)
    {
       chain_plug = app( ).find_plugin<chain_plugin>( );

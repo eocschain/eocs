@@ -59,10 +59,7 @@ class icp_sync_manager {
          in_sync
       };
 
-      uint32_t       sync_known_lib_num;
-      uint32_t       sync_last_requested_num;
-      uint32_t       sync_next_expected_num;
-      uint32_t       sync_req_span;
+     
       icp_connection_ptr source;
       stages         state;
 
