@@ -139,214 +139,222 @@ namespace eosio {
 
       vector<chain::permission_level> get_eoc_account_permissions(const vector<string> &permissions)
       {
-          auto fixedPermissions = permissions | boost::adaptors::transformed([](const string &p) {
-                                      vector<string> pieces;
-                                      boost::algorithm::split(pieces, p, boost::algorithm::is_any_of("@"));
-                                      if (pieces.size() == 1)
-                                          pieces.push_back("active");
-                                      return chain::permission_level{.actor = pieces[0], .permission = pieces[1]};
-                                  });
-          vector<chain::permission_level> accountPermissions;
-          boost::range::copy(fixedPermissions, back_inserter(accountPermissions));
-          return accountPermissions;
+         auto fixedPermissions = permissions | boost::adaptors::transformed([](const string &p) {
+                                    vector<string> pieces;
+                                    boost::algorithm::split(pieces, p, boost::algorithm::is_any_of("@"));
+                                    if (pieces.size() == 1)
+                                       pieces.push_back("active");
+                                    return chain::permission_level{.actor = pieces[0], .permission = pieces[1]};
+                                 });
+         vector<chain::permission_level> accountPermissions;
+         boost::range::copy(fixedPermissions, back_inserter(accountPermissions));
+         return accountPermissions;
       }
 
-     
-     void eoc_relay_plugin::init_eoc_relay_plugin(const variables_map&options)
-     {
+      void eoc_relay_plugin::init_eoc_relay_plugin(const variables_map &options)
+      {
 
          //peer_log_format = options.at( "peer-log-format" ).as<string>();
 
-         relay_->network_version_match = options.at( "network-version-match" ).as<bool>();
+         relay_->network_version_match = options.at("network-version-match").as<bool>();
 
-       
-         relay_->sync_master.reset( new eoc_icp::icp_sync_manager( options.at( "sync-fetch-span" ).as<uint32_t>()));
-         relay_->connector_period = std::chrono::seconds( options.at( "connection-cleanup-period" ).as<int>());
+         relay_->sync_master.reset(new eoc_icp::icp_sync_manager(options.at("sync-fetch-span").as<uint32_t>()));
+         relay_->connector_period = std::chrono::seconds(options.at("connection-cleanup-period").as<int>());
          relay_->max_cleanup_time_ms = options.at("max-cleanup-time-msec").as<int>();
          relay_->txn_exp_period = def_txn_expire_wait;
          relay_->resp_expected_period = def_resp_expected_wait;
-        // relay_->dispatcher->just_send_it_max = options.at( "max-implicit-request" ).as<uint32_t>();
-         relay_->max_client_count = options.at( "max-clients" ).as<int>();
-         relay_->max_nodes_per_host = options.at( "p2p-max-nodes-per-host" ).as<int>();
+         // relay_->dispatcher->just_send_it_max = options.at( "max-implicit-request" ).as<uint32_t>();
+         relay_->max_client_count = options.at("max-clients").as<int>();
+         relay_->max_nodes_per_host = options.at("p2p-max-nodes-per-host").as<int>();
          relay_->num_clients = 0;
          relay_->started_sessions = 0;
 
-         relay_->use_socket_read_watermark = options.at( "use-socket-read-watermark" ).as<bool>();
+         relay_->use_socket_read_watermark = options.at("use-socket-read-watermark").as<bool>();
 
-         relay_->resolver = std::make_shared<tcp::resolver>( std::ref( app().get_io_service()));
-         
-         if( options.count( "eoc-relay-endpoint" )) {
-            relay_->p2p_address = options.at( "eoc-relay-endpoint" ).as<string>();
-            auto host = relay_->p2p_address.substr( 0, relay_->p2p_address.find( ':' ));
-            auto port = relay_->p2p_address.substr( host.size() + 1, relay_->p2p_address.size());
-            idump((host)( port ));
-            tcp::resolver::query query( tcp::v4(), host.c_str(), port.c_str());
+         relay_->resolver = std::make_shared<tcp::resolver>(std::ref(app().get_io_service()));
+
+         if (options.count("eoc-relay-endpoint"))
+         {
+            relay_->p2p_address = options.at("eoc-relay-endpoint").as<string>();
+            auto host = relay_->p2p_address.substr(0, relay_->p2p_address.find(':'));
+            auto port = relay_->p2p_address.substr(host.size() + 1, relay_->p2p_address.size());
+            idump((host)(port));
+            tcp::resolver::query query(tcp::v4(), host.c_str(), port.c_str());
             // Note: need to add support for IPv6 too?
-            relay_->listen_endpoint = *relay_->resolver->resolve( query );
-            relay_->acceptor.reset( new tcp::acceptor( app().get_io_service()));
-            
-         } else {
-            if( relay_->listen_endpoint.address().to_v4() == address_v4::any()) {
+            relay_->listen_endpoint = *relay_->resolver->resolve(query);
+            relay_->acceptor.reset(new tcp::acceptor(app().get_io_service()));
+         }
+         else
+         {
+            if (relay_->listen_endpoint.address().to_v4() == address_v4::any())
+            {
                boost::system::error_code ec;
-               auto host = host_name( ec );
-               if( ec.value() != boost::system::errc::success ) {
+               auto host = host_name(ec);
+               if (ec.value() != boost::system::errc::success)
+               {
 
-                  FC_THROW_EXCEPTION( fc::invalid_arg_exception,
-                                      "Unable to retrieve host_name. ${msg}", ("msg", ec.message()));
-
+                  FC_THROW_EXCEPTION(fc::invalid_arg_exception,
+                                     "Unable to retrieve host_name. ${msg}", ("msg", ec.message()));
                }
-               auto port = relay_->p2p_address.substr( relay_->p2p_address.find( ':' ), relay_->p2p_address.size());
+               auto port = relay_->p2p_address.substr(relay_->p2p_address.find(':'), relay_->p2p_address.size());
                relay_->p2p_address = host + port;
             }
          }
 
          auto endpoint = options["eoc-relay-endpoint"].as<string>();
-                  relay_->endpoint_address_ = endpoint.substr(0, endpoint.find(':'));
-                  relay_->endpoint_port_ = static_cast<uint16_t>(std::stoul(endpoint.substr(endpoint.find(':') + 1, endpoint.size())));
-                  ilog("icp_relay_plugin listening on ${host}:${port}", ("host", relay_->endpoint_address_)("port", relay_->endpoint_port_));
-
-
-     }
-
-      void eoc_relay_plugin::plugin_initialize(const variables_map& options) {
-          try
-          {
-              relay_ = std::make_shared<eoc_icp::relay>();
-              relay_->chain_plug = app().find_plugin<chain_plugin>();
-                  EOS_ASSERT(relay_->chain_plug, chain::missing_chain_plugin_exception, "");
-
-                  if (options.count("eoc-relay-connect"))
-                  {
-                      relay_->connect_to_peers_ = options.at("eoc-relay-connect").as<vector<string>>();
-                      relay_->supplied_peers= relay_->connect_to_peers_;
-                  }
-
-                  FC_ASSERT(options.count("eoc-relay-peer-chain-id"), "option --icp-relay-peer-chain-id must be specified");
-                  relay_->local_contract_ = account_name(options.at("eoc-relay-local-contract").as<string>());
-                  relay_->peer_contract_ = account_name(options.at("eoc-relay-peer-contract").as<string>());
-                  relay_->peer_chain_id_ = chain_id_type(options.at("eoc-relay-peer-chain-id").as<string>());
-                  relay_->signer_ = get_eoc_account_permissions(vector<string>{options.at("eoc-relay-signer").as<string>()});
-                   if( options.count( "agent-name" )) {
-                     relay_->user_agent_name = options.at( "agent-name" ).as<string>();
-                    }
-
-                if( options.count( "peer-key" )) {
-                    const std::vector<std::string> key_strings = options["peer-key"].as<std::vector<std::string>>();
-                    for( const std::string& key_string : key_strings ) {
-                        relay_->allowed_peers.push_back( icp_dejsonify<chain::public_key_type>( key_string ));
-                    }
-                }
-
-                if( options.count( "peer-private-key" )) {
-                    const std::vector<std::string> key_id_to_wif_pair_strings = options["peer-private-key"].as<std::vector<std::string>>();
-                    for( const std::string& key_id_to_wif_pair_string : key_id_to_wif_pair_strings ) {
-                    auto key_id_to_wif_pair = icp_dejsonify<std::pair<chain::public_key_type, std::string> >(
-                     key_id_to_wif_pair_string );
-                    relay_->private_keys[key_id_to_wif_pair.first] = fc::crypto::private_key( key_id_to_wif_pair.second );
-                    }
-                }
-
-              relay_->chain_id = app().get_plugin<chain_plugin>().get_chain_id();
-              fc::rand_pseudo_bytes( relay_->node_id.data(), relay_->node_id.data_size());
-              ilog( "my node_id is ${id}", ("id", relay_->node_id));
-
-             if( options.count( "icp-allowed-connection" )) {
-            const std::vector<std::string> allowed_remotes = options["allowed-connection"].as<std::vector<std::string>>();
-            for( const std::string& allowed_remote : allowed_remotes ) {
-               if( allowed_remote == "any" )
-                  relay_->allowed_connections |= eoc_icp::relay::Any;
-               else if( allowed_remote == "producers" )
-                  relay_->allowed_connections |= eoc_icp::relay::Producers;
-               else if( allowed_remote == "specified" )
-                  relay_->allowed_connections |= eoc_icp::relay::Specified;
-               else if( allowed_remote == "none" )
-                  relay_->allowed_connections = eoc_icp::relay::None;
-            }
-         }
-
-
-                init_eoc_relay_plugin(options);
-        }
-           
-            FC_LOG_AND_RETHROW()
+         relay_->endpoint_address_ = endpoint.substr(0, endpoint.find(':'));
+         relay_->endpoint_port_ = static_cast<uint16_t>(std::stoul(endpoint.substr(endpoint.find(':') + 1, endpoint.size())));
+         ilog("icp_relay_plugin listening on ${host}:${port}", ("host", relay_->endpoint_address_)("port", relay_->endpoint_port_));
       }
 
-     
-      void eoc_relay_plugin::plugin_startup() {
-            ilog("starting eoc_relay_plugin");
-            //sendstartaction();
-             auto& chain = app().get_plugin<chain_plugin>().chain();
-            FC_ASSERT(chain.get_read_mode() != chain::db_read_mode::IRREVERSIBLE, "icp is not compatible with \"irreversible\" read_mode");
+      void eoc_relay_plugin::plugin_initialize(const variables_map &options)
+      {
+         try
+         {
+            relay_ = std::make_shared<eoc_icp::relay>();
+            relay_->chain_plug = app().find_plugin<chain_plugin>();
+            EOS_ASSERT(relay_->chain_plug, chain::missing_chain_plugin_exception, "");
 
-            relay_->start();
-            chain::controller&cc = relay_->chain_plug->chain();
+            if (options.count("eoc-relay-connect"))
             {
-                cc.applied_transaction.connect( boost::bind(&eoc_icp::relay::on_applied_transaction, relay_.get(), _1));
-                cc.accepted_block_with_action_digests.connect( boost::bind(&eoc_icp::relay::on_accepted_block, relay_.get(), _1) );
-                cc.irreversible_block.connect(boost::bind(&eoc_icp::relay::on_irreversible_block, relay_.get(), _1) );
+               relay_->connect_to_peers_ = options.at("eoc-relay-connect").as<vector<string>>();
+               relay_->supplied_peers = relay_->connect_to_peers_;
             }
 
-             relay_->start_monitors();
-
-      for( auto seed_node : relay_->connect_to_peers_ ) {
-         connect( seed_node );
-      }
-
-      if(fc::get_logger_map().find(icp_logger_name) != fc::get_logger_map().end())
-         icp_logger = fc::get_logger_map()[icp_logger_name];
-
-
-   // Make the magic happen
-      }
-
-     eoc_icp::read_only eoc_relay_plugin::get_read_only_api()
-     {
-        return relay_->get_read_only_api();
-     }
-   eoc_icp::read_write eoc_relay_plugin::get_read_write_api()
-   {
-       return relay_->get_read_write_api();
-   }
-
-      void eoc_relay_plugin::plugin_shutdown() {
-        // OK, that's enough magic
-        try {
-         ilog( "shutdown.." );
-         relay_->done = true;
-         if( relay_->acceptor ) {
-            ilog( "close acceptor" );
-            relay_->acceptor->close();
-
-            ilog( "close ${s} connections",( "s",relay_->connections.size()) );
-            auto cons = relay_->connections;
-            for( auto con : cons ) {
-               relay_->close( con);
+            FC_ASSERT(options.count("eoc-relay-peer-chain-id"), "option --icp-relay-peer-chain-id must be specified");
+            relay_->local_contract_ = account_name(options.at("eoc-relay-local-contract").as<string>());
+            relay_->peer_contract_ = account_name(options.at("eoc-relay-peer-contract").as<string>());
+            relay_->peer_chain_id_ = chain_id_type(options.at("eoc-relay-peer-chain-id").as<string>());
+            relay_->signer_ = get_eoc_account_permissions(vector<string>{options.at("eoc-relay-signer").as<string>()});
+            if (options.count("agent-name"))
+            {
+               relay_->user_agent_name = options.at("agent-name").as<string>();
             }
 
-            relay_->acceptor.reset(nullptr);
+            if (options.count("peer-key"))
+            {
+               const std::vector<std::string> key_strings = options["peer-key"].as<std::vector<std::string>>();
+               for (const std::string &key_string : key_strings)
+               {
+                  relay_->allowed_peers.push_back(icp_dejsonify<chain::public_key_type>(key_string));
+               }
+            }
+
+            if (options.count("peer-private-key"))
+            {
+               const std::vector<std::string> key_id_to_wif_pair_strings = options["peer-private-key"].as<std::vector<std::string>>();
+               for (const std::string &key_id_to_wif_pair_string : key_id_to_wif_pair_strings)
+               {
+                  auto key_id_to_wif_pair = icp_dejsonify<std::pair<chain::public_key_type, std::string>>(
+                      key_id_to_wif_pair_string);
+                  relay_->private_keys[key_id_to_wif_pair.first] = fc::crypto::private_key(key_id_to_wif_pair.second);
+               }
+            }
+
+            relay_->chain_id = app().get_plugin<chain_plugin>().get_chain_id();
+            fc::rand_pseudo_bytes(relay_->node_id.data(), relay_->node_id.data_size());
+            ilog("my node_id is ${id}", ("id", relay_->node_id));
+
+            if (options.count("icp-allowed-connection"))
+            {
+               const std::vector<std::string> allowed_remotes = options["allowed-connection"].as<std::vector<std::string>>();
+               for (const std::string &allowed_remote : allowed_remotes)
+               {
+                  if (allowed_remote == "any")
+                     relay_->allowed_connections |= eoc_icp::relay::Any;
+                  else if (allowed_remote == "producers")
+                     relay_->allowed_connections |= eoc_icp::relay::Producers;
+                  else if (allowed_remote == "specified")
+                     relay_->allowed_connections |= eoc_icp::relay::Specified;
+                  else if (allowed_remote == "none")
+                     relay_->allowed_connections = eoc_icp::relay::None;
+               }
+            }
+
+            init_eoc_relay_plugin(options);
          }
-         ilog( "exit shutdown" );
-        }
-      FC_CAPTURE_AND_RETHROW()
+
+         FC_LOG_AND_RETHROW()
       }
 
-     string  eoc_relay_plugin::connect( const string& host )
-     {
-         if( relay_->find_connection( host ) )
-         return "already connected";
+      void eoc_relay_plugin::plugin_startup()
+      {
+         ilog("starting eoc_relay_plugin");
+         //sendstartaction();
+         auto &chain = app().get_plugin<chain_plugin>().chain();
+         FC_ASSERT(chain.get_read_mode() != chain::db_read_mode::IRREVERSIBLE, "icp is not compatible with \"irreversible\" read_mode");
 
-      eoc_icp::icp_connection_ptr c = std::make_shared<eoc_icp::icp_connection>(host);
-      //fc_dlog(logger,"adding new connection to the list");
-      relay_->connections.insert( c );
-      //fc_dlog(logger,"calling active connector");
-      relay_->connect( c );
-      return "added connection";
-     }
+         relay_->start();
+         chain::controller &cc = relay_->chain_plug->chain();
+         {
+            cc.applied_transaction.connect(boost::bind(&eoc_icp::relay::on_applied_transaction, relay_.get(), _1));
+            cc.accepted_block_with_action_digests.connect(boost::bind(&eoc_icp::relay::on_accepted_block, relay_.get(), _1));
+            cc.irreversible_block.connect(boost::bind(&eoc_icp::relay::on_irreversible_block, relay_.get(), _1));
+         }
 
+         relay_->start_monitors();
 
-    eoc_icp::relay* eoc_relay_plugin::get_relay_pointer()
-     {
+         for (auto seed_node : relay_->connect_to_peers_)
+         {
+            connect(seed_node);
+         }
+
+         if (fc::get_logger_map().find(icp_logger_name) != fc::get_logger_map().end())
+            icp_logger = fc::get_logger_map()[icp_logger_name];
+
+         // Make the magic happen
+      }
+
+      eoc_icp::read_only eoc_relay_plugin::get_read_only_api()
+      {
+         return relay_->get_read_only_api();
+      }
+      eoc_icp::read_write eoc_relay_plugin::get_read_write_api()
+      {
+         return relay_->get_read_write_api();
+      }
+
+      void eoc_relay_plugin::plugin_shutdown()
+      {
+         // OK, that's enough magic
+         try
+         {
+            ilog("shutdown..");
+            relay_->done = true;
+            if (relay_->acceptor)
+            {
+               ilog("close acceptor");
+               relay_->acceptor->close();
+
+               ilog("close ${s} connections", ("s", relay_->connections.size()));
+               auto cons = relay_->connections;
+               for (auto con : cons)
+               {
+                  relay_->close(con);
+               }
+
+               relay_->acceptor.reset(nullptr);
+            }
+            ilog("exit shutdown");
+         }
+         FC_CAPTURE_AND_RETHROW()
+      }
+
+      string eoc_relay_plugin::connect(const string &host)
+      {
+         if (relay_->find_connection(host))
+            return "already connected";
+
+         eoc_icp::icp_connection_ptr c = std::make_shared<eoc_icp::icp_connection>(host);
+         //fc_dlog(logger,"adding new connection to the list");
+         relay_->connections.insert(c);
+         //fc_dlog(logger,"calling active connector");
+         relay_->connect(c);
+         return "added connection";
+      }
+
+      eoc_icp::relay *eoc_relay_plugin::get_relay_pointer()
+      {
          return relay_.get();
-     }
-
+      }
 }
