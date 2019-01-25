@@ -140,7 +140,7 @@ private:
 
    void cleanup();
    // void cleanup_sequences();
-
+   void update_send_transaction_index(const send_transaction& t);
    std::unique_ptr<boost::asio::io_context> ioc_;
    std::vector<std::thread> socket_threads_;
    

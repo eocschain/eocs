@@ -235,15 +235,37 @@ void relay::update_local_head(bool force) {
       return icp_connection_ptr();
  }
 
+void relay::update_send_transaction_index(const send_transaction& t)
+{
+   auto &transaction_set = send_transactions_.get<by_id>();
+   auto trace_iter = transaction_set.find(t.id);
+   if(trace_iter == transaction_set.end())
+   {
+      ilog("insert transaction  ${id} success !!!",("id",t.id));
+      send_transactions_.insert(t);
+      return ;
+   }
+
+   bool b_change = send_transactions_.replace(trace_iter,t);
+   if(!b_change)
+   {
+      ilog("update_send_transaction_index ${id} failed !!!",("id",t.id));
+      return;
+   }
+
+   ilog("update transaction  ${id} success !!!",("id",t.id));
+   
+}
+
+
 void relay::on_applied_transaction(const transaction_trace_ptr& t) {
    //ilog("on applied transaction");
-   /*
-   if (send_transactions_.find(t->id) != send_transactions_.end()) 
+   auto &transaction_set = send_transactions_.get<by_id>();
+   auto trace_iter = transaction_set.find(t->id);
+   if(trace_iter != transaction_set.end())
    {
-      ilog("send_transactions has found");
-      return; // has been handled
+      ilog("transaction_trace has found ${id}",("id",t->id));
    }
-   */
    send_transaction st{t->id, t->block_num};
    ilog("on applied transaction action dumy,${id},${b_num}",("id",t->id)("b_num",t->block_num));
 
@@ -317,7 +339,8 @@ void relay::on_applied_transaction(const transaction_trace_ptr& t) {
 
    if (st.empty()) return;
 
-   send_transactions_.insert(st);
+   //send_transactions_.insert(st);
+    update_send_transaction_index(st);
 }
 
 void relay::clear_cache_block_state() {

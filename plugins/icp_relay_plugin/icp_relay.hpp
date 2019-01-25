@@ -89,6 +89,7 @@ private:
    void push_icp_actions(const sequence_ptr& s, recv_transaction&& rt);
 
    void cleanup();
+   void update_send_transaction_index(const send_transaction& t);
    // void cleanup_sequences();
 
    std::unique_ptr<boost::asio::io_context> ioc_;
