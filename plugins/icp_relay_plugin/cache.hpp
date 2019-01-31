@@ -10,7 +10,7 @@ using namespace eosio::chain;
 // TODO: configurable
 constexpr uint32_t MAX_CACHED_BLOCKS = 50; // 1000
 constexpr uint32_t MIN_CACHED_BLOCKS = 20; // 100
-constexpr uint32_t DUMMY_ICP_SECONDS = 20; // 3600
+constexpr uint32_t DUMMY_ICP_SECONDS = 40; // 3600
 // constexpr uint32_t MAX_CLEANUP_SEQUENCES = 3;
 constexpr uint32_t MAX_CLEANUP_NUM = 10;
 

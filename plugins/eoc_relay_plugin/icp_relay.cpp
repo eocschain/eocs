@@ -792,7 +792,7 @@ void relay::on_irreversible_block(const block_state_ptr& s) {
    }
 
 
-   if (txs.empty()) {
+  // if (txs.empty()) {
       if (fc::time_point::now() - last_transaction_time_ >= fc::seconds(DUMMY_ICP_SECONDS) and peer_head_.valid()) {
          app().get_io_service().post([=] {
             action a;
@@ -802,10 +802,10 @@ void relay::on_irreversible_block(const block_state_ptr& s) {
          });
          last_transaction_time_ = fc::time_point::now();
       }
-      return;
-   }
+   //   return;
+   //}
 
-   last_transaction_time_ = fc::time_point::now();
+   //last_transaction_time_ = fc::time_point::now();
 
    auto bit = block_with_action_digests_.find(s->id);
    if (bit == block_with_action_digests_.end()) {
