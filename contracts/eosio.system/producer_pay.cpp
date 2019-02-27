@@ -211,32 +211,6 @@ namespace eosiosystem {
 
       int64_t voter_vote_vpay = (prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000) * voter_info.staked * (curr_block_num - voter_info.vote_update_height) / total_voteage;
 
-      print("ren rewards test");
-      int64_t testa = prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000;
-      print(testa);
-      print("bbb");
-      int64_t testb = voter_info.staked*(curr_block_num - voter_info.vote_update_height)/total_voteage;
-      print(testb);
-      print("what why");
-      print(curr_block_num);
-      print("oror");
-      print(voter_info.vote_update_height);
-      print("and");
-      print(total_voteage_add);
-      print("aaa");
-      print(total_voteage);
-      print("bbb");
-      print(voter_rote_pay);
-      print("ccc ");
-      print(voter_info.staked);
-      print("ddd");
-      print(prod.total_stake);
-      print("eee");
-      print(prod.total_votes);
-      print("fff");
-      print(voter_info.last_vote_weight);
-      print(" ren rewards test end");
-
       _gstate.pervote_bucket      -= producer_per_vote_pay;
       _gstate.perblock_bucket     -= producer_per_block_pay;
       _gstate.total_unpaid_blocks -= prod.unpaid_blocks;
