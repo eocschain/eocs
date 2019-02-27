@@ -23,7 +23,7 @@ namespace eosiosystem {
 
       require_auth(N(eosio));
 
-      /** until activated stake crosses this threshold no new rewards are paid */
+      /** until  activated stake crosses this threshold no new rewards are paid */
       if( _gstate.total_activated_stake < _gstate.min_activated_stake )
          return;
 
