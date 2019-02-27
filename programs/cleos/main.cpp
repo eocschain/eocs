@@ -1430,7 +1430,7 @@ struct roterewards_subcommand {
 
 struct setcomrate_subcommand {
    string owner;
-   uint8_t commission_rate;
+   uint16_t commission_rate;
 
    setcomrate_subcommand(CLI::App* actionRoot) {
       auto set_commission_rate = actionRoot->add_subcommand("setcomrate", localized("set commission_rate"));

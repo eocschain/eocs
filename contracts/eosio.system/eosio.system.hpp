@@ -83,7 +83,7 @@ namespace eosiosystem {
       uint64_t              last_claim_time = 0;
       uint16_t              location = 0;
 
-      uint8_t              commission_rate = 2000; // 0 - 10000 for 0% - 100%
+      uint16_t              commission_rate = 2000; // 0 - 10000 for 0% - 100%
       int64_t               total_stake     = 0; // sum( every voter's stake ) 
       int64_t               total_voteage   = 0; // sum( all voter's stake * every block height )
       uint32_t              voteage_update_height = 0;
@@ -97,7 +97,7 @@ namespace eosiosystem {
       bool     active()const      { return is_active;                               }
       void     deactivate()       { producer_key = public_key(); is_active = false; }
 
-      void     update_commission_rate( uint8_t rate ) {
+      void     update_commission_rate( uint16_t rate ) {
          commission_rate = rate;
       }
 
@@ -246,7 +246,7 @@ namespace eosiosystem {
 
 	 void roterewards( const account_name& owner );
 
-         void setcomrate( const account_name& owner, uint8_t commission_rate );
+         void setcomrate( const account_name& owner, uint16_t commission_rate );
 
          void setpriv( account_name account, uint8_t ispriv );
 

@@ -241,7 +241,7 @@ namespace eosiosystem {
       }
    }
 
-   void system_contract::setcomrate( const account_name& owner, uint8_t commission_rate ) {
+   void system_contract::setcomrate( const account_name& owner, uint16_t commission_rate ) {
       require_auth(owner);
 
       const auto& prod = _producers.get( owner );
