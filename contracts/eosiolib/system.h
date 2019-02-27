@@ -86,6 +86,9 @@ extern "C" {
    uint32_t  now() {
       return (uint32_t)( current_time() / 1000000 );
    }
+
+   uint32_t  current_block_num();
+
    ///@ } systemcapi
 
 

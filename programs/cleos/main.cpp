@@ -1412,6 +1412,41 @@ struct claimrewards_subcommand {
    }
 };
 
+struct roterewards_subcommand {
+   string owner;
+
+   roterewards_subcommand(CLI::App* actionRoot) {
+      auto rote_rewards = actionRoot->add_subcommand("roterewards", localized("get rote rewards"));
+      rote_rewards->add_option("owner", owner, localized("The account to get rote rewards for"))->required();
+      add_standard_transaction_options(rote_rewards);
+
+      rote_rewards->set_callback([this] {
+         fc::variant act_payload = fc::mutable_variant_object()
+                  ("owner", owner);
+         send_actions({create_action({permission_level{owner,config::active_name}}, config::system_account_name, N(roterewards), act_payload)});
+      });
+   }
+};
+
+struct setcomrate_subcommand {
+   string owner;
+   uint8_t commission_rate;
+
+   setcomrate_subcommand(CLI::App* actionRoot) {
+      auto set_commission_rate = actionRoot->add_subcommand("setcomrate", localized("set commission_rate"));
+      set_commission_rate->add_option("owner", owner, localized("The account to set commission_rate"))->required();
+      set_commission_rate->add_option("commission_rate", commission_rate, localized("commission_rate for rewards"))->required();
+      add_standard_transaction_options(set_commission_rate);
+
+      set_commission_rate->set_callback([this] {
+         fc::variant act_payload = fc::mutable_variant_object()
+                  ("owner", owner)
+                  ("commission_rate", commission_rate);
+         send_actions({create_action({permission_level{owner,config::active_name}}, config::system_account_name, N(setcomrate), act_payload)});
+      });
+   }
+};
+
 struct regproxy_subcommand {
    string proxy;
 
@@ -3126,6 +3161,9 @@ int main( int argc, char** argv ) {
    auto sellram = sellram_subcommand(system);
 
    auto claimRewards = claimrewards_subcommand(system);
+
+   auto roteRewards = roterewards_subcommand(system);
+   auto setComRate = setcomrate_subcommand(system);
 
    auto regProxy = regproxy_subcommand(system);
    auto unregProxy = unregproxy_subcommand(system);

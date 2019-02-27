@@ -930,6 +930,10 @@ class system_api : public context_aware_api {
          return static_cast<uint64_t>( context.trx_context.published.time_since_epoch().count() );
       }
 
+      uint32_t current_block_num() {
+         return ( context.control.head_block_num() );
+      }
+
 };
 
 class context_free_system_api :  public context_aware_api {
@@ -1840,6 +1844,7 @@ REGISTER_INTRINSICS(permission_api,
 REGISTER_INTRINSICS(system_api,
    (current_time, int64_t()       )
    (publication_time,   int64_t() )
+   (current_block_num,  int() )
 );
 
 REGISTER_INTRINSICS(context_free_system_api,
