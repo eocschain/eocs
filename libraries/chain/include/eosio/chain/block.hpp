@@ -51,6 +51,10 @@ namespace eosio { namespace chain {
       }
    };
 
+   enum class block_extension_type : uint16_t {
+      producer_random_seed
+   };
+
 
    /**
     */
