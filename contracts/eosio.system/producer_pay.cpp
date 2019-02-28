@@ -216,7 +216,6 @@ namespace eosiosystem {
       _gstate.total_unpaid_blocks -= prod.unpaid_blocks;
 
       _producers.modify( prod, 0, [&](auto& p) {
-          p.last_claim_time = ct;
           p.unpaid_blocks = 0;
           p.bp_reward += producer_per_block_pay * (10000 - prod.commission_rate) / 10000;
           p.bp_vreward += producer_per_vote_pay * (10000 - prod.commission_rate) / 10000;

@@ -365,7 +365,7 @@ namespace eosiosystem {
                   v.staked = total_update.amount;
                });
          } else {
-            if( (from_voter->staked > 0) && (from_voter->has_voted == 1) ) {
+            if( (from_voter->staked > 0) && (from_voter->has_voted == 1) && (_gstate.total_activated_stake >= _gstate.min_activated_stake)) {
                const auto curr_block_num = current_block_num();
 
                const auto& voter_info = _voters.get( from );
@@ -434,7 +434,6 @@ namespace eosiosystem {
                _gstate.total_unpaid_blocks -= prod.unpaid_blocks;
 
                _producers.modify( prod, 0, [&](auto& p) {
-                  p.last_claim_time = ct;
                   p.unpaid_blocks = 0;
                   p.bp_reward += producer_per_block_pay * (10000 - prod.commission_rate) / 10000;
                   p.bp_vreward += producer_per_vote_pay * (10000 - prod.commission_rate) / 10000;
