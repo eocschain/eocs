@@ -136,9 +136,9 @@ namespace eosiosystem {
           p.bp_vreward = 0;
       });
 
-      if( producer_per_block_pay > 0 ) {
+      if( producer_block_pay > 0 ) {
          INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio.bpay),N(active)},
-                                                       { N(eosio.bpay), owner, asset(producer_per_block_pay), std::string("producer block pay") } );
+                                                       { N(eosio.bpay), owner, asset(producer_block_pay), std::string("producer block pay") } );
       }
       if( producer_per_last_vote_pay > 0 ) {
          INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio.vpay),N(active)},
