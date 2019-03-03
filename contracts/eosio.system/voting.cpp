@@ -202,7 +202,7 @@ namespace eosiosystem {
          }
       }
 
-      if (voter->has_voted == 0)
+      if (!voter->has_voted)
       {
          for( const auto& pd : producer_deltas ) {
             auto pitr = _producers.find( pd.first );
@@ -229,7 +229,7 @@ namespace eosiosystem {
 
       const auto& voter_info = _voters.get( voter_name );
       const account_name producer_name = voter_info.producers[0];
-      if ((voter->has_voted == 1) && (producer_name == producers[0]))
+      if (voter->has_voted && (producer_name == producers[0]))
       {
          const auto& prod = _producers.get( producer_name );
          eosio_assert( prod.active(), "producer does not have an active key" );
@@ -277,10 +277,11 @@ namespace eosiosystem {
                producer_per_vote_pay = 0;
             }
 
-            auto total_voteage_add = prod.total_stake * (curr_block_num - prod.voteage_update_height);
-            auto total_voteage = prod.total_voteage + total_voteage_add;
-            int64_t voter_rote_pay = (prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000) * voter_info.staked * (curr_block_num - voter_info.vote_update_height) / total_voteage;
-            int64_t voter_vote_vpay = (prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000) * voter_info.staked * (curr_block_num - voter_info.vote_update_height) / total_voteage;
+            auto total_voteage_add = static_cast<uint128_t>(double(prod.total_stake) * double(curr_block_num - prod.voteage_update_height));
+            auto total_voteage = static_cast<uint128_t>(prod.total_voteage + total_voteage_add);
+            auto voteage = static_cast<uint128_t>(double(voter_info.staked) * double(curr_block_num - voter_info.vote_update_height));
+            auto voter_rote_pay = static_cast<int64_t>(double(prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000) * double(voter_info.staked) * double(curr_block_num - voter_info.vote_update_height) / double(total_voteage));
+            auto voter_vote_vpay = static_cast<int64_t>(double(prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000) * double(voter_info.staked) * double(curr_block_num - voter_info.vote_update_height) / double(total_voteage));
 
             _gstate.pervote_bucket      -= producer_per_vote_pay;
             _gstate.perblock_bucket     -= producer_per_block_pay;
@@ -290,10 +291,9 @@ namespace eosiosystem {
                p.unpaid_blocks = 0;
                p.bp_reward += producer_per_block_pay * (10000 - prod.commission_rate) / 10000;
                p.bp_vreward += producer_per_vote_pay * (10000 - prod.commission_rate) / 10000;
-               //p.total_stake -= voter_info.staked;
-               p.total_voteage = total_voteage - voter_info.staked*(curr_block_num - voter_info.vote_update_height);
-               p.rote_reward = prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000 - voter_rote_pay;
-               p.vote_vreward = prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000 - voter_vote_vpay;
+               p.total_voteage = total_voteage - voteage;
+               p.rote_reward += producer_per_block_pay*prod.commission_rate/10000 - voter_rote_pay;
+               p.vote_vreward += producer_per_vote_pay*prod.commission_rate/10000 - voter_vote_vpay;
                p.voteage_update_height = curr_block_num;
 
                p.total_votes += voter_info.last_vote_weight;
@@ -323,7 +323,7 @@ namespace eosiosystem {
             });
          }
       }
-      if ((voter->has_voted == 1) && (producer_name != producers[0]))
+      if (voter->has_voted && (producer_name != producers[0]))
       {
          const auto& prod = _producers.get( producer_name );
          eosio_assert( prod.active(), "producer does not have an active key" );
@@ -373,10 +373,11 @@ namespace eosiosystem {
                producer_per_vote_pay = 0;
             }
 
-            auto total_voteage_add = prod.total_stake * (curr_block_num - prod.voteage_update_height);
-            auto total_voteage = prod.total_voteage + total_voteage_add;
-            int64_t voter_rote_pay = (prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000) * voter_info.staked * (curr_block_num - voter_info.vote_update_height) / total_voteage;
-            int64_t voter_vote_vpay = (prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000) * voter_info.staked * (curr_block_num - voter_info.vote_update_height) / total_voteage;
+            auto total_voteage_add = static_cast<uint128_t>(double(prod.total_stake) * double(curr_block_num - prod.voteage_update_height));
+            auto total_voteage = static_cast<uint128_t>(prod.total_voteage + total_voteage_add);
+            auto voteage = static_cast<uint128_t>(double(voter_info.staked) * double(curr_block_num - voter_info.vote_update_height));
+            auto voter_rote_pay = static_cast<int64_t>(double(prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000) * double(voter_info.staked) * double(curr_block_num - voter_info.vote_update_height) / double(total_voteage));
+            auto voter_vote_vpay = static_cast<int64_t>(double(prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000) * double(voter_info.staked) * double(curr_block_num - voter_info.vote_update_height) / double(total_voteage));
 
             _gstate.pervote_bucket      -= producer_per_vote_pay;
             _gstate.perblock_bucket     -= producer_per_block_pay;
@@ -387,9 +388,9 @@ namespace eosiosystem {
                p.bp_reward += producer_per_block_pay * (10000 - prod.commission_rate) / 10000;
                p.bp_vreward += producer_per_vote_pay * (10000 - prod.commission_rate) / 10000;
                p.total_stake -= voter_info.staked;
-               p.total_voteage = total_voteage - voter_info.staked*(curr_block_num - voter_info.vote_update_height);
-               p.rote_reward = prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000 - voter_rote_pay;
-               p.vote_vreward = prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000 - voter_vote_vpay;
+               p.total_voteage = total_voteage - voteage;
+               p.rote_reward += producer_per_block_pay*prod.commission_rate/10000 - voter_rote_pay;
+               p.vote_vreward += producer_per_vote_pay*prod.commission_rate/10000 - voter_vote_vpay;
                p.voteage_update_height = curr_block_num;
             });
 
@@ -431,7 +432,7 @@ namespace eosiosystem {
          av.producers = producers;
          av.proxy     = proxy;
          av.vote_update_height = curr_block_num;
-         av.has_voted = 1;
+         av.has_voted = true;
       });
    }
 

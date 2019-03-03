@@ -280,7 +280,7 @@
          {"name":"location",        "type":"uint16"},
          {"name":"commission_rate", "type":"uint16"},
          {"name":"total_stake",     "type":"uint64"},
-         {"name":"total_voteage",   "type":"uint64"},
+         {"name":"total_voteage",   "type":"uint128"},
          {"name":"voteage_update_height", "type":"uint32"},
          {"name":"rote_reward",     "type":"int64"},
          {"name":"bp_reward",       "type":"int64"},

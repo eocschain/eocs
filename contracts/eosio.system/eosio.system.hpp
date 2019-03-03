@@ -85,7 +85,7 @@ namespace eosiosystem {
 
       uint16_t              commission_rate = 2000; // 0 - 10000 for 0% - 100%
       int64_t               total_stake     = 0; // sum( every voter's stake ) 
-      int64_t               total_voteage   = 0; // sum( all voter's stake * every block height )
+      uint128_t             total_voteage   = 0; // sum( all voter's stake * every block height )
       uint32_t              voteage_update_height = 0;
       int64_t               rote_reward = 0; //reward to voter
       int64_t               bp_reward = 0; //reward to block producer
@@ -118,7 +118,7 @@ namespace eosiosystem {
       int64_t                     staked = 0;
 
       uint32_t                    vote_update_height = 0; //the block number when vote
-      bool                        has_voted = 0; //whether the voter has voted
+      bool                        has_voted = false; //whether the voter has voted
       uint64_t                    last_vote_time = 0;
 
       /**
