@@ -22,12 +22,6 @@
       "name": "deferfunc",
       "base": "",
       "fields": [{
-<<<<<<< HEAD
-          "name": "payload",
-          "type": "uint64"
-        }
-      ]
-=======
          "name": "payload",
          "type": "uint64"
       }]
@@ -44,7 +38,6 @@
          "name": "payload",
          "type": "uint64"
       }]
->>>>>>> otherb
     }
   ],
   "actions": [{
@@ -55,13 +48,10 @@
       "name": "deferfunc",
       "type": "deferfunc",
       "ricardian_contract": ""
-<<<<<<< HEAD
-=======
     },{
       "name": "inlinecall",
       "type": "inlinecall",
       "ricardian_contract": ""
->>>>>>> otherb
     }
   ],
   "tables": [],
