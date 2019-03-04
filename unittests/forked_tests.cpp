@@ -88,7 +88,11 @@ BOOST_AUTO_TEST_CASE( fork_with_bad_block ) try {
          auto& fork = forks.at(j);
 
          if (j <= i) {
+<<<<<<< HEAD
             auto copy_b = std::make_shared<signed_block>(*b);
+=======
+            auto copy_b = std::make_shared<signed_block>(b->clone());
+>>>>>>> otherb
             if (j == i) {
                // corrupt this block
                fork.block_merkle = remote.control->head_block_state()->blockroot_merkle;
@@ -277,10 +281,18 @@ BOOST_AUTO_TEST_CASE( forking ) try {
    }
    wlog( "end push c2 blocks to c1" );
    wlog( "now push dan's block to c1 but first corrupt it so it is a bad block" );
+<<<<<<< HEAD
    auto bad_block = *b;
    bad_block.transaction_mroot = bad_block.previous;
    c.control->abort_block();
    BOOST_REQUIRE_EXCEPTION(c.control->push_block( std::make_shared<signed_block>(bad_block) ), fc::exception,
+=======
+   signed_block bad_block = std::move(*b);
+   bad_block.transaction_mroot = bad_block.previous;
+   auto bad_block_bs = c.control->create_block_state_future( std::make_shared<signed_block>(std::move(bad_block)) );
+   c.control->abort_block();
+   BOOST_REQUIRE_EXCEPTION(c.control->push_block( bad_block_bs ), fc::exception,
+>>>>>>> otherb
       [] (const fc::exception &ex)->bool {
          return ex.to_detail_string().find("block not signed by expected key") != std::string::npos;
       });
@@ -345,6 +357,7 @@ BOOST_AUTO_TEST_CASE( prune_remove_branch ) try {
 
 } FC_LOG_AND_RETHROW() 
 
+<<<<<<< HEAD
 BOOST_AUTO_TEST_CASE(confirmation) try {
 
    tester c;
@@ -437,6 +450,8 @@ BOOST_AUTO_TEST_CASE(confirmation) try {
    BOOST_REQUIRE_EQUAL(55, blk81->bft_irreversible_blocknum); // bft irreversible number will propagate into new blocks
 
 } FC_LOG_AND_RETHROW()
+=======
+>>>>>>> otherb
 
 BOOST_AUTO_TEST_CASE( read_modes ) try {
    tester c;

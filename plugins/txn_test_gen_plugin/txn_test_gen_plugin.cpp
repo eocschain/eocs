@@ -1,11 +1,18 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #include <eosio/txn_test_gen_plugin/txn_test_gen_plugin.hpp>
 #include <eosio/chain_plugin/chain_plugin.hpp>
 #include <eosio/chain/wast_to_wasm.hpp>
+<<<<<<< HEAD
 #include <eosio/utilities/key_conversion.hpp>
+=======
+>>>>>>> otherb
 
 #include <fc/variant.hpp>
 #include <fc/io/json.hpp>
@@ -88,6 +95,7 @@ using namespace eosio::chain;
    api_handle->call_name(vs.at(0).as<in_param0>(), vs.at(1).as<in_param1>(), result_handler);
 
 struct txn_test_gen_plugin_impl {
+<<<<<<< HEAD
    static void push_next_transaction(const std::shared_ptr<std::vector<signed_transaction>>& trxs, size_t index, const std::function<void(const fc::exception_ptr&)>& next ) {
       chain_plugin& cp = app().get_plugin<chain_plugin>();
       cp.accept_transaction( packed_transaction(trxs->at(index)), [=](const fc::static_variant<fc::exception_ptr, transaction_trace_ptr>& result){
@@ -101,6 +109,40 @@ struct txn_test_gen_plugin_impl {
             }
          }
       });
+=======
+
+   uint64_t _total_us = 0;
+   uint64_t _txcount = 0;
+
+   int _remain = 0;
+
+   void push_next_transaction(const std::shared_ptr<std::vector<signed_transaction>>& trxs, size_t index, const std::function<void(const fc::exception_ptr&)>& next ) {
+      chain_plugin& cp = app().get_plugin<chain_plugin>();
+
+      const int overlap = 20;
+      int end = std::min(index + overlap, trxs->size());
+      _remain = end - index;
+      for (int i = index; i < end; ++i) {
+         cp.accept_transaction( packed_transaction(trxs->at(i)), [=](const fc::static_variant<fc::exception_ptr, transaction_trace_ptr>& result){
+            if (result.contains<fc::exception_ptr>()) {
+               next(result.get<fc::exception_ptr>());
+            } else {
+               if (result.contains<transaction_trace_ptr>() && result.get<transaction_trace_ptr>()->receipt) {
+                  _total_us += result.get<transaction_trace_ptr>()->receipt->cpu_usage_us;
+                  ++_txcount;
+               }
+               --_remain;
+               if (_remain == 0 ) {
+                  if (end < trxs->size()) {
+                     push_next_transaction(trxs, index + overlap, next);
+                  } else {
+                     next(nullptr);
+                  }
+               }
+            }
+         });
+      }
+>>>>>>> otherb
    }
 
    void push_transactions( std::vector<signed_transaction>&& trxs, const std::function<void(fc::exception_ptr)>& next ) {
@@ -296,6 +338,7 @@ struct txn_test_gen_plugin_impl {
       try {
          controller& cc = app().get_plugin<chain_plugin>().chain();
          auto chainid = app().get_plugin<chain_plugin>().get_chain_id();
+<<<<<<< HEAD
          auto abi_serializer_max_time = app().get_plugin<chain_plugin>().get_abi_serializer_max_time();
 
          fc::crypto::private_key a_priv_key = fc::crypto::private_key::regenerate(fc::sha256(std::string(64, 'a')));
@@ -303,6 +346,13 @@ struct txn_test_gen_plugin_impl {
 
          static uint64_t nonce = static_cast<uint64_t>(fc::time_point::now().sec_since_epoch()) << 32;
          abi_serializer eosio_serializer(cc.db().find<account_object, by_name>(config::system_account_name)->get_abi(), abi_serializer_max_time);
+=======
+
+         static fc::crypto::private_key a_priv_key = fc::crypto::private_key::regenerate(fc::sha256(std::string(64, 'a')));
+         static fc::crypto::private_key b_priv_key = fc::crypto::private_key::regenerate(fc::sha256(std::string(64, 'b')));
+
+         static uint64_t nonce = static_cast<uint64_t>(fc::time_point::now().sec_since_epoch()) << 32;
+>>>>>>> otherb
 
          uint32_t reference_block_num = cc.last_irreversible_block_num();
          if (txn_reference_block_lag >= 0) {
@@ -352,6 +402,14 @@ struct txn_test_gen_plugin_impl {
       timer.cancel();
       running = false;
       ilog("Stopping transaction generation test");
+<<<<<<< HEAD
+=======
+
+      if (_txcount) {
+         ilog("${d} transactions executed, ${t}us / transaction", ("d", _txcount)("t", _total_us / (double)_txcount));
+         _txcount = _total_us = 0;
+      }
+>>>>>>> otherb
    }
 
    boost::asio::high_resolution_timer timer{app().get_io_service()};

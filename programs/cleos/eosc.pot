@@ -343,6 +343,7 @@ msgstr ""
 msgid "set or update blockchain action state"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Transfer EOS from account to account"
 msgstr ""
 
@@ -353,6 +354,18 @@ msgid "The account receiving EOS"
 msgstr ""
 
 msgid "The amount of EOS to send"
+=======
+msgid "Transfer tokens from account to account"
+msgstr ""
+
+msgid "The account sending tokens"
+msgstr ""
+
+msgid "The account receiving tokens"
+msgstr ""
+
+msgid "The amount of tokens to send"
+>>>>>>> otherb
 msgstr ""
 
 msgid "The memo for the transfer"

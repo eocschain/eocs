@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #pragma once
 
@@ -84,7 +88,12 @@ namespace eosio { namespace chain {
                               const flat_set<permission_level>&    provided_permissions = flat_set<permission_level>(),
                               fc::microseconds                     provided_delay = fc::microseconds(0),
                               const std::function<void()>&         checktime = std::function<void()>(),
+<<<<<<< HEAD
                               bool                                 allow_unused_keys = false
+=======
+                              bool                                 allow_unused_keys = false,
+                              const flat_set<permission_level>&    satisfied_authorizations = flat_set<permission_level>()
+>>>>>>> otherb
                             )const;
 
 

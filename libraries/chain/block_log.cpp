@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #include <eosio/chain/block_log.hpp>
 #include <eosio/chain/exceptions.hpp>
@@ -473,7 +477,11 @@ namespace eosio { namespace chain {
             old_block_stream.read( reinterpret_cast<char*>(&tmp_pos), sizeof(tmp_pos) );
          }
          if( pos != tmp_pos ) {
+<<<<<<< HEAD
             bad_block = tmp;
+=======
+            bad_block.emplace(std::move(tmp));
+>>>>>>> otherb
             break;
          }
 

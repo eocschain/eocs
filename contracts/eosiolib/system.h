@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #pragma once
 #include <eosiolib/types.h>
@@ -86,9 +90,12 @@ extern "C" {
    uint32_t  now() {
       return (uint32_t)( current_time() / 1000000 );
    }
+<<<<<<< HEAD
 
    uint32_t  current_block_num();
 
+=======
+>>>>>>> otherb
    ///@ } systemcapi
 
 

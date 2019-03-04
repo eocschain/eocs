@@ -16,9 +16,12 @@
 #include <noop/noop.wast.hpp>
 #include <noop/noop.abi.hpp>
 
+<<<<<<< HEAD
 #include <eosio.system/eosio.system.wast.hpp>
 #include <eosio.system/eosio.system.abi.hpp>
 
+=======
+>>>>>>> otherb
 #include <fc/io/fstream.hpp>
 
 #include <Runtime/Runtime.h>
@@ -517,6 +520,7 @@ BOOST_FIXTURE_TEST_CASE(misaligned_tests, tester ) try {
    check_aligned(misaligned_const_ref_wast);
 } FC_LOG_AND_RETHROW()
 
+<<<<<<< HEAD
 // test cpu usage
 
 /*  Comment out this test due to not being robust to changes
@@ -587,6 +591,8 @@ BOOST_FIXTURE_TEST_CASE(cpu_usage_tests, tester ) try {
 */
 
 
+=======
+>>>>>>> otherb
 // test weighted cpu limit
 BOOST_FIXTURE_TEST_CASE(weighted_cpu_limit_tests, tester ) try {
 // TODO Increase the robustness of this test.

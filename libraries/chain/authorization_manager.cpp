@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 
 #include <eosio/chain/authorization_manager.hpp>
@@ -431,7 +435,12 @@ namespace eosio { namespace chain {
                                                const flat_set<permission_level>&    provided_permissions,
                                                fc::microseconds                     provided_delay,
                                                const std::function<void()>&         _checktime,
+<<<<<<< HEAD
                                                bool                                 allow_unused_keys
+=======
+                                               bool                                 allow_unused_keys,
+                                               const flat_set<permission_level>&    satisfied_authorizations
+>>>>>>> otherb
                                              )const
    {
       const auto& checktime = ( static_cast<bool>(_checktime) ? _checktime : _noop_checktime );
@@ -488,9 +497,17 @@ namespace eosio { namespace chain {
                }
             }
 
+<<<<<<< HEAD
             auto res = permissions_to_satisfy.emplace( declared_auth, delay );
             if( !res.second && res.first->second > delay) { // if the declared_auth was already in the map and with a higher delay
                res.first->second = delay;
+=======
+            if( satisfied_authorizations.find( declared_auth ) == satisfied_authorizations.end() ) {
+               auto res = permissions_to_satisfy.emplace( declared_auth, delay );
+               if( !res.second && res.first->second > delay) { // if the declared_auth was already in the map and with a higher delay
+                  res.first->second = delay;
+               }
+>>>>>>> otherb
             }
          }
       }

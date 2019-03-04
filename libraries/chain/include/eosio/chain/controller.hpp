@@ -11,7 +11,13 @@
 namespace chainbase {
    class database;
 }
+<<<<<<< HEAD
 
+=======
+namespace boost { namespace asio {
+   class thread_pool;
+}}
+>>>>>>> otherb
 
 namespace eosio { namespace chain {
 
@@ -27,11 +33,18 @@ namespace eosio { namespace chain {
 
    class dynamic_global_property_object;
    class global_property_object;
+<<<<<<< HEAD
    class core_symbol_object;
+=======
+>>>>>>> otherb
    class permission_object;
    class account_object;
    using resource_limits::resource_limits_manager;
    using apply_handler = std::function<void(apply_context&)>;
+<<<<<<< HEAD
+=======
+   using unapplied_transactions_type = map<transaction_id_type, transaction_metadata_ptr>;
+>>>>>>> otherb
 
    class fork_database;
 
@@ -51,6 +64,10 @@ namespace eosio { namespace chain {
       public:
 
          struct config {
+<<<<<<< HEAD
+=======
+            flat_set<account_name>   sender_bypass_whiteblacklist;
+>>>>>>> otherb
             flat_set<account_name>   actor_whitelist;
             flat_set<account_name>   actor_blacklist;
             flat_set<account_name>   contract_whitelist;
@@ -63,6 +80,11 @@ namespace eosio { namespace chain {
             uint64_t                 state_guard_size       =  chain::config::default_state_guard_size;
             uint64_t                 reversible_cache_size  =  chain::config::default_reversible_cache_size;
             uint64_t                 reversible_guard_size  =  chain::config::default_reversible_guard_size;
+<<<<<<< HEAD
+=======
+            uint32_t                 sig_cpu_bill_pct       =  chain::config::default_sig_cpu_bill_pct;
+            uint16_t                 thread_pool_size       =  chain::config::default_controller_thread_pool_size;
+>>>>>>> otherb
             bool                     read_only              =  false;
             bool                     force_all_checks       =  false;
             bool                     disable_replay_opts    =  false;
@@ -86,11 +108,19 @@ namespace eosio { namespace chain {
             incomplete  = 3, ///< this is an incomplete block (either being produced by a producer or speculatively produced by a node)
          };
 
+<<<<<<< HEAD
          controller( const config& cfg );
          ~controller();
 
          void add_indices();
          void startup( const snapshot_reader_ptr& snapshot = nullptr );
+=======
+         explicit controller( const config& cfg );
+         ~controller();
+
+         void add_indices();
+         void startup( std::function<bool()> shutdown, const snapshot_reader_ptr& snapshot = nullptr );
+>>>>>>> otherb
 
          /**
           * Starts a new pending block session upon which new transactions can
@@ -107,6 +137,7 @@ namespace eosio { namespace chain {
           *  The caller is responsible for calling drop_unapplied_transaction on a failing transaction that
           *  they never intend to retry
           *
+<<<<<<< HEAD
           *  @return vector of transactions which have been unapplied
           */
          vector<transaction_metadata_ptr> get_unapplied_transactions() const;
@@ -123,6 +154,11 @@ namespace eosio { namespace chain {
           * @return
           */
          vector<transaction_id_type> get_scheduled_transactions() const;
+=======
+          *  @return map of transactions which have been unapplied
+          */
+         unapplied_transactions_type& get_unapplied_transactions();
+>>>>>>> otherb
 
          /**
           *
@@ -140,6 +176,7 @@ namespace eosio { namespace chain {
          void commit_block();
          void pop_block();
 
+<<<<<<< HEAD
          void push_block( const signed_block_ptr& b, block_status s = block_status::complete );
 
          /**
@@ -147,6 +184,12 @@ namespace eosio { namespace chain {
           * the last bft irreversible block and/or cause a switch of forks
           */
          void push_confirmation( const header_confirmation& c );
+=======
+         std::future<block_state_ptr> create_block_state_future( const signed_block_ptr& b );
+         void push_block( std::future<block_state_ptr>& block_state_future );
+
+         boost::asio::thread_pool& get_thread_pool();
+>>>>>>> otherb
 
          const chainbase::database& db()const;
 
@@ -155,7 +198,10 @@ namespace eosio { namespace chain {
          const account_object&                 get_account( account_name n )const;
          const global_property_object&         get_global_properties()const;
          const dynamic_global_property_object& get_dynamic_global_properties()const;
+<<<<<<< HEAD
          const core_symbol_object& get_core_symbol()const;
+=======
+>>>>>>> otherb
          const resource_limits_manager&        get_resource_limits_manager()const;
          resource_limits_manager&              get_mutable_resource_limits_manager();
          const authorization_manager&          get_authorization_manager()const;
@@ -209,6 +255,11 @@ namespace eosio { namespace chain {
          sha256 calculate_integrity_hash()const;
          void write_snapshot( const snapshot_writer_ptr& snapshot )const;
 
+<<<<<<< HEAD
+=======
+         bool sender_avoids_whitelist_blacklist_enforcement( account_name sender )const;
+         void check_actor_list( const flat_set<account_name>& actors )const;
+>>>>>>> otherb
          void check_contract_list( account_name code )const;
          void check_action_list( account_name code, action_name action )const;
          void check_key_list( const public_key_type& key )const;
@@ -221,7 +272,10 @@ namespace eosio { namespace chain {
          bool is_resource_greylisted(const account_name &name) const;
          const flat_set<account_name> &get_resource_greylist() const;
 
+<<<<<<< HEAD
          void validate_referenced_accounts( const transaction& t )const;
+=======
+>>>>>>> otherb
          void validate_expiration( const transaction& t )const;
          void validate_tapos( const transaction& t )const;
          void validate_db_available_size() const;
@@ -249,7 +303,10 @@ namespace eosio { namespace chain {
          signal<void(const signed_block_ptr&)>         pre_accepted_block;
          signal<void(const block_state_ptr&)>          accepted_block_header;
          signal<void(const block_state_ptr&)>          accepted_block;
+<<<<<<< HEAD
          signal<void(const block_state_with_action_digests_ptr&)> accepted_block_with_action_digests;
+=======
+>>>>>>> otherb
          signal<void(const block_state_ptr&)>          irreversible_block;
          signal<void(const transaction_metadata_ptr&)> accepted_transaction;
          signal<void(const transaction_trace_ptr&)>    applied_transaction;

@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #pragma once
 #include <fc/exception/exception.hpp>
@@ -37,8 +41,11 @@ namespace eosio {
 
 #define SY(P,X) ::eosio::chain::string_to_symbol_c(P,#X)
 
+<<<<<<< HEAD
       uint64_t core_symbol(const string& s = "");
 
+=======
+>>>>>>> otherb
       static uint64_t string_to_symbol(uint8_t precision, const char* str) {
          try {
             uint32_t len = 0;
@@ -65,6 +72,7 @@ namespace eosio {
 
             static constexpr uint8_t max_precision = 18;
 
+<<<<<<< HEAD
             static symbol core_symbol() {
                 return symbol(::eosio::chain::core_symbol());
             }
@@ -75,6 +83,14 @@ namespace eosio {
                EOS_ASSERT(valid(), symbol_type_exception, "invalid symbol: ${name}", ("name",name()));
             }
             explicit symbol(): symbol(::eosio::chain::core_symbol())  {}
+=======
+            explicit symbol(uint8_t p, const char* s): m_value(string_to_symbol(p, s)) {
+               EOS_ASSERT(valid(), symbol_type_exception, "invalid symbol: ${s}", ("s",s));
+            }
+            explicit symbol(uint64_t v = CORE_SYMBOL): m_value(v) {
+               EOS_ASSERT(valid(), symbol_type_exception, "invalid symbol: ${name}", ("name",name()));
+            }
+>>>>>>> otherb
             static symbol from_string(const string& from)
             {
                try {
@@ -143,7 +159,11 @@ namespace eosio {
                return ds << s.to_string();
             }
 
+<<<<<<< HEAD
             void reflector_verify()const {
+=======
+            void reflector_init()const {
+>>>>>>> otherb
                EOS_ASSERT( decimals() <= max_precision, symbol_type_exception, "precision ${p} should be <= 18", ("p", decimals()) );
                EOS_ASSERT( valid_name(name()), symbol_type_exception, "invalid symbol: ${name}", ("name",name()));
             }

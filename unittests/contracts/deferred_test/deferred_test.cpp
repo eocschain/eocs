@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 
 #include <eosiolib/eosio.hpp>
@@ -35,6 +39,15 @@ class deferred_test : public eosio::contract {
          eosio_assert( payload != 13, "value 13 not allowed in payload" );
       }
 
+<<<<<<< HEAD
+=======
+      //@abi action
+      void inlinecall( account_name contract, account_name authorizer, uint64_t payload ) {
+         action a( {permission_level{authorizer, N(active)}}, contract, N(deferfunc), payload );
+         a.send();
+      }
+
+>>>>>>> otherb
    private:
 };
 
@@ -53,6 +66,11 @@ extern "C" {
             execute_action( &thiscontract, &deferred_test::defercall );
          } else if( action == N(deferfunc) ) {
             execute_action( &thiscontract, &deferred_test::deferfunc );
+<<<<<<< HEAD
+=======
+         } else if( action == N(inlinecall) ) {
+            execute_action( &thiscontract, &deferred_test::inlinecall );
+>>>>>>> otherb
          }
       }
    }

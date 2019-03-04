@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #pragma once
 #include <eosio/chain/name.hpp>
@@ -103,7 +107,26 @@ namespace eosio { namespace chain {
     */
    class shared_blob : public shared_string {
       public:
+<<<<<<< HEAD
          shared_blob() = default;
+=======
+         shared_blob() = delete;
+         shared_blob(shared_blob&&) = default;
+
+         shared_blob(const shared_blob& s)
+         :shared_string(s.get_allocator())
+         {
+            assign(s.c_str(), s.size());
+         }
+
+
+         shared_blob& operator=(const shared_blob& s) {
+            assign(s.c_str(), s.size());
+            return *this;
+         }
+
+         shared_blob& operator=(shared_blob&& ) = default;
+>>>>>>> otherb
 
          template <typename InputIterator>
          shared_blob(InputIterator f, InputIterator l, const allocator_type& a)
@@ -172,7 +195,10 @@ namespace eosio { namespace chain {
       account_history_object_type,              ///< Defined by history_plugin
       action_history_object_type,               ///< Defined by history_plugin
       reversible_block_object_type,
+<<<<<<< HEAD
       core_symbol_object_type,
+=======
+>>>>>>> otherb
       OBJECT_TYPE_COUNT ///< Sentry value which contains the number of different object types
    };
 

@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #pragma once
 
@@ -58,11 +62,20 @@ namespace eosio { namespace chain {
 
       transaction_id_type        id()const;
       digest_type                sig_digest( const chain_id_type& chain_id, const vector<bytes>& cfd = vector<bytes>() )const;
+<<<<<<< HEAD
       flat_set<public_key_type>  get_signature_keys( const vector<signature_type>& signatures,
                                                      const chain_id_type& chain_id,
                                                      const vector<bytes>& cfd = vector<bytes>(),
                                                      bool allow_duplicate_keys = false,
                                                      bool use_cache = true )const;
+=======
+      fc::microseconds           get_signature_keys( const vector<signature_type>& signatures,
+                                                     const chain_id_type& chain_id,
+                                                     fc::time_point deadline,
+                                                     const vector<bytes>& cfd,
+                                                     flat_set<public_key_type>& recovered_pub_keys,
+                                                     bool allow_duplicate_keys = false) const;
+>>>>>>> otherb
 
       uint32_t total_actions()const { return context_free_actions.size() + actions.size(); }
       account_name first_authorizor()const {
@@ -84,15 +97,30 @@ namespace eosio { namespace chain {
       : transaction(std::move(trx))
       , signatures(signatures)
       , context_free_data(context_free_data)
+<<<<<<< HEAD
       {
       }
+=======
+      {}
+      signed_transaction( transaction&& trx, const vector<signature_type>& signatures, vector<bytes>&& context_free_data)
+      : transaction(std::move(trx))
+      , signatures(signatures)
+      , context_free_data(std::move(context_free_data))
+      {}
+>>>>>>> otherb
 
       vector<signature_type>    signatures;
       vector<bytes>             context_free_data; ///< for each context-free action, there is an entry here
 
       const signature_type&     sign(const private_key_type& key, const chain_id_type& chain_id);
       signature_type            sign(const private_key_type& key, const chain_id_type& chain_id)const;
+<<<<<<< HEAD
       flat_set<public_key_type> get_signature_keys( const chain_id_type& chain_id, bool allow_duplicate_keys = false, bool use_cache = true )const;
+=======
+      fc::microseconds          get_signature_keys( const chain_id_type& chain_id, fc::time_point deadline,
+                                                    flat_set<public_key_type>& recovered_pub_keys,
+                                                    bool allow_duplicate_keys = false )const;
+>>>>>>> otherb
    };
 
    struct packed_transaction {
@@ -102,6 +130,7 @@ namespace eosio { namespace chain {
       };
 
       packed_transaction() = default;
+<<<<<<< HEAD
 
       explicit packed_transaction(const transaction& t, compression_type _compression = none)
       {
@@ -120,16 +149,68 @@ namespace eosio { namespace chain {
          set_transaction(t, std::move(t.context_free_data), _compression);
       }
 
+=======
+      packed_transaction(packed_transaction&&) = default;
+      explicit packed_transaction(const packed_transaction&) = default;
+      packed_transaction& operator=(const packed_transaction&) = delete;
+      packed_transaction& operator=(packed_transaction&&) = default;
+
+      explicit packed_transaction(const signed_transaction& t, compression_type _compression = none)
+      :signatures(t.signatures), compression(_compression), unpacked_trx(t)
+      {
+         local_pack_transaction();
+         local_pack_context_free_data();
+      }
+
+      explicit packed_transaction(signed_transaction&& t, compression_type _compression = none)
+      :signatures(t.signatures), compression(_compression), unpacked_trx(std::move(t))
+      {
+         local_pack_transaction();
+         local_pack_context_free_data();
+      }
+
+      // used by abi_serializer
+      packed_transaction( bytes&& packed_txn, vector<signature_type>&& sigs, bytes&& packed_cfd, compression_type _compression );
+      packed_transaction( bytes&& packed_txn, vector<signature_type>&& sigs, vector<bytes>&& cfd, compression_type _compression );
+      packed_transaction( transaction&& t, vector<signature_type>&& sigs, bytes&& packed_cfd, compression_type _compression );
+
+>>>>>>> otherb
       uint32_t get_unprunable_size()const;
       uint32_t get_prunable_size()const;
 
       digest_type packed_digest()const;
 
+<<<<<<< HEAD
+=======
+      transaction_id_type id()const { return unpacked_trx.id(); }
+      bytes               get_raw_transaction()const;
+
+      time_point_sec                expiration()const { return unpacked_trx.expiration; }
+      const vector<bytes>&          get_context_free_data()const { return unpacked_trx.context_free_data; }
+      const transaction&            get_transaction()const { return unpacked_trx; }
+      const signed_transaction&     get_signed_transaction()const { return unpacked_trx; }
+      const vector<signature_type>& get_signatures()const { return signatures; }
+      const fc::enum_type<uint8_t,compression_type>& get_compression()const { return compression; }
+      const bytes&                  get_packed_context_free_data()const { return packed_context_free_data; }
+      const bytes&                  get_packed_transaction()const { return packed_trx; }
+
+   private:
+      void local_unpack_transaction(vector<bytes>&& context_free_data);
+      void local_unpack_context_free_data();
+      void local_pack_transaction();
+      void local_pack_context_free_data();
+
+      friend struct fc::reflector<packed_transaction>;
+      friend struct fc::reflector_init_visitor<packed_transaction>;
+      void reflector_init();
+   private:
+>>>>>>> otherb
       vector<signature_type>                  signatures;
       fc::enum_type<uint8_t,compression_type> compression;
       bytes                                   packed_context_free_data;
       bytes                                   packed_trx;
 
+<<<<<<< HEAD
       time_point_sec     expiration()const;
       transaction_id_type id()const;
       transaction_id_type get_uncached_id()const; // thread safe
@@ -143,6 +224,11 @@ namespace eosio { namespace chain {
    private:
       mutable optional<transaction>           unpacked_trx; // <-- intermediate buffer used to retrieve values
       void local_unpack()const;
+=======
+   private:
+      // cache unpacked trx, for thread safety do not modify after construction
+      signed_transaction                      unpacked_trx;
+>>>>>>> otherb
    };
 
    using packed_transaction_ptr = std::shared_ptr<packed_transaction>;

@@ -11,9 +11,13 @@
 #include <eosio/chain/wasm_eosio_validation.hpp>
 #include <eosio/chain/wasm_eosio_injection.hpp>
 #include <eosio/chain/global_property_object.hpp>
+<<<<<<< HEAD
 #include <eosio/chain/core_symbol_object.hpp>
 #include <eosio/chain/account_object.hpp>
 #include <eosio/chain/symbol.hpp>
+=======
+#include <eosio/chain/account_object.hpp>
+>>>>>>> otherb
 #include <fc/exception/exception.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/sha1.hpp>
@@ -24,6 +28,10 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <fstream>
+<<<<<<< HEAD
+=======
+#include <string.h>
+>>>>>>> otherb
 
 namespace eosio { namespace chain {
    using namespace webassembly;
@@ -145,7 +153,11 @@ class privileged_api : public context_aware_api {
          EOS_ASSERT(net_weight >= -1, wasm_execution_error, "invalid value for net resource weight expected [-1,INT64_MAX]");
          EOS_ASSERT(cpu_weight >= -1, wasm_execution_error, "invalid value for cpu resource weight expected [-1,INT64_MAX]");
          if( context.control.get_mutable_resource_limits_manager().set_account_limits(account, ram_bytes, net_weight, cpu_weight) ) {
+<<<<<<< HEAD
             context.trx_context.emplace_validate_ram_usage( account );
+=======
+            context.trx_context.validate_ram_usage.insert( account );
+>>>>>>> otherb
          }
       }
 
@@ -194,6 +206,7 @@ class privileged_api : public context_aware_api {
          });
       }
 
+<<<<<<< HEAD
       void set_minimum_resource_security(int64_t ram_bytes, int64_t net_bytes, int64_t cpu_us) {
          EOS_ASSERT(cpu_us >= 0, wasm_execution_error, "cpu_us must be >= 0");
          EOS_ASSERT(net_bytes >= 0, wasm_execution_error, "net_bytes must be >= 0");
@@ -207,6 +220,8 @@ class privileged_api : public context_aware_api {
          resource_limits.set_mrs_parameters(ram_bytes, net_bytes, cpu_us);
        }
 
+=======
+>>>>>>> otherb
       bool is_privileged( account_name n )const {
          return context.db.get<account_object, by_name>( n ).privileged;
       }
@@ -252,8 +267,13 @@ class softfloat_api : public context_aware_api {
          if (is_nan(b)) {
             return bf;
          }
+<<<<<<< HEAD
          if ( sign_bit(a) != sign_bit(b) ) {
             return sign_bit(a) ? af : bf;
+=======
+         if ( f32_sign_bit(a) != f32_sign_bit(b) ) {
+            return f32_sign_bit(a) ? af : bf;
+>>>>>>> otherb
          }
          return f32_lt(a,b) ? af : bf;
       }
@@ -266,8 +286,13 @@ class softfloat_api : public context_aware_api {
          if (is_nan(b)) {
             return bf;
          }
+<<<<<<< HEAD
          if ( sign_bit(a) != sign_bit(b) ) {
             return sign_bit(a) ? bf : af;
+=======
+         if ( f32_sign_bit(a) != f32_sign_bit(b) ) {
+            return f32_sign_bit(a) ? bf : af;
+>>>>>>> otherb
          }
          return f32_lt( a, b ) ? bf : af;
       }
@@ -419,8 +444,13 @@ class softfloat_api : public context_aware_api {
             return af;
          if (is_nan(b))
             return bf;
+<<<<<<< HEAD
          if (sign_bit(a) != sign_bit(b))
             return sign_bit(a) ? af : bf;
+=======
+         if (f64_sign_bit(a) != f64_sign_bit(b))
+            return f64_sign_bit(a) ? af : bf;
+>>>>>>> otherb
          return f64_lt( a, b ) ? af : bf;
       }
       double _eosio_f64_max( double af, double bf ) {
@@ -430,8 +460,13 @@ class softfloat_api : public context_aware_api {
             return af;
          if (is_nan(b))
             return bf;
+<<<<<<< HEAD
          if (sign_bit(a) != sign_bit(b))
             return sign_bit(a) ? bf : af;
+=======
+         if (f64_sign_bit(a) != f64_sign_bit(b))
+            return f64_sign_bit(a) ? bf : af;
+>>>>>>> otherb
          return f64_lt( a, b ) ? bf : af;
       }
       double _eosio_f64_copysign( double af, double bf ) {
@@ -665,6 +700,7 @@ class softfloat_api : public context_aware_api {
       }
 
       static bool is_nan( const float32_t f ) {
+<<<<<<< HEAD
          return ((f.v & 0x7FFFFFFF) > 0x7F800000);
       }
       static bool is_nan( const float64_t f ) {
@@ -691,6 +727,19 @@ class softfloat_api : public context_aware_api {
       static bool sign_bit( float32_t f ) { return f.v >> 31; }
       static bool sign_bit( float64_t f ) { return f.v >> 63; }
 
+=======
+         return f32_is_nan( f );
+      }
+      static bool is_nan( const float64_t f ) {
+         return f64_is_nan( f );
+      }
+      static bool is_nan( const float128_t& f ) {
+         return f128_is_nan( f );
+      }
+
+      static constexpr uint32_t inv_float_eps = 0x4B000000;
+      static constexpr uint64_t inv_double_eps = 0x4330000000000000;
+>>>>>>> otherb
 };
 
 class producer_api : public context_aware_api {
@@ -929,42 +978,65 @@ class system_api : public context_aware_api {
          return static_cast<uint64_t>( context.trx_context.published.time_since_epoch().count() );
       }
 
+<<<<<<< HEAD
       uint32_t current_block_num() {
          return ( context.control.head_block_num() );
       }
 
 };
 
+=======
+};
+
+constexpr size_t max_assert_message = 1024;
+
+>>>>>>> otherb
 class context_free_system_api :  public context_aware_api {
 public:
    explicit context_free_system_api( apply_context& ctx )
    :context_aware_api(ctx,true){}
 
    void abort() {
+<<<<<<< HEAD
       edump(("abort() called"));
+=======
+>>>>>>> otherb
       EOS_ASSERT( false, abort_called, "abort() called");
    }
 
    // Kept as intrinsic rather than implementing on WASM side (using eosio_assert_message and strlen) because strlen is faster on native side.
    void eosio_assert( bool condition, null_terminated_ptr msg ) {
       if( BOOST_UNLIKELY( !condition ) ) {
+<<<<<<< HEAD
          std::string message( msg );
          edump((message));
+=======
+         const size_t sz = strnlen( msg, max_assert_message );
+         std::string message( msg, sz );
+>>>>>>> otherb
          EOS_THROW( eosio_assert_message_exception, "assertion failure with message: ${s}", ("s",message) );
       }
    }
 
    void eosio_assert_message( bool condition, array_ptr<const char> msg, size_t msg_len ) {
       if( BOOST_UNLIKELY( !condition ) ) {
+<<<<<<< HEAD
          std::string message( msg, msg_len );
          edump((message));
+=======
+         const size_t sz = msg_len > max_assert_message ? max_assert_message : msg_len;
+         std::string message( msg, sz );
+>>>>>>> otherb
          EOS_THROW( eosio_assert_message_exception, "assertion failure with message: ${s}", ("s",message) );
       }
    }
 
    void eosio_assert_code( bool condition, uint64_t error_code ) {
       if( BOOST_UNLIKELY( !condition ) ) {
+<<<<<<< HEAD
          edump((error_code));
+=======
+>>>>>>> otherb
          EOS_THROW( eosio_assert_code_exception,
                     "assertion failure with error code: ${error_code}", ("error_code", error_code) );
       }
@@ -998,6 +1070,7 @@ class action_api : public context_aware_api {
       name current_receiver() {
          return context.receiver;
       }
+<<<<<<< HEAD
       bool is_inline(){
          return context.recurse_depth > 0;
       }
@@ -1023,6 +1096,8 @@ class core_symbol_api : public context_aware_api {
                  cs.core_symbol = s;
          });
       }   
+=======
+>>>>>>> otherb
 };
 
 class console_api : public context_aware_api {
@@ -1126,12 +1201,25 @@ class console_api : public context_aware_api {
             auto& console = context.get_console_stream();
             auto orig_prec = console.precision();
 
+<<<<<<< HEAD
             console.precision( std::numeric_limits<long double>::digits10 );
 
             extFloat80_t val_approx;
             f128M_to_extF80M(&val, &val_approx);
             context.console_append( *(long double*)(&val_approx) );
 
+=======
+#ifdef __x86_64__
+            console.precision( std::numeric_limits<long double>::digits10 );
+            extFloat80_t val_approx;
+            f128M_to_extF80M(&val, &val_approx);
+            context.console_append( *(long double*)(&val_approx) );
+#else
+            console.precision( std::numeric_limits<double>::digits10 );
+            double val_approx = from_softfloat64( f128M_to_f64(&val) );
+            context.console_append(val_approx);
+#endif
+>>>>>>> otherb
             console.precision( orig_prec );
          }
       }
@@ -1373,11 +1461,17 @@ class transaction_api : public context_aware_api {
       }
 
       void send_deferred( const uint128_t& sender_id, account_name payer, array_ptr<char> data, size_t data_len, uint32_t replace_existing) {
+<<<<<<< HEAD
          try {
             transaction trx;
             fc::raw::unpack<transaction>(data, data_len, trx);
             context.schedule_deferred_transaction(sender_id, payer, std::move(trx), replace_existing);
          } FC_RETHROW_EXCEPTIONS(warn, "data as hex: ${data}", ("data", fc::to_hex(data, data_len)))
+=======
+         transaction trx;
+         fc::raw::unpack<transaction>(data, data_len, trx);
+         context.schedule_deferred_transaction(sender_id, payer, std::move(trx), replace_existing);
+>>>>>>> otherb
       }
 
       bool cancel_deferred( const unsigned __int128& val ) {
@@ -1561,6 +1655,7 @@ class compiler_builtins : public context_aware_api {
 
       // conversion long double
       void __extendsftf2( float128_t& ret, float f ) {
+<<<<<<< HEAD
          ret = f32_to_f128( softfloat_api::to_softfloat32(f) );
       }
       void __extenddftf2( float128_t& ret, double d ) {
@@ -1573,6 +1668,20 @@ class compiler_builtins : public context_aware_api {
       float __trunctfsf2( uint64_t l, uint64_t h ) {
          float128_t f = {{ l, h }};
          return softfloat_api::from_softfloat32(f128_to_f32( f ));
+=======
+         ret = f32_to_f128( to_softfloat32(f) );
+      }
+      void __extenddftf2( float128_t& ret, double d ) {
+         ret = f64_to_f128( to_softfloat64(d) );
+      }
+      double __trunctfdf2( uint64_t l, uint64_t h ) {
+         float128_t f = {{ l, h }};
+         return from_softfloat64(f128_to_f64( f ));
+      }
+      float __trunctfsf2( uint64_t l, uint64_t h ) {
+         float128_t f = {{ l, h }};
+         return from_softfloat32(f128_to_f32( f ));
+>>>>>>> otherb
       }
       int32_t __fixtfsi( uint64_t l, uint64_t h ) {
          float128_t f = {{ l, h }};
@@ -1599,6 +1708,7 @@ class compiler_builtins : public context_aware_api {
          ret = ___fixunstfti( f );
       }
       void __fixsfti( __int128& ret, float a ) {
+<<<<<<< HEAD
          ret = ___fixsfti( softfloat_api::to_softfloat32(a).v );
       }
       void __fixdfti( __int128& ret, double a ) {
@@ -1612,6 +1722,21 @@ class compiler_builtins : public context_aware_api {
       }
       double __floatsidf( int32_t i ) {
          return softfloat_api::from_softfloat64(i32_to_f64(i));
+=======
+         ret = ___fixsfti( to_softfloat32(a).v );
+      }
+      void __fixdfti( __int128& ret, double a ) {
+         ret = ___fixdfti( to_softfloat64(a).v );
+      }
+      void __fixunssfti( unsigned __int128& ret, float a ) {
+         ret = ___fixunssfti( to_softfloat32(a).v );
+      }
+      void __fixunsdfti( unsigned __int128& ret, double a ) {
+         ret = ___fixunsdfti( to_softfloat64(a).v );
+      }
+      double __floatsidf( int32_t i ) {
+         return from_softfloat64(i32_to_f64(i));
+>>>>>>> otherb
       }
       void __floatsitf( float128_t& ret, int32_t i ) {
          ret = i32_to_f128(i);
@@ -1690,6 +1815,7 @@ class call_depth_api : public context_aware_api {
       }
 };
 
+<<<<<<< HEAD
 /*
  * This api will be removed with fix for missing `strtod`
  */
@@ -1707,6 +1833,8 @@ REGISTER_INTRINSICS(strtod_api,
    (strtod,  double(int, int)               )
 );
 
+=======
+>>>>>>> otherb
 REGISTER_INJECTED_INTRINSICS(call_depth_api,
    (call_depth_assert,  void()               )
 );
@@ -1765,7 +1893,10 @@ REGISTER_INTRINSICS(privileged_api,
    (set_proposed_producers,           int64_t(int,int)                      )
    (get_blockchain_parameters_packed, int(int, int)                         )
    (set_blockchain_parameters_packed, void(int,int)                         )
+<<<<<<< HEAD
    (set_minimum_resource_security,    void(int64_t,int64_t,int64_t)         )
+=======
+>>>>>>> otherb
    (is_privileged,                    int(int64_t)                          )
    (set_privileged,                   void(int64_t, int)                    )
 );
@@ -1846,7 +1977,10 @@ REGISTER_INTRINSICS(permission_api,
 REGISTER_INTRINSICS(system_api,
    (current_time, int64_t()       )
    (publication_time,   int64_t() )
+<<<<<<< HEAD
    (current_block_num,  int() )
+=======
+>>>>>>> otherb
 );
 
 REGISTER_INTRINSICS(context_free_system_api,
@@ -1860,8 +1994,12 @@ REGISTER_INTRINSICS(context_free_system_api,
 REGISTER_INTRINSICS(action_api,
    (read_action_data,       int(int, int)  )
    (action_data_size,       int()          )
+<<<<<<< HEAD
    (current_receiver,       int64_t()      )
    (is_inline,              int()          )
+=======
+   (current_receiver,   int64_t()          )
+>>>>>>> otherb
 );
 
 REGISTER_INTRINSICS(authorization_api,
@@ -1872,12 +2010,15 @@ REGISTER_INTRINSICS(authorization_api,
    (is_account,            int(int64_t)           )
 );
 
+<<<<<<< HEAD
 
 REGISTER_INTRINSICS(core_symbol_api,
    (core_symbol, int64_t())
    (set_core_symbol, void(int, int))
 );
 
+=======
+>>>>>>> otherb
 REGISTER_INTRINSICS(console_api,
    (prints,                void(int)      )
    (prints_l,              void(int, int) )

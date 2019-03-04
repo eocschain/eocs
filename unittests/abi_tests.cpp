@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #include <algorithm>
 #include <vector>
@@ -18,7 +22,10 @@
 #include <eosio/chain/contract_types.hpp>
 #include <eosio/chain/abi_serializer.hpp>
 #include <eosio/chain/eosio_contract.hpp>
+<<<<<<< HEAD
 #include <eosio/abi_generator/abi_generator.hpp>
+=======
+>>>>>>> otherb
 #include <eosio/testing/tester.hpp>
 
 #include <boost/test/framework.hpp>
@@ -539,6 +546,7 @@ BOOST_AUTO_TEST_CASE(uint_types)
 
 } FC_LOG_AND_RETHROW() }
 
+<<<<<<< HEAD
 using namespace eosio::unittests::config;
 
 struct abi_gen_helper {
@@ -1831,6 +1839,8 @@ BOOST_FIXTURE_TEST_CASE(abigen_no_eosioabi_macro, abi_gen_helper)
    BOOST_TEST( generate_abi(abigen_no_eosioabi_macro, abigen_no_eosioabi_macro_abi) == true );
 
 } FC_LOG_AND_RETHROW() }
+=======
+>>>>>>> otherb
 
 BOOST_AUTO_TEST_CASE(general)
 { try {
@@ -2768,7 +2778,11 @@ public_key_type  get_public_key( name keyname, string role ) {
 BOOST_AUTO_TEST_CASE(packed_transaction)
 { try {
 
+<<<<<<< HEAD
    chain::transaction txn;
+=======
+   chain::signed_transaction txn;
+>>>>>>> otherb
    txn.ref_block_num = 1;
    txn.ref_block_prefix = 2;
    txn.expiration.from_iso_string("2021-12-20T15:30");

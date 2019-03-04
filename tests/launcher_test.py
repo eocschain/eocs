@@ -52,7 +52,12 @@ try:
         cluster.killall(allInstances=killAll)
         cluster.cleanup()
         Print("Stand up cluster")
+<<<<<<< HEAD
         if cluster.launch(pnodes=4, p2pPlugin=p2pPlugin) is False:
+=======
+        pnodes=4
+        if cluster.launch(pnodes=pnodes, totalNodes=pnodes, p2pPlugin=p2pPlugin) is False:
+>>>>>>> otherb
             cmdError("launcher")
             errorExit("Failed to stand up eos cluster.")
     else:

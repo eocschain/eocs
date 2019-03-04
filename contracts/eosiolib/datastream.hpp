@@ -1,6 +1,10 @@
 /**
  *  @file datastream.hpp
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #pragma once
 #include <eosiolib/system.h>
@@ -825,6 +829,7 @@ DataStream& operator>>( DataStream& ds, std::tuple<Args...>& t ) {
    return ds;
 }
 
+<<<<<<< HEAD
 template<typename DataStream, typename First, typename Second>
 DataStream& operator<<( DataStream& ds, const std::pair<First, Second>& t ) {
    ds << t.first << t.second;
@@ -837,6 +842,8 @@ DataStream& operator>>( DataStream& ds, std::pair<First, Second>& t ) {
    return ds;
 }
 
+=======
+>>>>>>> otherb
 /**
  *  Serialize a class
  *

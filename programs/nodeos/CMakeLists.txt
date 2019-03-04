@@ -51,6 +51,10 @@ target_link_libraries( ${NODE_EXECUTABLE_NAME}
         PRIVATE appbase
         PRIVATE -Wl,${whole_archive_flag} login_plugin               -Wl,${no_whole_archive_flag}
         PRIVATE -Wl,${whole_archive_flag} history_plugin             -Wl,${no_whole_archive_flag}
+<<<<<<< HEAD
+=======
+        PRIVATE -Wl,${whole_archive_flag} state_history_plugin       -Wl,${no_whole_archive_flag}
+>>>>>>> otherb
         PRIVATE -Wl,${whole_archive_flag} bnet_plugin                -Wl,${no_whole_archive_flag}
         PRIVATE -Wl,${whole_archive_flag} history_api_plugin         -Wl,${no_whole_archive_flag}
         PRIVATE -Wl,${whole_archive_flag} chain_api_plugin           -Wl,${no_whole_archive_flag}
@@ -63,13 +67,18 @@ target_link_libraries( ${NODE_EXECUTABLE_NAME}
         PRIVATE -Wl,${whole_archive_flag} test_control_plugin        -Wl,${no_whole_archive_flag}
         PRIVATE -Wl,${whole_archive_flag} test_control_api_plugin    -Wl,${no_whole_archive_flag}
         PRIVATE -Wl,${build_id_flag}
+<<<<<<< HEAD
         PRIVATE chain_plugin http_plugin producer_plugin http_client_plugin 
+=======
+        PRIVATE chain_plugin http_plugin producer_plugin http_client_plugin
+>>>>>>> otherb
         PRIVATE eosio_chain fc ${CMAKE_DL_LIBS} ${PLATFORM_SPECIFIC_LIBS} )
 
 if(BUILD_MONGO_DB_PLUGIN)
   target_link_libraries( ${NODE_EXECUTABLE_NAME} PRIVATE -Wl,${whole_archive_flag} mongo_db_plugin -Wl,${no_whole_archive_flag} )
 endif()
 
+<<<<<<< HEAD
 # if(BUILD_MYSQL_DB_PLUGIN)
 #   target_link_libraries( ${NODE_EXECUTABLE_NAME} PRIVATE -Wl,${whole_archive_flag} mysql_db_plugin -Wl,${no_whole_archive_flag} )
 # endif()
@@ -83,6 +92,11 @@ target_link_libraries( ${NODE_EXECUTABLE_NAME} PRIVATE -Wl,${whole_archive_flag}
 include(additionalPlugins)
 
 #copy_bin( ${NODE_EXECUTABLE_NAME} )
+=======
+include(additionalPlugins)
+
+copy_bin( ${NODE_EXECUTABLE_NAME} )
+>>>>>>> otherb
 install( TARGETS
    ${NODE_EXECUTABLE_NAME}
 

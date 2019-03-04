@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #pragma once
 #include <eosio/chain/exceptions.hpp>
@@ -22,11 +26,18 @@ struct asset
 {
    static constexpr int64_t max_amount = (1LL << 62) - 1;
 
+<<<<<<< HEAD
    explicit asset(share_type a, symbol id) :amount(a), sym(id) {
       EOS_ASSERT( is_amount_within_range(), asset_type_exception, "magnitude of asset amount must be less than 2^62" );
       EOS_ASSERT( sym.valid(), asset_type_exception, "invalid symbol" );
    }
    explicit asset(share_type a = 0) : asset(a, symbol::core_symbol()) {}
+=======
+   explicit asset(share_type a = 0, symbol id = symbol(CORE_SYMBOL)) :amount(a), sym(id) {
+      EOS_ASSERT( is_amount_within_range(), asset_type_exception, "magnitude of asset amount must be less than 2^62" );
+      EOS_ASSERT( sym.valid(), asset_type_exception, "invalid symbol" );
+   }
+>>>>>>> otherb
 
    bool is_amount_within_range()const { return -max_amount <= amount && amount <= max_amount; }
    bool is_valid()const               { return is_amount_within_range() && sym.valid(); }
@@ -85,7 +96,11 @@ struct asset
 
    friend struct fc::reflector<asset>;
 
+<<<<<<< HEAD
    void reflector_verify()const {
+=======
+   void reflector_init()const {
+>>>>>>> otherb
       EOS_ASSERT( is_amount_within_range(), asset_type_exception, "magnitude of asset amount must be less than 2^62" );
       EOS_ASSERT( sym.valid(), asset_type_exception, "invalid symbol" );
    }

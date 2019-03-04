@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #include <eosio/http_client_plugin/http_client_plugin.hpp>
 #include <eosio/chain/exceptions.hpp>

@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #include <eosio/chain/chain_config.hpp>
 #include <eosio/chain/authority_checker.hpp>
@@ -9,9 +13,12 @@
 #include <eosio/chain/asset.hpp>
 #include <eosio/testing/tester.hpp>
 
+<<<<<<< HEAD
 #include <eosio/utilities/key_conversion.hpp>
 #include <eosio/utilities/rand.hpp>
 
+=======
+>>>>>>> otherb
 #include <fc/io/json.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -196,6 +203,7 @@ BOOST_AUTO_TEST_CASE(asset_from_string_overflow)
    });
 }
 
+<<<<<<< HEAD
 /// Test that our deterministic random shuffle algorithm gives the same results in all environments
 BOOST_AUTO_TEST_CASE(deterministic_randomness)
 { try {
@@ -230,6 +238,8 @@ BOOST_AUTO_TEST_CASE(deterministic_distributions)
    BOOST_TEST(std::equal(nums.begin(), nums.end(), c.begin()));
 } FC_LOG_AND_RETHROW() }
 
+=======
+>>>>>>> otherb
 struct permission_visitor {
    std::vector<permission_level> permissions;
    std::vector<size_t> size_stack;
@@ -627,11 +637,17 @@ BOOST_AUTO_TEST_CASE(transaction_test) { try {
    BOOST_CHECK_EQUAL(1, trx.signatures.size());
    trx.validate();
 
+<<<<<<< HEAD
    packed_transaction pkt;
    pkt.set_transaction(trx, packed_transaction::none);
 
    packed_transaction pkt2;
    pkt2.set_transaction(trx, packed_transaction::zlib);
+=======
+   packed_transaction pkt(trx, packed_transaction::none);
+
+   packed_transaction pkt2(trx, packed_transaction::zlib);
+>>>>>>> otherb
 
    BOOST_CHECK_EQUAL(true, trx.expiration ==  pkt.expiration());
    BOOST_CHECK_EQUAL(true, trx.expiration == pkt2.expiration());

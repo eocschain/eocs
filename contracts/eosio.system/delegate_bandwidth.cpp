@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #include "eosio.system.hpp"
 
@@ -28,8 +32,13 @@ namespace eosiosystem {
    using std::map;
    using std::pair;
 
+<<<<<<< HEAD
    // static constexpr time refund_delay = 3*24*3600;
    // static constexpr time refund_expiration_time = 3600;
+=======
+   static constexpr time refund_delay = 3*24*3600;
+   static constexpr time refund_expiration_time = 3600;
+>>>>>>> otherb
 
    struct user_resources {
       account_name  owner;
@@ -88,7 +97,11 @@ namespace eosiosystem {
    void system_contract::buyrambytes( account_name payer, account_name receiver, uint32_t bytes ) {
       auto itr = _rammarket.find(S(4,RAMCORE));
       auto tmp = *itr;
+<<<<<<< HEAD
       auto eosout = tmp.convert( asset(bytes,S(0,RAM)), core_symbol() );
+=======
+      auto eosout = tmp.convert( asset(bytes,S(0,RAM)), CORE_SYMBOL );
+>>>>>>> otherb
 
       buyram( payer, receiver, eosout );
    }
@@ -172,7 +185,11 @@ namespace eosiosystem {
       auto itr = _rammarket.find(S(4,RAMCORE));
       _rammarket.modify( itr, 0, [&]( auto& es ) {
           /// the cast to int64_t of bytes is safe because we certify bytes is <= quota which is limited by prior purchases
+<<<<<<< HEAD
           tokens_out = es.convert( asset(bytes,S(0,RAM)), core_symbol());
+=======
+          tokens_out = es.convert( asset(bytes,S(0,RAM)), CORE_SYMBOL);
+>>>>>>> otherb
       });
 
       eosio_assert( tokens_out.amount > 1, "token amount received from selling ram is too low" );
@@ -341,7 +358,11 @@ namespace eosiosystem {
          if ( need_deferred_trx ) {
             eosio::transaction out;
             out.actions.emplace_back( permission_level{ from, N(active) }, _self, N(refund), from );
+<<<<<<< HEAD
             out.delay_sec = _gstate.refund_delay;
+=======
+            out.delay_sec = refund_delay;
+>>>>>>> otherb
             cancel_deferred( from ); // TODO: Remove this line when replacing deferred trxs is fixed
             out.send( from, from, true );
          } else {
@@ -365,6 +386,7 @@ namespace eosiosystem {
                   v.staked = total_update.amount;
                });
          } else {
+<<<<<<< HEAD
             if( (from_voter->staked > 0) && (from_voter->has_voted == 1) && (_gstate.total_activated_stake >= _gstate.min_activated_stake)) {
                const auto curr_block_num = current_block_num();
 
@@ -458,6 +480,8 @@ namespace eosiosystem {
                                                                { N(eosio.vpay), from, asset(voter_vote_vpay), std::string("voter get producer_vpay's vote pay") } );
                }
             }
+=======
+>>>>>>> otherb
             _voters.modify( from_voter, 0, [&]( auto& v ) {
                   v.staked += total_update.amount;
                });
@@ -491,7 +515,11 @@ namespace eosiosystem {
       eosio_assert( asset() <= unstake_cpu_quantity, "must unstake a positive amount" );
       eosio_assert( asset() <= unstake_net_quantity, "must unstake a positive amount" );
       eosio_assert( asset() < unstake_cpu_quantity + unstake_net_quantity, "must unstake a positive amount" );
+<<<<<<< HEAD
       eosio_assert( _gstate.total_activated_stake >= _gstate.min_activated_stake,
+=======
+      eosio_assert( _gstate.total_activated_stake >= min_activated_stake,
+>>>>>>> otherb
                     "cannot undelegate bandwidth until the chain is activated (at least 15% of all tokens participate in voting)" );
 
       changebw( from, receiver, -unstake_net_quantity, -unstake_cpu_quantity, false);
@@ -504,7 +532,11 @@ namespace eosiosystem {
       refunds_table refunds_tbl( _self, owner );
       auto req = refunds_tbl.find( owner );
       eosio_assert( req != refunds_tbl.end(), "refund request not found" );
+<<<<<<< HEAD
       eosio_assert( req->request_time + _gstate.refund_delay <= now(), "refund is not available yet" );
+=======
+      eosio_assert( req->request_time + refund_delay <= now(), "refund is not available yet" );
+>>>>>>> otherb
       // Until now() becomes NOW, the fact that now() is the timestamp of the previous block could in theory
       // allow people to get their tokens earlier than the 3 day delay if the unstake happened immediately after many
       // consecutive missed blocks.

@@ -56,11 +56,19 @@
 	if [[ "${OS_NAME}" == "Amazon Linux AMI" ]]; then
 		DEP_ARRAY=( git gcc72.x86_64 gcc72-c++.x86_64 autoconf automake libtool make bzip2 \
 		bzip2-devel.x86_64 openssl-devel.x86_64 gmp-devel.x86_64 libstdc++72.x86_64 \
+<<<<<<< HEAD
 		python27.x86_64 python36-devel.x86_64 libedit-devel.x86_64 doxygen.x86_64 graphviz.x86_64)
 	else
 		DEP_ARRAY=( git gcc.x86_64 gcc-c++.x86_64 autoconf automake libtool make bzip2 \
 		bzip2-devel.x86_64 openssl-devel.x86_64 gmp-devel.x86_64 libstdc++.x86_64 \
 		python3.x86_64 python3-devel.x86_64 libedit-devel.x86_64 doxygen.x86_64 graphviz.x86_64)
+=======
+		python27.x86_64 python27-devel.x86_64 python36-devel.x86_64 libedit-devel.x86_64 doxygen.x86_64 graphviz.x86_64)
+	else
+		DEP_ARRAY=( git gcc gcc-c++ autoconf automake libtool make bzip2 \
+		bzip2-devel openssl-devel gmp-devel libstdc++ \
+		python3 python3-devel python-devel libedit-devel doxygen graphviz)
+>>>>>>> otherb
 	fi
 	COUNT=1
 	DISPLAY=""
@@ -70,7 +78,11 @@
 
 	for (( i=0; i<${#DEP_ARRAY[@]}; i++ ));
 	do
+<<<<<<< HEAD
 		pkg=$( sudo "$YUM" info "${DEP_ARRAY[$i]}" 2>/dev/null | grep Repo | tr -s ' ' | cut -d: -f2 | sed 's/ //g' )
+=======
+		pkg=$("$YUM" info "${DEP_ARRAY[$i]}" 2>/dev/null | grep Repo | tr -s ' ' | cut -d: -f2 | sed 's/ //g' )
+>>>>>>> otherb
 
 		if [ "$pkg" != "installed" ]; then
 			DEP=$DEP" ${DEP_ARRAY[$i]} "
@@ -87,6 +99,10 @@
 		printf "\\n\\tThe following dependencies are required to install EOSIO.\\n"
 		printf "\\n\\t${DISPLAY}\\n\\n"
 		printf "\\tDo you wish to install these dependencies?\\n"
+<<<<<<< HEAD
+=======
+		if is_noninteractive; then exec <<< "1"; fi
+>>>>>>> otherb
 		select yn in "Yes" "No"; do
 			case $yn in
 				[Yy]* ) 

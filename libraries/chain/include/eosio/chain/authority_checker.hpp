@@ -1,14 +1,22 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #pragma once
 
 #include <eosio/chain/types.hpp>
 #include <eosio/chain/authority.hpp>
 #include <eosio/chain/exceptions.hpp>
+<<<<<<< HEAD
 
 #include <eosio/utilities/parallel_markers.hpp>
+=======
+#include <eosio/chain/parallel_markers.hpp>
+>>>>>>> otherb
 
 #include <fc/scoped_exit.hpp>
 
@@ -148,11 +156,19 @@ namespace detail {
          bool all_keys_used() const { return boost::algorithm::all_of_equal(_used_keys, true); }
 
          flat_set<public_key_type> used_keys() const {
+<<<<<<< HEAD
             auto range = utilities::filter_data_by_marker(provided_keys, _used_keys, true);
             return {range.begin(), range.end()};
          }
          flat_set<public_key_type> unused_keys() const {
             auto range = utilities::filter_data_by_marker(provided_keys, _used_keys, false);
+=======
+            auto range = filter_data_by_marker(provided_keys, _used_keys, true);
+            return {range.begin(), range.end()};
+         }
+         flat_set<public_key_type> unused_keys() const {
+            auto range = filter_data_by_marker(provided_keys, _used_keys, false);
+>>>>>>> otherb
             return {range.begin(), range.end()};
          }
 

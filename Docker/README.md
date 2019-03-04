@@ -20,10 +20,17 @@ cd eos/Docker
 docker build . -t eosio/eos
 ```
 
+<<<<<<< HEAD
 The above will build off the most recent commit to the master branch by default. If you would like to target a specific branch/tag, you may use a build argument. For example, if you wished to generate a docker image based off of the v1.4.1 tag, you could do the following:
 
 ```bash
 docker build -t eosio/eos:v1.4.1 --build-arg branch=v1.4.1 .
+=======
+The above will build off the most recent commit to the master branch by default. If you would like to target a specific branch/tag, you may use a build argument. For example, if you wished to generate a docker image based off of the 1.6.2 tag, you could do the following:
+
+```bash
+docker build -t eosio/eos:v1.6.2 --build-arg branch=1.6.2 .
+>>>>>>> otherb
 ```
 
 By default, the symbol in eosio.system is set to SYS. You can override this using the symbol argument while building the docker image.
@@ -133,6 +140,7 @@ docker volume rm keosd-data-volume
 
 ### Docker Hub
 
+<<<<<<< HEAD
 Docker Hub image available from [docker hub](https://hub.docker.com/r/eosio/eos/).
 Create a new `docker-compose.yaml` file with the content below
 
@@ -172,6 +180,9 @@ volumes:
 run `docker pull eosio/eos:latest`
 
 run `docker-compose up`
+=======
+Docker Hub images are now deprecated. New build images were discontinued on January 1st, 2019. The existing old images will be removed on June 1st, 2019.
+>>>>>>> otherb
 
 ### EOSIO Testnet
 

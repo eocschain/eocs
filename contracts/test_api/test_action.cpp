@@ -1,6 +1,10 @@
 /**
  * @file action_test.cpp
+<<<<<<< HEAD
  * @copyright defined in eos/LICENSE.txt
+=======
+ * @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #include <eosiolib/action.hpp>
 #include <eosiolib/transaction.hpp>

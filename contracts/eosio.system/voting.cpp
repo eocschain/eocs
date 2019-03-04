@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #include "eosio.system.hpp"
 
@@ -76,9 +80,15 @@ namespace eosiosystem {
       auto idx = _producers.get_index<N(prototalvote)>();
 
       std::vector< std::pair<eosio::producer_key,uint16_t> > top_producers;
+<<<<<<< HEAD
       top_producers.reserve(_gstate.max_producer_schedule_size);
 
       for ( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < _gstate.max_producer_schedule_size && 0 < it->total_votes && it->active(); ++it ) {
+=======
+      top_producers.reserve(21);
+
+      for ( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < 21 && 0 < it->total_votes && it->active(); ++it ) {
+>>>>>>> otherb
          top_producers.emplace_back( std::pair<eosio::producer_key,uint16_t>({{it->owner, it->producer_key}, it->location}) );
       }
 
@@ -135,15 +145,22 @@ namespace eosiosystem {
          eosio_assert( voter_name != proxy, "cannot proxy to self" );
          require_recipient( proxy );
       } else {
+<<<<<<< HEAD
          eosio_assert( producers.size() <= 1, "attempt to vote for too many producers" );
+=======
+         eosio_assert( producers.size() <= 30, "attempt to vote for too many producers" );
+>>>>>>> otherb
          for( size_t i = 1; i < producers.size(); ++i ) {
             eosio_assert( producers[i-1] < producers[i], "producer votes must be unique and sorted" );
          }
       }
 
       auto voter = _voters.find(voter_name);
+<<<<<<< HEAD
       auto curr_block_num = current_block_num();
       auto ct = current_time();
+=======
+>>>>>>> otherb
       eosio_assert( voter != _voters.end(), "user must stake before they can vote" ); /// staking creates voter object
       eosio_assert( !proxy || !voter->is_proxy, "account registered as a proxy is not allowed to use a proxy" );
 
@@ -154,7 +171,11 @@ namespace eosiosystem {
        */
       if( voter->last_vote_weight <= 0.0 ) {
          _gstate.total_activated_stake += voter->staked;
+<<<<<<< HEAD
          if( _gstate.total_activated_stake >= _gstate.min_activated_stake && _gstate.thresh_activated_stake_time == 0 ) {
+=======
+         if( _gstate.total_activated_stake >= min_activated_stake && _gstate.thresh_activated_stake_time == 0 ) {
+>>>>>>> otherb
             _gstate.thresh_activated_stake_time = current_time();
          }
       }
@@ -202,6 +223,7 @@ namespace eosiosystem {
          }
       }
 
+<<<<<<< HEAD
       if (voter->has_voted == 0)
       {
          for( const auto& pd : producer_deltas ) {
@@ -423,6 +445,22 @@ namespace eosiosystem {
                }
                _gstate.total_producer_vote_weight += voter_info.last_vote_weight;
             });
+=======
+      for( const auto& pd : producer_deltas ) {
+         auto pitr = _producers.find( pd.first );
+         if( pitr != _producers.end() ) {
+            eosio_assert( !voting || pitr->active() || !pd.second.second /* not from new set */, "producer is not currently registered" );
+            _producers.modify( pitr, 0, [&]( auto& p ) {
+               p.total_votes += pd.second.first;
+               if ( p.total_votes < 0 ) { // floating point arithmetics can give small negative numbers
+                  p.total_votes = 0;
+               }
+               _gstate.total_producer_vote_weight += pd.second.first;
+               //eosio_assert( p.total_votes >= 0, "something bad happened" );
+            });
+         } else {
+            eosio_assert( !pd.second.second /* not from new set */, "producer is not registered" ); //data corruption
+>>>>>>> otherb
          }
       }
 
@@ -430,8 +468,11 @@ namespace eosiosystem {
          av.last_vote_weight = new_vote_weight;
          av.producers = producers;
          av.proxy     = proxy;
+<<<<<<< HEAD
          av.vote_update_height = curr_block_num;
          av.has_voted = 1;
+=======
+>>>>>>> otherb
       });
    }
 

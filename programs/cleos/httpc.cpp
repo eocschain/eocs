@@ -198,12 +198,19 @@ namespace eosio { namespace client { namespace http {
    request_stream << "content-length: " << postjson.size() << "\r\n";
    request_stream << "Accept: */*\r\n";
    request_stream << "Connection: close\r\n";
+<<<<<<< HEAD
    request_stream << "\r\n";
+=======
+>>>>>>> otherb
    // append more customized headers
    std::vector<string>::iterator itr;
    for (itr = cp.headers.begin(); itr != cp.headers.end(); itr++) {
       request_stream << *itr << "\r\n";
    }
+<<<<<<< HEAD
+=======
+   request_stream << "\r\n";
+>>>>>>> otherb
    request_stream << postjson;
 
    if ( print_request ) {

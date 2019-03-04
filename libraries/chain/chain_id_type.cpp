@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 
 #include <eosio/chain/chain_id_type.hpp>
@@ -8,7 +12,11 @@
 
 namespace eosio { namespace chain {
 
+<<<<<<< HEAD
    void chain_id_type::reflector_verify()const {
+=======
+   void chain_id_type::reflector_init()const {
+>>>>>>> otherb
       EOS_ASSERT( *reinterpret_cast<const fc::sha256*>(this) != fc::sha256(), chain_id_type_exception, "chain_id_type cannot be zero" );
    }
 

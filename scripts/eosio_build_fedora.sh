@@ -69,7 +69,11 @@
 
 	for (( i=0; i<${#DEP_ARRAY[@]}; i++ ));
 	do
+<<<<<<< HEAD
 		pkg=$( sudo "${YUM}" info "${DEP_ARRAY[$i]}" 2>/dev/null | grep Repo | tr -s ' ' | cut -d: -f2 | sed 's/ //g' )
+=======
+		pkg=$( "${YUM}" info "${DEP_ARRAY[$i]}" 2>/dev/null | grep Repo | tr -s ' ' | cut -d: -f2 | sed 's/ //g' )
+>>>>>>> otherb
 
 		if [ "$pkg" != "@System" ]; then
 			DEP=$DEP" ${DEP_ARRAY[$i]} "
@@ -86,6 +90,10 @@
 		printf "\\n\\tThe following dependencies are required to install EOSIO.\\n"
 		printf "\\n\\t${DISPLAY}\\n\\n"
 		printf "\\tDo you wish to install these dependencies?\\n"
+<<<<<<< HEAD
+=======
+		if is_noninteractive; then exec <<< "1"; fi
+>>>>>>> otherb
 		select yn in "Yes" "No"; do
 			case $yn in
 				[Yy]* ) 

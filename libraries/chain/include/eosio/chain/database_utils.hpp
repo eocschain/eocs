@@ -1,6 +1,10 @@
 /**
  *  @file
+<<<<<<< HEAD
  *  @copyright defined in eos/LICENSE.txt
+=======
+ *  @copyright defined in eos/LICENSE
+>>>>>>> otherb
  */
 #pragma once
 
@@ -216,4 +220,7 @@ DataStream& operator >> ( DataStream& ds, float128_t& v ) {
    fc::raw::unpack(ds, *reinterpret_cast<eosio::chain::uint128_t*>(&v));
    return ds;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> otherb

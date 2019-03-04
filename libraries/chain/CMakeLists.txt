@@ -40,19 +40,30 @@ add_library( eosio_chain
              webassembly/wavm.cpp
              webassembly/wabt.cpp
 
+<<<<<<< HEAD
               symbol.cpp
 
+=======
+>>>>>>> otherb
 #             get_config.cpp
 #             global_property_object.cpp
 #
 #             contracts/chain_initializer.cpp
 
 
+<<<<<<< HEAD
 #             transaction_metadata.cpp
              ${HEADERS}
              )
 
 target_link_libraries( eosio_chain eos_utilities fc chainbase Logging IR WAST WASM Runtime
+=======
+             transaction_metadata.cpp
+             ${HEADERS}
+             )
+
+target_link_libraries( eosio_chain fc chainbase Logging IR WAST WASM Runtime
+>>>>>>> otherb
                        softfloat builtins wabt
                      )
 target_include_directories( eosio_chain
