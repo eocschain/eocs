@@ -1,10 +1,6 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
  */
 #include <algorithm>
 #include <vector>
@@ -22,10 +18,7 @@
 #include <eosio/chain/contract_types.hpp>
 #include <eosio/chain/abi_serializer.hpp>
 #include <eosio/chain/eosio_contract.hpp>
-<<<<<<< HEAD
-#include <eosio/abi_generator/abi_generator.hpp>
-=======
->>>>>>> otherb
+
 #include <eosio/testing/tester.hpp>
 
 #include <boost/test/framework.hpp>
@@ -2777,12 +2770,7 @@ public_key_type  get_public_key( name keyname, string role ) {
 // its sub-types have different packing/unpacking orders in FC_REFLECT vs. their abi_def
 BOOST_AUTO_TEST_CASE(packed_transaction)
 { try {
-
-<<<<<<< HEAD
-   chain::transaction txn;
-=======
    chain::signed_transaction txn;
->>>>>>> otherb
    txn.ref_block_num = 1;
    txn.ref_block_prefix = 2;
    txn.expiration.from_iso_string("2021-12-20T15:30");
