@@ -2,17 +2,6 @@
 
 The `bios-boot-tutorial.py` script simulates the EOSIO bios boot sequence.
 
-<<<<<<< HEAD
-The script can be run with no arguments directly from the `tutorials/bios-boot-tutorial` directory.
-
-```bash
-$ cd tutorials/bios-boot-tutorial
-
-$ ./bios-boot-tutorial.py
-```
-
-See [EOSIO Documentation Wiki: Tutorial - Bios Boot](https://github.com/EOSIO/eos/wiki/Tutorial-Bios-Boot-Sequence) for additional information.
-=======
 ``Prerequisites``:
 
 1. Python 3.x
@@ -53,4 +42,3 @@ $ python3 bios-boot-tutorial.py --cleos="cleos --wallet-url http://127.0.0.1:666
 ```
 
 See [EOSIO Documentation Wiki: Tutorial - Bios Boot](https://github.com/EOSIO/eos/wiki/Tutorial-Bios-Boot-Sequence) for additional information.
->>>>>>> otherb
