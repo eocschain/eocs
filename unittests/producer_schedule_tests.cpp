@@ -260,8 +260,6 @@ BOOST_FIXTURE_TEST_CASE( producer_schedule_promotion_test, TESTER ) try {
    BOOST_REQUIRE_EQUAL( validate(), true );
 } FC_LOG_AND_RETHROW()
 
-<<<<<<< HEAD
-=======
 BOOST_FIXTURE_TEST_CASE( producer_schedule_reduction, tester ) try {
    create_accounts( {N(alice),N(bob),N(carol)} );
    produce_block();
@@ -394,5 +392,4 @@ BOOST_FIXTURE_TEST_CASE( empty_producer_schedule_has_no_effect, tester ) try {
    BOOST_REQUIRE_EQUAL( validate(), true );
 } FC_LOG_AND_RETHROW()
 
->>>>>>> otherb
 BOOST_AUTO_TEST_SUITE_END()
