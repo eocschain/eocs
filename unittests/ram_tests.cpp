@@ -23,12 +23,6 @@
 #include <test_ram_limit/test_ram_limit.abi.hpp>
 #include <test_ram_limit/test_ram_limit.wast.hpp>
 
-<<<<<<< HEAD
-#define DISABLE_EOSLIB_SERIALIZE
-#include <test_api/test_api_common.hpp>
-
-=======
->>>>>>> otherb
 /*
  * register test suite `ram_tests`
  */
