@@ -1,19 +1,12 @@
 cmake_minimum_required( VERSION 3.5 )
-<<<<<<< HEAD
-message(STATUS "Setting up Eosio Tester @VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@ at @EOS_ROOT_DIR@")
-=======
+
 message(STATUS "Setting up Eosio Tester @VERSION_FULL@ at @EOS_ROOT_DIR@")
->>>>>>> otherb
+
 
 set(CMAKE_CXX_COMPILER @CMAKE_CXX_COMPILER@)
 set(CMAKE_C_COMPILER   @CMAKE_C_COMPILER@)
 
-<<<<<<< HEAD
-set(EOSIO_VERSION "@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@")
 
-enable_testing()
-
-=======
 set(EOSIO_VERSION "@VERSION_FULL@")
 
 enable_testing()
@@ -27,7 +20,7 @@ if (UNIX)
 endif()
 
 
->>>>>>> otherb
+
 find_package( Gperftools QUIET )
 if( GPERFTOOLS_FOUND )
     message( STATUS "Found gperftools; compiling tests with TCMalloc")
@@ -109,14 +102,8 @@ macro(add_eosio_test test_name)
        ${liblogging}
        ${libchainbase}
        ${libbuiltins}
-<<<<<<< HEAD
-       ${GMP_LIBRARIES}
-       ${libsecp256k1}
-=======
        ${libsecp256k1}
        ${GMP_LIBRARIES}
->>>>>>> otherb
-
        LLVMX86Disassembler
        LLVMX86AsmParser
        LLVMX86AsmPrinter
