@@ -12,23 +12,13 @@
 #include <asserter/asserter.wast.hpp>
 #include <asserter/asserter.abi.hpp>
 
-<<<<<<< HEAD
-#include <stltest/stltest.wast.hpp>
-#include <stltest/stltest.abi.hpp>
-=======
 #include <eosio.token/eosio.token.wast.hpp>
 #include <eosio.token/eosio.token.abi.hpp>
->>>>>>> otherb
 
 #include <eosio.system/eosio.system.wast.hpp>
 #include <eosio.system/eosio.system.abi.hpp>
 
-<<<<<<< HEAD
-#include <eosio.token/eosio.token.wast.hpp>
-#include <eosio.token/eosio.token.abi.hpp>
 
-=======
->>>>>>> otherb
 #include <fc/io/fstream.hpp>
 
 #include <Runtime/Runtime.h>
@@ -66,11 +56,7 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, TESTER ) try {
    set_abi( N(eosio.token), eosio_token_abi );
    produce_blocks(1);
 
-<<<<<<< HEAD
-   // create currency 
-=======
    // create currency
->>>>>>> otherb
    auto act = mutable_variant_object()
          ("issuer",       "eosio")
          ("maximum_supply", eosio::chain::asset::from_string("1000000000.0000 SYS"));
@@ -106,21 +92,14 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, TESTER ) try {
    }
 
    param.lower_bound = "initb";
-<<<<<<< HEAD
-   param.upper_bound = "initd";
-=======
    param.upper_bound = "initc";
->>>>>>> otherb
+
    result = plugin.read_only::get_table_by_scope(param);
    BOOST_REQUIRE_EQUAL(2, result.rows.size());
    BOOST_REQUIRE_EQUAL("", result.more);
    if (result.rows.size() >= 2) {
       BOOST_REQUIRE_EQUAL(name(N(initb)), result.rows[0].scope);
-<<<<<<< HEAD
-      BOOST_REQUIRE_EQUAL(name(N(initc)), result.rows[1].scope);      
-=======
       BOOST_REQUIRE_EQUAL(name(N(initc)), result.rows[1].scope);
->>>>>>> otherb
    }
 
    param.limit = 1;
@@ -136,14 +115,6 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, TESTER ) try {
    param.table = N(invalid);
    result = plugin.read_only::get_table_by_scope(param);
    BOOST_REQUIRE_EQUAL(0, result.rows.size());
-<<<<<<< HEAD
-   BOOST_REQUIRE_EQUAL("", result.more); 
-
-} FC_LOG_AND_RETHROW() /// get_scope_test
-
-BOOST_AUTO_TEST_SUITE_END()
-
-=======
    BOOST_REQUIRE_EQUAL("", result.more);
 
 } FC_LOG_AND_RETHROW() /// get_scope_test
@@ -478,4 +449,3 @@ BOOST_FIXTURE_TEST_CASE( get_table_by_seckey_test, TESTER ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
->>>>>>> otherb
