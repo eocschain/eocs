@@ -64,13 +64,10 @@ public:
       return _produce_block(skip_time, true, skip_flag);
    }
 
-<<<<<<< HEAD
-=======
    signed_block_ptr finish_block()override {
       return _finish_block();
    }
 
->>>>>>> otherb
    bool validate() { return true; }
 };
 
