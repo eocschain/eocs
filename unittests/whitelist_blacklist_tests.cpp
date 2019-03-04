@@ -2,11 +2,9 @@
 #include <eosio/testing/tester.hpp>
 #include <eosio/testing/tester_network.hpp>
 
-<<<<<<< HEAD
-=======
+
 #include <eosio/chain/generated_transaction_object.hpp>
 
->>>>>>> otherb
 #include <fc/variant_object.hpp>
 
 #include <eosio.token/eosio.token.wast.hpp>
@@ -59,10 +57,7 @@ class whitelist_blacklist_tester {
          FC_ASSERT( !chain, "chain is already up" );
 
          auto cfg = get_default_chain_configuration( tempdir.path() );
-<<<<<<< HEAD
-=======
          cfg.sender_bypass_whiteblacklist = sender_bypass_whiteblacklist;
->>>>>>> otherb
          cfg.actor_whitelist = actor_whitelist;
          cfg.actor_blacklist = actor_blacklist;
          cfg.contract_whitelist = contract_whitelist;
@@ -108,10 +103,7 @@ class whitelist_blacklist_tester {
 
       fc::temp_directory                tempdir; // Must come before chain
       fc::optional<Tester>              chain;
-<<<<<<< HEAD
-=======
       flat_set<account_name>            sender_bypass_whiteblacklist;
->>>>>>> otherb
       flat_set<account_name>            actor_whitelist;
       flat_set<account_name>            actor_blacklist;
       flat_set<account_name>            contract_whitelist;
@@ -449,8 +441,6 @@ BOOST_AUTO_TEST_CASE( blacklist_onerror ) { try {
 
 } FC_LOG_AND_RETHROW() }
 
-<<<<<<< HEAD
-=======
 BOOST_AUTO_TEST_CASE( actor_blacklist_inline_deferred ) { try {
    whitelist_blacklist_tester<tester> tester1;
    tester1.init();
@@ -746,5 +736,4 @@ BOOST_AUTO_TEST_CASE( blacklist_sender_bypass ) { try {
 
 } FC_LOG_AND_RETHROW() }
 
->>>>>>> otherb
 BOOST_AUTO_TEST_SUITE_END()
