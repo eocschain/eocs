@@ -1,10 +1,6 @@
 /**
  *  @file api_tests.cpp
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
  */
 #include <algorithm>
 #include <random>
@@ -153,12 +149,8 @@ transaction_trace_ptr CallAction(TESTER& test, T ac, const vector<account_name>&
 
    test.set_transaction_headers(trx);
    auto sigs = trx.sign(test.get_private_key(scope[0], "active"), test.control->get_chain_id());
-<<<<<<< HEAD
-   trx.get_signature_keys(test.control->get_chain_id());
-=======
    flat_set<public_key_type> keys;
    trx.get_signature_keys(test.control->get_chain_id(), fc::time_point::maximum(), keys);
->>>>>>> otherb
    auto res = test.push_transaction(trx);
    BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
    test.produce_block();
@@ -182,12 +174,8 @@ transaction_trace_ptr CallFunction(TESTER& test, T ac, const vector<char>& data,
 
       test.set_transaction_headers(trx, test.DEFAULT_EXPIRATION_DELTA);
       auto sigs = trx.sign(test.get_private_key(scope[0], "active"), test.control->get_chain_id());
-<<<<<<< HEAD
-      trx.get_signature_keys(test.control->get_chain_id() );
-=======
       flat_set<public_key_type> keys;
       trx.get_signature_keys(test.control->get_chain_id(), fc::time_point::maximum(), keys);
->>>>>>> otherb
       auto res = test.push_transaction(trx);
       BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
       test.produce_block();
@@ -280,12 +268,8 @@ BOOST_FIXTURE_TEST_CASE(action_receipt_tests, TESTER) { try {
       trx.actions.push_back(act);
       this->set_transaction_headers(trx, this->DEFAULT_EXPIRATION_DELTA);
       trx.sign(this->get_private_key(config::system_account_name, "active"), control->get_chain_id());
-<<<<<<< HEAD
-      trx.get_signature_keys(control->get_chain_id() );
-=======
       flat_set<public_key_type> keys;
       trx.get_signature_keys(control->get_chain_id(), fc::time_point::maximum(), keys);
->>>>>>> otherb
       auto res = this->push_transaction(trx);
       BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
       this->produce_block();
@@ -1138,11 +1122,7 @@ BOOST_FIXTURE_TEST_CASE(deferred_transaction_tests, TESTER) { try {
       produce_blocks( 3 );
 
       //check that only one deferred transaction executed
-<<<<<<< HEAD
-      auto dtrxs = control->get_scheduled_transactions();
-=======
       auto dtrxs = get_scheduled_transactions();
->>>>>>> otherb
       BOOST_CHECK_EQUAL(dtrxs.size(), 1);
       for (const auto& trx: dtrxs) {
          control->push_scheduled_transaction(trx, fc::time_point::maximum());
@@ -1196,63 +1176,6 @@ BOOST_FIXTURE_TEST_CASE(deferred_transaction_tests, TESTER) { try {
 
    produce_blocks(10);
 
-<<<<<<< HEAD
-{
-   // Trigger a tx which in turn sends a deferred tx with payer != receiver
-   // Payer is alice in this case, this tx should fail since we don't have the authorization of alice
-   dtt_action dtt_act1;
-   dtt_act1.payer = N(alice);
-   BOOST_CHECK_THROW(CALL_TEST_FUNCTION(*this, "test_transaction", "send_deferred_tx_with_dtt_action", fc::raw::pack(dtt_act1)), missing_auth_exception);
-
-   // Send a tx which in turn sends a deferred tx with the deferred tx's receiver != this tx receiver
-   // This will include the authorization of the receiver, and impose any related delay associated with the authority
-   // We set the authorization delay to be 10 sec here, and since the deferred tx delay is set to be 5 sec, so this tx should fail
-   dtt_action dtt_act2;
-   dtt_act2.deferred_account = N(testapi2);
-   dtt_act2.permission_name = N(additional);
-   dtt_act2.delay_sec = 5;
-
-   auto auth = authority(get_public_key("testapi", name(dtt_act2.permission_name).to_string()), 10);
-   auth.accounts.push_back( permission_level_weight{{N(testapi), config::eosio_code_name}, 1} );
-
-   push_action(config::system_account_name, updateauth::get_name(), "testapi", fc::mutable_variant_object()
-           ("account", "testapi")
-           ("permission", name(dtt_act2.permission_name))
-           ("parent", "active")
-           ("auth", auth)
-   );
-   push_action(config::system_account_name, linkauth::get_name(), "testapi", fc::mutable_variant_object()
-           ("account", "testapi")
-           ("code", name(dtt_act2.deferred_account))
-           ("type", name(dtt_act2.deferred_action))
-           ("requirement", name(dtt_act2.permission_name)));
-   BOOST_CHECK_THROW(CALL_TEST_FUNCTION(*this, "test_transaction", "send_deferred_tx_with_dtt_action", fc::raw::pack(dtt_act2)), unsatisfied_authorization);
-
-   // But if the deferred transaction has a sufficient delay, then it should work.
-   dtt_act2.delay_sec = 10;
-   CALL_TEST_FUNCTION(*this, "test_transaction", "send_deferred_tx_with_dtt_action", fc::raw::pack(dtt_act2));
-
-   // Meanwhile, if the deferred tx receiver == this tx receiver, the delay will be ignored, this tx should succeed
-   dtt_action dtt_act3;
-   dtt_act3.deferred_account = N(testapi);
-   dtt_act3.permission_name = N(additional);
-   push_action(config::system_account_name, linkauth::get_name(), "testapi", fc::mutable_variant_object()
-         ("account", "testapi")
-         ("code", name(dtt_act3.deferred_account))
-         ("type", name(dtt_act3.deferred_action))
-         ("requirement", name(dtt_act3.permission_name)));
-   CALL_TEST_FUNCTION(*this, "test_transaction", "send_deferred_tx_with_dtt_action", fc::raw::pack(dtt_act3)); //will replace existing transaction
-
-   // If we make testapi account to be priviledged account:
-   // - the deferred transaction will work no matter who is the payer
-   // - the deferred transaction will not care about the delay of the authorization
-   push_action(config::system_account_name, N(setpriv), config::system_account_name,  mutable_variant_object()
-                                                       ("account", "testapi")
-                                                       ("is_priv", 1));
-   CALL_TEST_FUNCTION(*this, "test_transaction", "send_deferred_tx_with_dtt_action", fc::raw::pack(dtt_act1));
-   CALL_TEST_FUNCTION(*this, "test_transaction", "send_deferred_tx_with_dtt_action", fc::raw::pack(dtt_act2));
-}
-=======
    {
       // Trigger a tx which in turn sends a deferred tx with payer != receiver
       // Payer is alice in this case, this tx should fail since we don't have the authorization of alice
@@ -1313,7 +1236,6 @@ BOOST_FIXTURE_TEST_CASE(deferred_transaction_tests, TESTER) { try {
       CALL_TEST_FUNCTION(*this, "test_transaction", "send_deferred_tx_with_dtt_action", fc::raw::pack(dtt_act1));
       CALL_TEST_FUNCTION(*this, "test_transaction", "send_deferred_tx_with_dtt_action", fc::raw::pack(dtt_act2));
    }
->>>>>>> otherb
 
    BOOST_REQUIRE_EQUAL( validate(), true );
 } FC_LOG_AND_RETHROW() }
@@ -1818,16 +1740,6 @@ BOOST_FIXTURE_TEST_CASE(print_tests, TESTER) { try {
    BOOST_CHECK_EQUAL( tx9_act_cnsl.substr(start, end-start), "6.666666666666666e-07" );
 
    // test printqf
-<<<<<<< HEAD
-   auto tx10_trace = CALL_TEST_FUNCTION( *this, "test_print", "test_printqf", {} );
-   auto tx10_act_cnsl = tx10_trace->action_traces.front().console;
-   start = 0; end = tx10_act_cnsl.find('\n', start);
-   BOOST_CHECK_EQUAL( tx10_act_cnsl.substr(start, end-start), "5.000000000000000000e-01" );
-   start = end + 1; end = tx10_act_cnsl.find('\n', start);
-   BOOST_CHECK_EQUAL( tx10_act_cnsl.substr(start, end-start), "-3.750000000000000000e+00" );
-   start = end + 1; end = tx10_act_cnsl.find('\n', start);
-   BOOST_CHECK_EQUAL( tx10_act_cnsl.substr(start, end-start), "6.666666666666666667e-07" );
-=======
 #ifdef __x86_64__
    std::string expect1 = "5.000000000000000000e-01";
    std::string expect2 = "-3.750000000000000000e+00";
@@ -1845,7 +1757,6 @@ BOOST_FIXTURE_TEST_CASE(print_tests, TESTER) { try {
    BOOST_CHECK_EQUAL( tx10_act_cnsl.substr(start, end-start), expect2 );
    start = end + 1; end = tx10_act_cnsl.find('\n', start);
    BOOST_CHECK_EQUAL( tx10_act_cnsl.substr(start, end-start), expect3 );
->>>>>>> otherb
 
    BOOST_REQUIRE_EQUAL( validate(), true );
 } FC_LOG_AND_RETHROW() }
