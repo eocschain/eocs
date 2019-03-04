@@ -34,12 +34,6 @@
 
    function usage()
    {
-<<<<<<< HEAD
-      printf "\\tUsage: %s \\n\\t[Build Option -o <Debug|Release|RelWithDebInfo|MinSizeRel>] \\n\\t[CodeCoverage -c] \\n\\t[Doxygen -d] \\n\\t[CoreSymbolName -s <1-7 characters>] \\n\\t[Avoid Compiling -a]\\n\\n" "$0" 1>&2
-      exit 1
-   }
-
-=======
       printf "\\tUsage: %s \\n\\t[Build Option -o <Debug|Release|RelWithDebInfo|MinSizeRel>] \\n\\t[CodeCoverage -c] \\n\\t[Doxygen -d] \\n\\t[CoreSymbolName -s <1-7 characters>] \\n\\t[Avoid Compiling -a]\\n\\t[Noninteractive -y]\\n\\n" "$0" 1>&2
       exit 1
    }
@@ -48,7 +42,6 @@
       [[ -n "${EOSIO_BUILD_NONINTERACTIVE+1}" ]]
    }
 
->>>>>>> otherb
    ARCH=$( uname )
    if [ "${SOURCE_DIR}" == "${PWD}" ]; then
       BUILD_DIR="${PWD}/build"
@@ -56,17 +49,12 @@
       BUILD_DIR="${PWD}"
    fi
    CMAKE_BUILD_TYPE=Release
-<<<<<<< HEAD
-   DISK_MIN=8
-   DOXYGEN=false
-   ENABLE_COVERAGE_TESTING=false
-   CORE_SYMBOL_NAME="SYS" # deprecated
-=======
+
    DISK_MIN=20
    DOXYGEN=false
    ENABLE_COVERAGE_TESTING=false
    CORE_SYMBOL_NAME="SYS"
->>>>>>> otherb
+
    # Use current directory's tmp directory if noexec is enabled for /tmp
    if (mount | grep "/tmp " | grep --quiet noexec); then
         mkdir -p $SOURCE_DIR/tmp
@@ -84,11 +72,7 @@
    txtrst=$(tput sgr0)
 
    if [ $# -ne 0 ]; then
-<<<<<<< HEAD
-      while getopts ":cdo:s:ah" opt; do
-=======
       while getopts ":cdo:s:ahy" opt; do
->>>>>>> otherb
          case "${opt}" in
             o )
                options=( "Debug" "Release" "RelWithDebInfo" "MinSizeRel" )
@@ -122,12 +106,9 @@
                usage
                exit 1
             ;;
-<<<<<<< HEAD
-=======
             y)
                EOSIO_BUILD_NONINTERACTIVE=1
             ;;
->>>>>>> otherb
             \? )
                printf "\\n\\tInvalid Option: %s\\n" "-${OPTARG}" 1>&2
                usage
@@ -266,11 +247,8 @@
 
    . "$FILE"
 
-<<<<<<< HEAD
-   printf "\\n\\n>>>>>>>> ALL dependencies sucessfully found or installed . Installing EOSIO\\n\\n"
-=======
+
    printf "\\n\\n>>>>>>>> ALL dependencies successfully found or installed . Installing EOSIO\\n\\n"
->>>>>>> otherb
    printf ">>>>>>>> CMAKE_BUILD_TYPE=%s\\n" "${CMAKE_BUILD_TYPE}"
    printf ">>>>>>>> ENABLE_COVERAGE_TESTING=%s\\n" "${ENABLE_COVERAGE_TESTING}"
    printf ">>>>>>>> DOXYGEN=%s\\n\\n" "${DOXYGEN}"
@@ -295,12 +273,7 @@
 
    if ! "${CMAKE}" -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}" -DCMAKE_CXX_COMPILER="${CXX_COMPILER}" \
       -DCMAKE_C_COMPILER="${C_COMPILER}" -DWASM_ROOT="${WASM_ROOT}" -DCORE_SYMBOL_NAME="${CORE_SYMBOL_NAME}" \
-<<<<<<< HEAD
-      -DOPENSSL_ROOT_DIR="${OPENSSL_ROOT_DIR}" -DBUILD_MONGO_DB_PLUGIN=false \
-      -DBUILD_MYSQL_DB_PLUGIN=true \
-=======
       -DOPENSSL_ROOT_DIR="${OPENSSL_ROOT_DIR}" -DBUILD_MONGO_DB_PLUGIN=true \
->>>>>>> otherb
       -DENABLE_COVERAGE_TESTING="${ENABLE_COVERAGE_TESTING}" -DBUILD_DOXYGEN="${DOXYGEN}" \
       -DCMAKE_INSTALL_PREFIX="/usr/local/eosio" ${LOCAL_CMAKE_FLAGS} "${SOURCE_DIR}"
    then
