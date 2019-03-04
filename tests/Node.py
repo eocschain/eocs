@@ -1073,10 +1073,7 @@ class Node(object):
             (self.endpointHttp, producer, whereInSequence, basedOnLib)
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
         rtn=None
-<<<<<<< HEAD
-=======
         start=time.perf_counter()
->>>>>>> otherb
         try:
             if returnType==ReturnType.json:
                 rtn=Utils.runCmdReturnJson(cmd, silentErrors=silentErrors)
@@ -1084,12 +1081,6 @@ class Node(object):
                 rtn=Utils.runCmdReturnStr(cmd)
             else:
                 unhandledEnumType(returnType)
-<<<<<<< HEAD
-        except subprocess.CalledProcessError as ex:
-            if not silentErrors:
-                msg=ex.output.decode("utf-8")
-                errorMsg="Exception during \"%s\". %s" % (cmd, msg)
-=======
 
             if Utils.Debug:
                 end=time.perf_counter()
@@ -1099,7 +1090,6 @@ class Node(object):
                 end=time.perf_counter()
                 msg=ex.output.decode("utf-8")
                 errorMsg="Exception during \"%s\". %s.  cmd Duration=%.3f sec." % (cmd, msg, end-start)
->>>>>>> otherb
                 if exitOnError:
                     Utils.cmdError(errorMsg)
                     Utils.errorExit(errorMsg)
@@ -1144,14 +1134,6 @@ class Node(object):
         cmd="%s %s" % (Utils.MongoPath, self.mongoEndpointArgs)
         subcommand="db.blocks.find().sort({\"_id\":%d}).limit(1).pretty()" % (idx)
         if Utils.Debug: Utils.Print("cmd: echo \"%s\" | %s" % (subcommand, cmd))
-<<<<<<< HEAD
-        try:
-            trans=Node.runMongoCmdReturnJson(cmd.split(), subcommand)
-            return trans
-        except subprocess.CalledProcessError as ex:
-            msg=ex.output.decode("utf-8")
-            Utils.Print("ERROR: Exception during get db block. %s" % (msg))
-=======
         start=time.perf_counter()
         try:
             trans=Node.runMongoCmdReturnJson(cmd.split(), subcommand)
@@ -1163,7 +1145,6 @@ class Node(object):
             end=time.perf_counter()
             msg=ex.output.decode("utf-8")
             Utils.Print("ERROR: Exception during get db block.  cmd Duration: %.3f sec.  %s" % (end-start, msg))
->>>>>>> otherb
             return None
 
     def checkPulse(self, exitOnError=False):
