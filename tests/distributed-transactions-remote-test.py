@@ -58,11 +58,7 @@ try:
     Print ("producing nodes: %s, non-producing nodes: %d, topology: %s, delay between nodes launch(seconds): %d" %
            (pnodes, total_nodes-pnodes, topo, delay))
     Print("Stand up cluster")
-<<<<<<< HEAD
-    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, prodCount=prodCount, topo=topo, delay=delay, dontKill=dontKill) is False:
-=======
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, prodCount=prodCount, topo=topo, delay=delay) is False:
->>>>>>> otherb
         errorExit("Failed to stand up eos cluster.")
 
     Print ("Wait for Cluster stabilization")
