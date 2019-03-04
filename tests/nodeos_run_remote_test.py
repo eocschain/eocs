@@ -43,11 +43,7 @@ try:
            (pnodes, total_nodes-pnodes, topo, delay))
     Print("Stand up cluster")
 
-<<<<<<< HEAD
-    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, prodCount=prodCount, topo=topo, delay=delay, onlyBios=onlyBios, dontKill=dontKill) is False:
-=======
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, prodCount=prodCount, topo=topo, delay=delay, onlyBios=onlyBios) is False:
->>>>>>> otherb
         errorExit("Failed to stand up eos cluster.")
 
     Print ("Wait for Cluster stabilization")
