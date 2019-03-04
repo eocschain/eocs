@@ -1023,10 +1023,7 @@ class Node(object):
         else:
             exitMsg=""
         trans=None
-<<<<<<< HEAD
-=======
         start=time.perf_counter()
->>>>>>> otherb
         try:
             if returnType==ReturnType.json:
                 trans=Utils.runCmdReturnJson(cmd, silentErrors=silentErrors)
@@ -1034,12 +1031,6 @@ class Node(object):
                 trans=Utils.runCmdReturnStr(cmd)
             else:
                 unhandledEnumType(returnType)
-<<<<<<< HEAD
-        except subprocess.CalledProcessError as ex:
-            if not silentErrors:
-                msg=ex.output.decode("utf-8")
-                errorMsg="Exception during \"%s\". Exception message: %s. %s" % (cmdDesc, msg, exitMsg)
-=======
 
             if Utils.Debug:
                 end=time.perf_counter()
@@ -1049,7 +1040,6 @@ class Node(object):
                 end=time.perf_counter()
                 msg=ex.output.decode("utf-8")
                 errorMsg="Exception during \"%s\". Exception message: %s.  cmd Duration=%.3f sec. %s" % (cmdDesc, msg, end-start, exitMsg)
->>>>>>> otherb
                 if exitOnError:
                     Utils.cmdError(errorMsg)
                     Utils.errorExit(errorMsg)
