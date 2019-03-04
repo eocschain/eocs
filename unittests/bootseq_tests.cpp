@@ -5,11 +5,7 @@
 #include <eosio.system/eosio.system.wast.hpp>
 #include <eosio.system/eosio.system.abi.hpp>
 // These contracts are still under dev
-<<<<<<< HEAD
-#include <eosio.bios/eosio.bios.wast.hpp>
-#include <eosio.bios/eosio.bios.abi.hpp>
-=======
->>>>>>> otherb
+
 #include <eosio.token/eosio.token.wast.hpp>
 #include <eosio.token/eosio.token.abi.hpp>
 #include <eosio.msig/eosio.msig.wast.hpp>
