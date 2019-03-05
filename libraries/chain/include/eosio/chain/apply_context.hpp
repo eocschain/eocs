@@ -1,10 +1,8 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
+
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
+
  */
 #pragma once
 #include <eosio/chain/controller.hpp>
@@ -576,7 +574,7 @@ class apply_context {
       uint64_t next_recv_sequence( account_name receiver );
       uint64_t next_auth_sequence( account_name actor );
 
-<<<<<<< HEAD
+
       void add_ram_usage( account_name account, int64_t ram_delta, bool includes_mrs_ram = true );
       void finalize_trace( action_trace& trace, const fc::time_point& start );
 
@@ -586,11 +584,7 @@ class apply_context {
       void validate_expiration( const transaction& t )const;
 
 
-=======
-      void add_ram_usage( account_name account, int64_t ram_delta );
-      void finalize_trace( action_trace& trace, const fc::time_point& start );
 
->>>>>>> otherb
    /// Fields:
    public:
 
