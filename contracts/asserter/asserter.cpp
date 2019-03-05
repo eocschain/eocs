@@ -1,10 +1,7 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
+
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
  */
 
 #include <asserter/asserter.hpp> /// defines assert_def struct (abi)
