@@ -1,10 +1,6 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
  */
 
 #pragma once
@@ -27,10 +23,7 @@ public:
       fc::optional<int32_t> max_irreversible_block_age;
       fc::optional<int32_t> produce_time_offset_us;
       fc::optional<int32_t> last_block_time_offset_us;
-<<<<<<< HEAD
-=======
       fc::optional<int32_t> max_scheduled_transaction_time_per_block_ms;
->>>>>>> otherb
       fc::optional<int32_t> subjective_cpu_leeway_us;
       fc::optional<double>  incoming_defer_ratio;
    };
@@ -67,10 +60,7 @@ public:
       ) override;
 
    bool                   is_producer_key(const chain::public_key_type& key) const;
-<<<<<<< HEAD
    flat_set<chain::public_key_type> get_producer_keys() const;
-=======
->>>>>>> otherb
    chain::signature_type  sign_compact(const chain::public_key_type& key, const fc::sha256& digest) const;
 
    virtual void plugin_initialize(const boost::program_options::variables_map& options);
