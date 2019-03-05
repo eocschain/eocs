@@ -3,18 +3,6 @@ add_subdirectory( builtins )
 add_subdirectory( softfloat )
 add_subdirectory( chainbase )
 add_subdirectory( wasm-jit )
-<<<<<<< HEAD
-add_subdirectory( utilities )
-add_subdirectory( appbase )
-add_subdirectory( chain )
-add_subdirectory( testing )
-add_subdirectory( abi_generator )
-
-#turn these off for now
-set(BUILD_TESTS OFF CACHE BOOL "Build GTest-based tests")
-set(BUILD_TOOLS OFF CACHE BOOL "Build wabt tools")
-set(RUN_RE2C OFF CACHE BOOL "Run re2c")
-=======
 add_subdirectory( appbase )
 add_subdirectory( chain )
 add_subdirectory( testing )
@@ -24,5 +12,4 @@ set(BUILD_TESTS OFF CACHE BOOL "Build GTest-based tests")
 set(BUILD_TOOLS OFF CACHE BOOL "Build wabt tools")
 set(RUN_RE2C OFF CACHE BOOL "Run re2c")
 set(WITH_EXCEPTIONS ON CACHE BOOL "Build with exceptions enabled" FORCE)
->>>>>>> otherb
 add_subdirectory( wabt )
