@@ -1,10 +1,8 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
+
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
+
  */
 #pragma once
 #include <eosiolib/system.h>
@@ -125,11 +123,10 @@ extern "C" {
 
    bool is_account( account_name name );
 
-<<<<<<< HEAD
+
    bool is_inline();
 
-=======
->>>>>>> otherb
+
    /**
     *  Send an inline action in the context of this action's parent transaction
     * 
