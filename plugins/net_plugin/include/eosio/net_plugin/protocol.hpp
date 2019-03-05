@@ -1,10 +1,6 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
  */
 #pragma once
 #include <eosio/chain/block.hpp>
@@ -143,13 +139,8 @@ namespace eosio {
                                       notice_message,
                                       request_message,
                                       sync_request_message,
-<<<<<<< HEAD
-                                      signed_block,
-                                      packed_transaction>;
-=======
                                       signed_block,         // which = 7
                                       packed_transaction>;  // which = 8
->>>>>>> otherb
 
 } // namespace eosio
 
