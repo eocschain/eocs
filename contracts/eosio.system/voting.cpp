@@ -1,10 +1,7 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
+
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
  */
 #include "eosio.system.hpp"
 
@@ -80,15 +77,10 @@ namespace eosiosystem {
       auto idx = _producers.get_index<N(prototalvote)>();
 
       std::vector< std::pair<eosio::producer_key,uint16_t> > top_producers;
-<<<<<<< HEAD
+
       top_producers.reserve(_gstate.max_producer_schedule_size);
 
       for ( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < _gstate.max_producer_schedule_size && 0 < it->total_votes && it->active(); ++it ) {
-=======
-      top_producers.reserve(21);
-
-      for ( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < 21 && 0 < it->total_votes && it->active(); ++it ) {
->>>>>>> otherb
          top_producers.emplace_back( std::pair<eosio::producer_key,uint16_t>({{it->owner, it->producer_key}, it->location}) );
       }
 
@@ -145,22 +137,15 @@ namespace eosiosystem {
          eosio_assert( voter_name != proxy, "cannot proxy to self" );
          require_recipient( proxy );
       } else {
-<<<<<<< HEAD
-         eosio_assert( producers.size() <= 1, "attempt to vote for too many producers" );
-=======
+
          eosio_assert( producers.size() <= 30, "attempt to vote for too many producers" );
->>>>>>> otherb
+
          for( size_t i = 1; i < producers.size(); ++i ) {
             eosio_assert( producers[i-1] < producers[i], "producer votes must be unique and sorted" );
          }
       }
 
       auto voter = _voters.find(voter_name);
-<<<<<<< HEAD
-      auto curr_block_num = current_block_num();
-      auto ct = current_time();
-=======
->>>>>>> otherb
       eosio_assert( voter != _voters.end(), "user must stake before they can vote" ); /// staking creates voter object
       eosio_assert( !proxy || !voter->is_proxy, "account registered as a proxy is not allowed to use a proxy" );
 
@@ -171,11 +156,7 @@ namespace eosiosystem {
        */
       if( voter->last_vote_weight <= 0.0 ) {
          _gstate.total_activated_stake += voter->staked;
-<<<<<<< HEAD
          if( _gstate.total_activated_stake >= _gstate.min_activated_stake && _gstate.thresh_activated_stake_time == 0 ) {
-=======
-         if( _gstate.total_activated_stake >= min_activated_stake && _gstate.thresh_activated_stake_time == 0 ) {
->>>>>>> otherb
             _gstate.thresh_activated_stake_time = current_time();
          }
       }
@@ -223,229 +204,7 @@ namespace eosiosystem {
          }
       }
 
-<<<<<<< HEAD
-      if (voter->has_voted == 0)
-      {
-         for( const auto& pd : producer_deltas ) {
-            auto pitr = _producers.find( pd.first );
-            if( pitr != _producers.end() ) {
-               eosio_assert( !voting || pitr->active() || !pd.second.second /* not from new set */, "producer is not currently registered" );
-               _producers.modify( pitr, 0, [&]( auto& p ) {
-                  //producer state change after vote
-                  p.total_voteage += p.total_stake * (curr_block_num - p.voteage_update_height);
-                  p.total_stake += voter->staked;
-                  p.voteage_update_height = curr_block_num;
-                  
-                  p.total_votes += pd.second.first;
-                  if ( p.total_votes < 0 ) { // floating point arithmetics can give small negative numbers
-                     p.total_votes = 0;
-                  }
-                  _gstate.total_producer_vote_weight += pd.second.first;
-                  //eosio_assert( p.total_votes >= 0, "something bad happened" );
-               });
-            } else {
-               eosio_assert( !pd.second.second /* not from new set */, "producer is not registered" ); //data corruption
-            }
-         }
-      }
 
-      const auto& voter_info = _voters.get( voter_name );
-      const account_name producer_name = voter_info.producers[0];
-      if ((voter->has_voted == 1) && (producer_name == producers[0]))
-      {
-         const auto& prod = _producers.get( producer_name );
-         eosio_assert( prod.active(), "producer does not have an active key" );
-
-         if (_gstate.total_activated_stake >= _gstate.min_activated_stake)
-         {
-            const asset token_supply   = token( N(eosio.token)).get_supply(symbol_type(system_token_symbol()).name() );
-            const auto usecs_since_last_fill = ct - _gstate.last_pervote_bucket_fill;
-
-            if( usecs_since_last_fill > 0 && _gstate.last_pervote_bucket_fill > 0 ) {
-               auto new_tokens = static_cast<int64_t>( (_gstate.continuous_rate * double(token_supply.amount) * double(usecs_since_last_fill)) / double(useconds_per_year) );
-
-               auto to_producers       = static_cast<int64_t>( new_tokens * _gstate.to_producers_rate );
-               auto to_savings         = new_tokens - to_producers;
-               auto to_per_block_pay   = static_cast<int64_t>( to_producers * _gstate.to_bpay_rate );
-               auto to_per_vote_pay    = to_producers - to_per_block_pay;
-
-               INLINE_ACTION_SENDER(eosio::token, issue)( N(eosio.token), {{N(eosio),N(active)}},
-                                                         {N(eosio), asset(new_tokens), std::string("issue tokens for producer pay and savings")} );
-
-               INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio),N(active)},
-                                                            { N(eosio), N(eosio.saving), asset(to_savings), "unallocated inflation" } );
-
-               INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio),N(active)},
-                                                            { N(eosio), N(eosio.bpay), asset(to_per_block_pay), "fund per-block bucket" } );
-
-               INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio),N(active)},
-                                                            { N(eosio), N(eosio.vpay), asset(to_per_vote_pay), "fund per-vote bucket" } );
-
-               _gstate.pervote_bucket  += to_per_vote_pay;
-               _gstate.perblock_bucket += to_per_block_pay;
-
-               _gstate.last_pervote_bucket_fill = ct;
-            }
-
-            int64_t producer_per_block_pay = 0;
-            if( _gstate.total_unpaid_blocks > 0 ) {
-               producer_per_block_pay = (_gstate.perblock_bucket * prod.unpaid_blocks) / _gstate.total_unpaid_blocks;
-            }
-            int64_t producer_per_vote_pay = 0;
-            if( _gstate.total_producer_vote_weight > 0 ) {
-               producer_per_vote_pay  = int64_t((_gstate.pervote_bucket * prod.total_votes ) / _gstate.total_producer_vote_weight);
-            }
-            if( producer_per_vote_pay < _gstate.min_pervote_daily_pay ) {
-               producer_per_vote_pay = 0;
-            }
-
-            auto total_voteage_add = prod.total_stake * (curr_block_num - prod.voteage_update_height);
-            auto total_voteage = prod.total_voteage + total_voteage_add;
-            int64_t voter_rote_pay = (prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000) * voter_info.staked * (curr_block_num - voter_info.vote_update_height) / total_voteage;
-            int64_t voter_vote_vpay = (prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000) * voter_info.staked * (curr_block_num - voter_info.vote_update_height) / total_voteage;
-
-            _gstate.pervote_bucket      -= producer_per_vote_pay;
-            _gstate.perblock_bucket     -= producer_per_block_pay;
-            _gstate.total_unpaid_blocks -= prod.unpaid_blocks;
-
-            _producers.modify( prod, 0, [&](auto& p) {
-               p.unpaid_blocks = 0;
-               p.bp_reward += producer_per_block_pay * (10000 - prod.commission_rate) / 10000;
-               p.bp_vreward += producer_per_vote_pay * (10000 - prod.commission_rate) / 10000;
-               //p.total_stake -= voter_info.staked;
-               p.total_voteage = total_voteage - voter_info.staked*(curr_block_num - voter_info.vote_update_height);
-               p.rote_reward = prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000 - voter_rote_pay;
-               p.vote_vreward = prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000 - voter_vote_vpay;
-               p.voteage_update_height = curr_block_num;
-
-               p.total_votes += voter_info.last_vote_weight;
-               if ( p.total_votes < 0 ) { // floating point arithmetics can give small negative numbers
-                  p.total_votes = 0;
-               }
-               _gstate.total_producer_vote_weight += voter_info.last_vote_weight;
-            });
-
-            if( voter_rote_pay > 0 ) {
-               INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio.bpay),N(active)},
-                                                            { N(eosio.bpay), voter_name, asset(voter_rote_pay), std::string("voter get vote pay") } );
-            }
-            if( voter_vote_vpay > 0 ) {
-               INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio.vpay),N(active)},
-                                                            { N(eosio.vpay), voter_name, asset(voter_vote_vpay), std::string("voter get producer_vpay's vote pay") } );
-            }
-         }
-         else
-         {
-            _producers.modify( prod, 0, [&](auto& p) {
-               p.total_votes += voter_info.last_vote_weight;
-               if ( p.total_votes < 0 ) { // floating point arithmetics can give small negative numbers
-                  p.total_votes = 0;
-               }
-               _gstate.total_producer_vote_weight += voter_info.last_vote_weight;
-            });
-         }
-      }
-      if ((voter->has_voted == 1) && (producer_name != producers[0]))
-      {
-         const auto& prod = _producers.get( producer_name );
-         eosio_assert( prod.active(), "producer does not have an active key" );
-         const auto& prod_new = _producers.get( producers[0] );
-         eosio_assert( prod_new.active(), "producer does not have an active key" );
-
-         if (_gstate.total_activated_stake >= _gstate.min_activated_stake)
-         {
-            const asset token_supply   = token( N(eosio.token)).get_supply(symbol_type(system_token_symbol()).name() );
-            const auto usecs_since_last_fill = ct - _gstate.last_pervote_bucket_fill;
-
-            if( usecs_since_last_fill > 0 && _gstate.last_pervote_bucket_fill > 0 ) {
-               auto new_tokens = static_cast<int64_t>( (_gstate.continuous_rate * double(token_supply.amount) * double(usecs_since_last_fill)) / double(useconds_per_year) );
-
-               auto to_producers       = static_cast<int64_t>( new_tokens * _gstate.to_producers_rate );
-               auto to_savings         = new_tokens - to_producers;
-               auto to_per_block_pay   = static_cast<int64_t>( to_producers * _gstate.to_bpay_rate );
-               auto to_per_vote_pay    = to_producers - to_per_block_pay;
-
-               INLINE_ACTION_SENDER(eosio::token, issue)( N(eosio.token), {{N(eosio),N(active)}},
-                                                         {N(eosio), asset(new_tokens), std::string("issue tokens for producer pay and savings")} );
-
-               INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio),N(active)},
-                                                            { N(eosio), N(eosio.saving), asset(to_savings), "unallocated inflation" } );
-
-               INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio),N(active)},
-                                                            { N(eosio), N(eosio.bpay), asset(to_per_block_pay), "fund per-block bucket" } );
-
-               INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio),N(active)},
-                                                            { N(eosio), N(eosio.vpay), asset(to_per_vote_pay), "fund per-vote bucket" } );
-
-               _gstate.pervote_bucket  += to_per_vote_pay;
-               _gstate.perblock_bucket += to_per_block_pay;
-
-               _gstate.last_pervote_bucket_fill = ct;
-            }
-
-            int64_t producer_per_block_pay = 0;
-            if( _gstate.total_unpaid_blocks > 0 ) {
-               producer_per_block_pay = (_gstate.perblock_bucket * prod.unpaid_blocks) / _gstate.total_unpaid_blocks;
-            }
-            int64_t producer_per_vote_pay = 0;
-            if( _gstate.total_producer_vote_weight > 0 ) {
-               producer_per_vote_pay  = int64_t((_gstate.pervote_bucket * prod.total_votes ) / _gstate.total_producer_vote_weight);
-            }
-            if( producer_per_vote_pay < _gstate.min_pervote_daily_pay ) {
-               producer_per_vote_pay = 0;
-            }
-
-            auto total_voteage_add = prod.total_stake * (curr_block_num - prod.voteage_update_height);
-            auto total_voteage = prod.total_voteage + total_voteage_add;
-            int64_t voter_rote_pay = (prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000) * voter_info.staked * (curr_block_num - voter_info.vote_update_height) / total_voteage;
-            int64_t voter_vote_vpay = (prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000) * voter_info.staked * (curr_block_num - voter_info.vote_update_height) / total_voteage;
-
-            _gstate.pervote_bucket      -= producer_per_vote_pay;
-            _gstate.perblock_bucket     -= producer_per_block_pay;
-            _gstate.total_unpaid_blocks -= prod.unpaid_blocks;
-
-            _producers.modify( prod, 0, [&](auto& p) {
-               p.unpaid_blocks = 0;
-               p.bp_reward += producer_per_block_pay * (10000 - prod.commission_rate) / 10000;
-               p.bp_vreward += producer_per_vote_pay * (10000 - prod.commission_rate) / 10000;
-               p.total_stake -= voter_info.staked;
-               p.total_voteage = total_voteage - voter_info.staked*(curr_block_num - voter_info.vote_update_height);
-               p.rote_reward = prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000 - voter_rote_pay;
-               p.vote_vreward = prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000 - voter_vote_vpay;
-               p.voteage_update_height = curr_block_num;
-            });
-
-            _producers.modify( prod_new, 0, [&](auto& p) {
-               p.total_voteage += p.total_stake*(curr_block_num - p.voteage_update_height);
-               p.total_stake += voter_info.staked;
-               p.voteage_update_height = curr_block_num;
-
-               p.total_votes += voter_info.last_vote_weight;
-               if ( p.total_votes < 0 ) { // floating point arithmetics can give small negative numbers
-                  p.total_votes = 0;
-               }
-               _gstate.total_producer_vote_weight += voter_info.last_vote_weight;
-            });
-
-            if( voter_rote_pay > 0 ) {
-               INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio.bpay),N(active)},
-                                                            { N(eosio.bpay), voter_name, asset(voter_rote_pay), std::string("voter get vote pay") } );
-            }
-            if( voter_vote_vpay > 0 ) {
-               INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio.vpay),N(active)},
-                                                            { N(eosio.vpay), voter_name, asset(voter_vote_vpay), std::string("voter get producer_vpay's vote pay") } );
-            }
-         }
-         else
-         {
-            _producers.modify( prod_new, 0, [&](auto& p) {
-               p.total_votes += voter_info.last_vote_weight;
-               if ( p.total_votes < 0 ) { // floating point arithmetics can give small negative numbers
-                  p.total_votes = 0;
-               }
-               _gstate.total_producer_vote_weight += voter_info.last_vote_weight;
-            });
-=======
       for( const auto& pd : producer_deltas ) {
          auto pitr = _producers.find( pd.first );
          if( pitr != _producers.end() ) {
@@ -460,7 +219,6 @@ namespace eosiosystem {
             });
          } else {
             eosio_assert( !pd.second.second /* not from new set */, "producer is not registered" ); //data corruption
->>>>>>> otherb
          }
       }
 
@@ -468,11 +226,6 @@ namespace eosiosystem {
          av.last_vote_weight = new_vote_weight;
          av.producers = producers;
          av.proxy     = proxy;
-<<<<<<< HEAD
-         av.vote_update_height = curr_block_num;
-         av.has_voted = 1;
-=======
->>>>>>> otherb
       });
    }
 
