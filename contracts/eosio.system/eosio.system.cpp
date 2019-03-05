@@ -9,14 +9,13 @@
 
 namespace eosiosystem {
 
-<<<<<<< HEAD
+
    uint64_t system_token_symbol() {
      static auto symbol =  core_symbol();
      return symbol;
    }
 
-=======
->>>>>>> otherb
+
    system_contract::system_contract( account_name s )
    :native(s),
     _voters(_self,_self),
@@ -30,11 +29,8 @@ namespace eosiosystem {
       auto itr = _rammarket.find(S(4,RAMCORE));
 
       if( itr == _rammarket.end() ) {
-<<<<<<< HEAD
          auto system_token_supply   = eosio::token(N(eosio.token)).get_supply(eosio::symbol_type(system_token_symbol()).name()).amount;
-=======
-         auto system_token_supply   = eosio::token(N(eosio.token)).get_supply(eosio::symbol_type(system_token_symbol).name()).amount;
->>>>>>> otherb
+
          if( system_token_supply > 0 ) {
             itr = _rammarket.emplace( _self, [&]( auto& m ) {
                m.supply.amount = 100000000000000ll;
@@ -42,11 +38,8 @@ namespace eosiosystem {
                m.base.balance.amount = int64_t(_gstate.free_ram());
                m.base.balance.symbol = S(0,RAM);
                m.quote.balance.amount = system_token_supply / 1000;
-<<<<<<< HEAD
                m.quote.balance.symbol = core_symbol();
-=======
-               m.quote.balance.symbol = CORE_SYMBOL;
->>>>>>> otherb
+
             });
          }
       } else {
@@ -150,7 +143,6 @@ namespace eosiosystem {
       }
    }
 
-<<<<<<< HEAD
    void system_contract::setglobal( std::string name, std::string value ) {
       require_auth( _self );
 
@@ -207,8 +199,6 @@ namespace eosiosystem {
       set_minimum_resource_security(ram_bytes, net_bytes, cpu_us);
    }
 
-=======
->>>>>>> otherb
    /**
     *  Called after a new account is created. This code enforces resource-limits rules
     *  for new accounts as well as new account naming conventions.
@@ -263,19 +253,14 @@ EOSIO_ABI( eosiosystem::system_contract,
      // native.hpp (newaccount definition is actually in eosio.system.cpp)
      (newaccount)(updateauth)(deleteauth)(linkauth)(unlinkauth)(canceldelay)(onerror)
      // eosio.system.cpp
-<<<<<<< HEAD
+
      (setram)(setparams)(setpriv)(rmvproducer)(bidname)(setglobal)(setmrs)
-=======
-     (setram)(setparams)(setpriv)(rmvproducer)(bidname)
->>>>>>> otherb
+
      // delegate_bandwidth.cpp
      (buyrambytes)(buyram)(sellram)(delegatebw)(undelegatebw)(refund)
      // voting.cpp
      (regproducer)(unregprod)(voteproducer)(regproxy)
      // producer_pay.cpp
-<<<<<<< HEAD
-     (onblock)(claimrewards)(roterewards)(setcomrate)
-=======
      (onblock)(claimrewards)
->>>>>>> otherb
+
 )
