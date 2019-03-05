@@ -258,7 +258,6 @@
          {"name":"thresh_activated_stake_time",   "type":"uint64"},
          {"name":"last_producer_schedule_size",   "type":"uint16"},
          {"name":"total_producer_vote_weight",    "type":"float64"},
-<<<<<<< HEAD
          {"name":"last_name_close",               "type":"block_timestamp_type"},
          {"name":"max_producer_schedule_size",    "type":"uint8"},
          {"name":"min_pervote_daily_pay",         "type":"int64"},
@@ -266,9 +265,6 @@
          {"name":"continuous_rate",               "type":"float64"},
          {"name":"to_producers_rate",             "type":"float64"},
          {"name":"to_bpay_rate",                  "type":"float64"}
-=======
-         {"name":"last_name_close",               "type":"block_timestamp_type"}
->>>>>>> otherb
       ]
     },{
       "name": "producer_info",
@@ -281,19 +277,7 @@
          {"name":"url",             "type":"string"},
          {"name":"unpaid_blocks",   "type":"uint32"},
          {"name":"last_claim_time", "type":"uint64"},
-<<<<<<< HEAD
-         {"name":"location",        "type":"uint16"},
-         {"name":"commission_rate", "type":"uint16"},
-         {"name":"total_stake",     "type":"uint64"},
-         {"name":"total_voteage",   "type":"uint64"},
-         {"name":"voteage_update_height", "type":"uint32"},
-         {"name":"rote_reward",     "type":"int64"},
-         {"name":"bp_reward",       "type":"int64"},
-         {"name":"vote_vreward",    "type":"int64"},
-         {"name":"bp_vreward",      "type":"int64"}
-=======
          {"name":"location",        "type":"uint16"}
->>>>>>> otherb
       ]
     },{
       "name": "regproducer",
@@ -339,12 +323,6 @@
         {"name":"proxy",                "type":"account_name"},
         {"name":"producers",            "type":"account_name[]"},
         {"name":"staked",               "type":"int64"},
-<<<<<<< HEAD
-        {"name":"vote_update_height",   "type":"uint32"},
-        {"name":"has_voted",            "type":"bool"},
-        {"name":"last_vote_time",       "type":"int64"},
-=======
->>>>>>> otherb
         {"name":"last_vote_weight",     "type":"float64"},
         {"name":"proxied_vote_weight",  "type":"float64"},
         {"name":"is_proxy",             "type":"bool"}
@@ -356,22 +334,6 @@
         {"name":"owner",   "type":"account_name"}
       ]
     },{
-<<<<<<< HEAD
-      "name": "roterewards",
-      "base": "",
-      "fields": [
-        {"name":"owner",   "type":"account_name"}
-      ]
-    },{
-      "name": "setcomrate",
-      "base": "",
-      "fields": [
-        {"name":"owner",   "type":"account_name"},
-        {"name":"commission_rate", "type":"int16"}
-      ]
-    },{
-=======
->>>>>>> otherb
       "name": "setpriv",
       "base": "",
       "fields": [
@@ -448,7 +410,7 @@
           {"name":"high_bid", "type":"int64"},
           {"name":"last_bid_time", "type":"uint64"}
        ]
-<<<<<<< HEAD
+
     }, {
        "name": "setglobal",
        "base": "",
@@ -465,9 +427,6 @@
          {"name":"ram_bytes", "type":"int64"}
        ]
    }
-=======
-    }
->>>>>>> otherb
    ],
    "actions": [{
      "name": "newaccount",
@@ -558,17 +517,6 @@
       "type": "claimrewards",
       "ricardian_contract": ""
    },{
-<<<<<<< HEAD
-      "name": "roterewards",
-      "type": "roterewards",
-      "ricardian_contract": ""
-   },{
-      "name": "setcomrate",
-      "type": "setcomrate",
-      "ricardian_contract": ""
-   },{
-=======
->>>>>>> otherb
       "name": "setpriv",
       "type": "setpriv",
       "ricardian_contract": ""
@@ -596,7 +544,6 @@
       "name": "setparams",
       "type": "setparams",
       "ricardian_contract": ""
-<<<<<<< HEAD
    },{
       "name": "setglobal",
       "type": "setglobal",
@@ -606,9 +553,6 @@
        "type": "setmrs",
        "ricardian_contract": ""
    }],
-=======
-    }],
->>>>>>> otherb
    "tables": [{
       "name": "producers",
       "type": "producer_info",
