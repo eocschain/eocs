@@ -1,10 +1,8 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
+
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
+
  */
 #include <eosiolib/eosio.hpp>
 #include "../test_api/test_api.hpp"
