@@ -1,10 +1,8 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
+
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
+
  */
 #pragma once
 
@@ -135,24 +133,18 @@ namespace eosio { namespace chain {
    typedef secondary_index<key256_t,index256_object_type>::index_index  index256_index;
 
    struct soft_double_less {
-<<<<<<< HEAD
-      bool operator()( const float64_t& lhs, const float64_t& rhs )const {
-         return f64_lt(lhs, rhs);
-=======
+
       bool operator()( const float64_t& lhs, const float64_t& rhs ) const {
          return f64_lt( lhs, rhs );
->>>>>>> otherb
+
       }
    };
 
    struct soft_long_double_less {
-<<<<<<< HEAD
-      bool operator()( const float128_t lhs, const float128_t& rhs )const {
-         return f128_lt(lhs, rhs);
-=======
+
       bool operator()( const float128_t& lhs, const float128_t& rhs ) const {
          return f128_lt( lhs, rhs );
->>>>>>> otherb
+
       }
    };
 
@@ -161,10 +153,7 @@ namespace eosio { namespace chain {
     *
     *  The software double implementation is using the Berkeley softfloat library (release 3).
     */
-<<<<<<< HEAD
-=======
 
->>>>>>> otherb
    typedef secondary_index<float64_t,index_double_object_type,soft_double_less>::index_object  index_double_object;
    typedef secondary_index<float64_t,index_double_object_type,soft_double_less>::index_index   index_double_index;
 
@@ -176,8 +165,7 @@ namespace eosio { namespace chain {
    typedef secondary_index<float128_t,index_long_double_object_type,soft_long_double_less>::index_object  index_long_double_object;
    typedef secondary_index<float128_t,index_long_double_object_type,soft_long_double_less>::index_index   index_long_double_index;
 
-<<<<<<< HEAD
-=======
+
    template<typename T>
    struct secondary_key_traits {
       using value_type = std::enable_if_t<std::is_integral<T>::value, T>;
@@ -237,7 +225,7 @@ namespace eosio { namespace chain {
       }
    };
 
->>>>>>> otherb
+
    /**
     * helper template to map from an index type to the best tag
     * to use when traversing by table_id
@@ -265,11 +253,9 @@ namespace config {
    template<>
    struct billable_size<table_id_object> {
       static const uint64_t overhead = overhead_per_row_per_index_ram_bytes * 2;  ///< overhead for 2x indices internal-key and code,scope,table
-<<<<<<< HEAD
-      static const uint64_t value = 44 + overhead; ///< 36 bytes for constant size fields + overhead
-=======
+
       static const uint64_t value = 44 + overhead; ///< 44 bytes for constant size fields + overhead
->>>>>>> otherb
+
    };
 
    template<>
