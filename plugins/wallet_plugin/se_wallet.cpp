@@ -1,10 +1,6 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
  */
 #include <eosio/wallet_plugin/se_wallet.hpp>
 #include <eosio/wallet_plugin/macos_user_auth.h>
@@ -309,8 +305,6 @@ se_wallet::se_wallet() : my(new detail::se_wallet_impl()) {
             return;
          }
       }
-<<<<<<< HEAD
-=======
       if(sscanf(model, "Macmini%u", &major) == 1 && major >= 8) {
          my->populate_existing_keys();
          return;
@@ -319,7 +313,6 @@ se_wallet::se_wallet() : my(new detail::se_wallet_impl()) {
          my->populate_existing_keys();
          return;
       }
->>>>>>> otherb
    }
 
    EOS_THROW(secure_enclave_exception, "Secure Enclave not supported on this hardware");
