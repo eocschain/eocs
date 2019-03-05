@@ -2,7 +2,7 @@
  * @file action_test.cpp
 
  * @copyright defined in eos/LICENSE
->>>>>>> otherb
+
  */
 #include <eosiolib/action.hpp>
 #include <eosiolib/transaction.hpp>
