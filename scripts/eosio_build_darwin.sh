@@ -70,10 +70,7 @@
 	then
 		printf "\\tHomebrew must be installed to compile EOS.IO\\n\\n"
 		printf "\\tDo you wish to install Home Brew?\\n"
-<<<<<<< HEAD
-=======
 		if is_noninteractive; then exec <<< "1"; fi
->>>>>>> otherb
 		select yn in "Yes" "No"; do
 			case "${yn}" in
 				[Yy]* )
@@ -142,10 +139,7 @@
 		printf "\\n\\tThe following dependencies are required to install EOSIO.\\n"
 		printf "\\n\\t${DISPLAY}\\n\\n"
 		echo "Do you wish to install these packages?"
-<<<<<<< HEAD
-=======
 		if is_noninteractive; then exec <<< "1"; fi
->>>>>>> otherb
 		select yn in "Yes" "No"; do
 			case $yn in
 				[Yy]* )
@@ -167,20 +161,12 @@
 						printf "\\tExiting now.\\n\\n"
 						exit 1;
 					fi
-<<<<<<< HEAD
-					if ! "${BREW}" unlink {DEP} && "${BREW}" link --force ${DEP}
-					then
-						printf "\\tHomebrew exited with the above errors.\\n"
-						printf "\\tExiting now.\\n\\n"
-						exit 1;
-=======
 					if [ $PERMISSION_GETTEXT -eq 1 ]; then
 						if ! "${BREW}" link --force gettext; then
 							printf "\\tHomebrew exited with the above errors.\\n"
 							printf "\\tExiting now.\\n\\n"
 							exit 1;
 						fi
->>>>>>> otherb
 					fi
 				break;;
 				[Nn]* ) echo "User aborting installation of required dependencies, Exiting now."; exit;;
@@ -199,10 +185,7 @@
 			printf "\\tFound Boost Version %s.\\n" "${BVERSION}"
 			printf "\\tEOS.IO requires Boost version 1.67.\\n"
 			printf "\\tWould you like to uninstall version %s and install Boost version 1.67.\\n" "${BVERSION}"
-<<<<<<< HEAD
-=======
 			if is_noninteractive; then exec <<< "1"; fi
->>>>>>> otherb
 			select yn in "Yes" "No"; do
 				case $yn in
 					[Yy]* )
@@ -237,11 +220,7 @@
 			done
 		fi
 		printf "\\tInstalling boost libraries.\\n"
-<<<<<<< HEAD
-		if ! "${BREW}" install https://raw.githubusercontent.com/Homebrew/homebrew-core/f946d12e295c8a27519b73cc810d06593270a07f/Formula/boost.rb
-=======
 		if ! "${BREW}" install "${SOURCE_DIR}/scripts/boost.rb"
->>>>>>> otherb
 		then
 			printf "\\tUnable to install boost 1.67 libraries at this time. 0\\n"
 			printf "\\tExiting now.\\n\\n"
