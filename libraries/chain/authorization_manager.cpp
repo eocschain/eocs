@@ -1,10 +1,8 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
+
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
+
  */
 
 #include <eosio/chain/authorization_manager.hpp>
@@ -497,17 +495,13 @@ namespace eosio { namespace chain {
                }
             }
 
-<<<<<<< HEAD
-            auto res = permissions_to_satisfy.emplace( declared_auth, delay );
-            if( !res.second && res.first->second > delay) { // if the declared_auth was already in the map and with a higher delay
-               res.first->second = delay;
-=======
+
             if( satisfied_authorizations.find( declared_auth ) == satisfied_authorizations.end() ) {
                auto res = permissions_to_satisfy.emplace( declared_auth, delay );
                if( !res.second && res.first->second > delay) { // if the declared_auth was already in the map and with a higher delay
                   res.first->second = delay;
                }
->>>>>>> otherb
+
             }
          }
       }
