@@ -1,10 +1,8 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
+
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
+
  */
 #pragma once
 
@@ -64,12 +62,7 @@ struct chain_config {
                  << "Max Inline Action Depth: " << c.max_inline_action_depth << ", "
                  << "Max Authority Depth: " << c.max_authority_depth << "\n";
    }
-<<<<<<< HEAD
-};
 
-       bool operator==(const chain_config& a, const chain_config& b);
-inline bool operator!=(const chain_config& a, const chain_config& b) { return !(a == b); }
-=======
 
    friend inline bool operator ==( const chain_config& lhs, const chain_config& rhs ) {
       return   std::tie(   lhs.max_block_net_usage,
@@ -114,7 +107,7 @@ inline bool operator!=(const chain_config& a, const chain_config& b) { return !(
    friend inline bool operator !=( const chain_config& lhs, const chain_config& rhs ) { return !(lhs == rhs); }
 
 };
->>>>>>> otherb
+
 
 } } // namespace eosio::chain
 
