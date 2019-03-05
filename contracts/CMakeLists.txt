@@ -7,10 +7,6 @@ set(STANDARD_INCLUDE_FOLDERS ${CMAKE_SOURCE_DIR}/contracts ${CMAKE_BINARY_DIR}/c
 add_subdirectory(eosiolib)
 add_subdirectory(musl)
 add_subdirectory(libc++)
-<<<<<<< HEAD
-add_subdirectory(simple.token)
-=======
->>>>>>> otherb
 add_subdirectory(eosio.token)
 add_subdirectory(eosio.msig)
 add_subdirectory(eosio.sudo)
@@ -21,36 +17,27 @@ add_subdirectory(identity)
 add_subdirectory(stltest)
 add_subdirectory(test.inline)
 
-<<<<<<< HEAD
-#add_subdirectory(bancor)
+
 add_subdirectory(hello)
 add_subdirectory(asserter)
-add_subdirectory(infinite)
-=======
-add_subdirectory(hello)
-add_subdirectory(asserter)
->>>>>>> otherb
+
 add_subdirectory(proxy)
 add_subdirectory(test_api)
 add_subdirectory(test_api_mem)
 add_subdirectory(test_api_db)
 add_subdirectory(test_api_multi_index)
 add_subdirectory(test_ram_limit)
-<<<<<<< HEAD
-#add_subdirectory(social)
-=======
->>>>>>> otherb
+
 add_subdirectory(eosio.bios)
 add_subdirectory(noop)
 add_subdirectory(tic_tac_toe)
 add_subdirectory(payloadless)
 add_subdirectory(integration_test)
 
-<<<<<<< HEAD
+
 add_subdirectory(icp)
 add_subdirectory(icp.token)
-=======
->>>>>>> otherb
+
 
 file(GLOB SKELETONS RELATIVE ${CMAKE_SOURCE_DIR}/contracts "skeleton/*")
 
