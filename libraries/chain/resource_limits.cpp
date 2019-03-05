@@ -108,7 +108,7 @@ void resource_limits_manager::set_block_parameters(const elastic_limit_parameter
    });
 }
 
-<<<<<<< HEAD
+
 void resource_limits_manager::set_mrs_parameters(int64_t ram_bytes, int64_t net_bytes, int64_t cpu_us) {
    const auto& config = _db.get<resource_limits_config_object>();
    _db.modify(config, [&](resource_limits_config_object& c){
@@ -125,8 +125,7 @@ void resource_limits_manager::get_mrs_parameters(int64_t& ram_bytes, int64_t& ne
    ram_bytes = config.mrs_ram_bytes;
 }
 
-=======
->>>>>>> otherb
+
 void resource_limits_manager::update_account_usage(const flat_set<account_name>& accounts, uint32_t time_slot ) {
    const auto& config = _db.get<resource_limits_config_object>();
    for( const auto& a : accounts ) {
@@ -163,11 +162,9 @@ void resource_limits_manager::add_transaction_usage(const flat_set<account_name>
          uint128_t user_weight     = (uint128_t)cpu_weight;
          uint128_t all_user_weight = state.total_cpu_weight;
 
-<<<<<<< HEAD
+
          auto max_user_use_in_window = (virtual_network_capacity_in_window * user_weight) / all_user_weight + config.mrs_cpu_us;
-=======
-         auto max_user_use_in_window = (virtual_network_capacity_in_window * user_weight) / all_user_weight;
->>>>>>> otherb
+
 
          EOS_ASSERT( cpu_used_in_window <= max_user_use_in_window,
                      tx_cpu_usage_exceeded,
@@ -186,11 +183,9 @@ void resource_limits_manager::add_transaction_usage(const flat_set<account_name>
          uint128_t user_weight     = (uint128_t)net_weight;
          uint128_t all_user_weight = state.total_net_weight;
 
-<<<<<<< HEAD
+
          auto max_user_use_in_window = (virtual_network_capacity_in_window * user_weight) / all_user_weight + config.mrs_net_bytes;
-=======
-         auto max_user_use_in_window = (virtual_network_capacity_in_window * user_weight) / all_user_weight;
->>>>>>> otherb
+
 
          EOS_ASSERT( net_used_in_window <= max_user_use_in_window,
                      tx_net_usage_exceeded,
@@ -229,15 +224,12 @@ void resource_limits_manager::add_pending_ram_usage( const account_name account,
    });
 }
 
-<<<<<<< HEAD
+
 void resource_limits_manager::verify_account_ram_usage( const account_name account, bool includes_mrs_ram )const {
    int64_t ram_bytes; int64_t net_weight; int64_t cpu_weight;
    get_account_limits( account, ram_bytes, net_weight, cpu_weight, includes_mrs_ram );
-=======
-void resource_limits_manager::verify_account_ram_usage( const account_name account )const {
-   int64_t ram_bytes; int64_t net_weight; int64_t cpu_weight;
-   get_account_limits( account, ram_bytes, net_weight, cpu_weight );
->>>>>>> otherb
+
+
    const auto& usage  = _db.get<resource_usage_object,by_owner>( account );
 
    if( ram_bytes >= 0 ) {
@@ -302,14 +294,11 @@ bool resource_limits_manager::set_account_limits( const account_name& account, i
    return decreased_limit;
 }
 
-<<<<<<< HEAD
+
 void resource_limits_manager::get_account_limits( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight, bool includes_mrs_ram ) const {
    const auto* pending_buo = _db.find<resource_limits_object,by_owner>( boost::make_tuple(true, account) );
    const auto& config = _db.get<resource_limits_config_object>();
-=======
-void resource_limits_manager::get_account_limits( const account_name& account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight ) const {
-   const auto* pending_buo = _db.find<resource_limits_object,by_owner>( boost::make_tuple(true, account) );
->>>>>>> otherb
+
    if (pending_buo) {
       ram_bytes  = pending_buo->ram_bytes;
       net_weight = pending_buo->net_weight;
@@ -320,13 +309,12 @@ void resource_limits_manager::get_account_limits( const account_name& account, i
       net_weight = buo.net_weight;
       cpu_weight = buo.cpu_weight;
    }
-<<<<<<< HEAD
+
 
    if (includes_mrs_ram) {
       ram_bytes += config.mrs_ram_bytes;
    }
-=======
->>>>>>> otherb
+
 }
 
 
@@ -435,11 +423,9 @@ account_resource_limit resource_limits_manager::get_account_cpu_limit_ex( const 
    uint128_t user_weight     = (uint128_t)cpu_weight;
    uint128_t all_user_weight = (uint128_t)state.total_cpu_weight;
 
-<<<<<<< HEAD
+
    auto max_user_use_in_window = (virtual_cpu_capacity_in_window * user_weight) / all_user_weight + config.mrs_cpu_us;
-=======
-   auto max_user_use_in_window = (virtual_cpu_capacity_in_window * user_weight) / all_user_weight;
->>>>>>> otherb
+
    auto cpu_used_in_window  = impl::integer_divide_ceil((uint128_t)usage.cpu_usage.value_ex * window_size, (uint128_t)config::rate_limiting_precision);
 
    if( max_user_use_in_window <= cpu_used_in_window )
@@ -478,11 +464,9 @@ account_resource_limit resource_limits_manager::get_account_net_limit_ex( const 
    uint128_t all_user_weight = (uint128_t)state.total_net_weight;
 
 
-<<<<<<< HEAD
+
    auto max_user_use_in_window = (virtual_network_capacity_in_window * user_weight) / all_user_weight + config.mrs_net_bytes;
-=======
-   auto max_user_use_in_window = (virtual_network_capacity_in_window * user_weight) / all_user_weight;
->>>>>>> otherb
+
    auto net_used_in_window  = impl::integer_divide_ceil((uint128_t)usage.net_usage.value_ex * window_size, (uint128_t)config::rate_limiting_precision);
 
    if( max_user_use_in_window <= net_used_in_window )
