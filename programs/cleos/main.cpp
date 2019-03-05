@@ -35,11 +35,7 @@ Subcommands:
   create                      Create various items, on and off the blockchain
   get                         Retrieve various items and information from the blockchain
   set                         Set or update blockchain state
-<<<<<<< HEAD
-  transfer                    Transfer EOS from account to account
-=======
   transfer                    Transfer tokens from account to account
->>>>>>> otherb
   net                         Interact with local p2p network connections
   wallet                      Interact with local wallet
   sign                        Sign a transaction
