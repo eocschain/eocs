@@ -3,11 +3,7 @@
 VERS=`sw_vers -productVersion | awk '/10\.13\..*/{print $0}'`
 if [[ -z "$VERS" ]];
 then
-<<<<<<< HEAD
-   VERS=`sw_vers -productVersion | awk '/10\.14\..*/{print $0}'`
-=======
    VERS=`sw_vers -productVersion | awk '/10\.14.*/{print $0}'`
->>>>>>> otherb
    if [[ -z "$VERS" ]];
    then
       echo "Error, unsupported OS X version"
