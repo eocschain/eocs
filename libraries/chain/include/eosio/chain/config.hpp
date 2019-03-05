@@ -16,10 +16,7 @@ typedef __uint128_t uint128_t;
 
 const static auto default_blocks_dir_name    = "blocks";
 const static auto reversible_blocks_dir_name = "reversible";
-<<<<<<< HEAD
-// TODO: compute from producer scheduler size
-=======
->>>>>>> otherb
+
 const static auto default_reversible_cache_size = 340*1024*1024ll;/// 1MB * 340 blocks based on 21 producer BFT delay
 const static auto default_reversible_guard_size = 2*1024*1024ll;/// 1MB * 340 blocks based on 21 producer BFT delay
 
@@ -85,15 +82,12 @@ const static uint32_t   default_max_trx_delay                  = 45*24*3600; // 
 const static uint32_t   default_max_inline_action_size         = 4 * 1024;   // 4 KB
 const static uint16_t   default_max_inline_action_depth        = 4;
 const static uint16_t   default_max_auth_depth                 = 6;
-<<<<<<< HEAD
+
 // Minimal Resource Security (MRS)
 const static uint32_t   default_mrs_cpu_us = 200'000; // 200 microseconds
 const static uint32_t   default_mrs_net_bytes = 10 * 1024; // 10 KB
 const static uint32_t   default_mrs_ram_bytes = 0; // 0 KB
-=======
-const static uint32_t   default_sig_cpu_bill_pct               = 50 * percent_1; // billable percentage of signature recovery
-const static uint16_t   default_controller_thread_pool_size    = 2;
->>>>>>> otherb
+
 
 const static uint32_t   min_net_usage_delta_between_base_and_max_for_trx  = 10*1024;
 // Should be large enough to allow recovery from badly set blockchain parameters without a hard fork
