@@ -26,11 +26,7 @@ namespace bacc = boost::accumulators;
    struct deadline_timer_verify {
       deadline_timer_verify() {
          //keep longest first in list. You're effectively going to take test_intervals[0]*sizeof(test_intervals[0])
-<<<<<<< HEAD
-         //time to do the the "calibration" 
-=======
          //time to do the the "calibration"
->>>>>>> otherb
          int test_intervals[] = {50000, 10000, 5000, 1000, 500, 100, 50, 10};
 
          struct sigaction act;
@@ -288,10 +284,6 @@ namespace bacc = boost::accumulators;
 
    void transaction_context::init_for_input_trx( uint64_t packed_trx_unprunable_size,
                                                  uint64_t packed_trx_prunable_size,
-<<<<<<< HEAD
-                                                 uint32_t num_signatures,
-=======
->>>>>>> otherb
                                                  bool skip_recording )
    {
       const auto& cfg = control.get_global_properties().configuration;
@@ -321,11 +313,7 @@ namespace bacc = boost::accumulators;
       if (!control.skip_trx_checks()) {
          control.validate_expiration(trx);
          control.validate_tapos(trx);
-<<<<<<< HEAD
-         control.validate_referenced_accounts(trx);
-=======
          validate_referenced_accounts( trx, enforce_whiteblacklist && control.is_producing_block() );
->>>>>>> otherb
       }
       init( initial_net_usage);
       if (!skip_recording)
@@ -374,11 +362,7 @@ namespace bacc = boost::accumulators;
 
       auto& rl = control.get_mutable_resource_limits_manager();
       for( auto a : validate_ram_usage ) {
-<<<<<<< HEAD
          rl.verify_account_ram_usage( a.first, a.second );
-=======
-         rl.verify_account_ram_usage( a );
->>>>>>> otherb
       }
 
       // Calculate the new highest network usage and CPU time that all of the billed accounts can afford to be billed
@@ -538,7 +522,6 @@ namespace bacc = boost::accumulators;
       }
    }
 
-<<<<<<< HEAD
    void transaction_context::add_ram_usage( account_name account, int64_t ram_delta, bool includes_mrs_ram ) {
       auto& rl = control.get_mutable_resource_limits_manager();
       rl.add_pending_ram_usage( account, ram_delta );
@@ -555,16 +538,6 @@ namespace bacc = boost::accumulators;
       validate_ram_usage[account] = includes_mrs_ram;
    }
 
-=======
-   void transaction_context::add_ram_usage( account_name account, int64_t ram_delta ) {
-      auto& rl = control.get_mutable_resource_limits_manager();
-      rl.add_pending_ram_usage( account, ram_delta );
-      if( ram_delta > 0 ) {
-         validate_ram_usage.insert( account );
-      }
-   }
-
->>>>>>> otherb
    uint32_t transaction_context::update_billed_cpu_time( fc::time_point now ) {
       if( explicit_billed_cpu_time ) return static_cast<uint32_t>(billed_cpu_time_us);
 
@@ -649,8 +622,6 @@ namespace bacc = boost::accumulators;
       }
    } /// record_transaction
 
-<<<<<<< HEAD
-=======
    void transaction_context::validate_referenced_accounts( const transaction& trx, bool enforce_actor_whitelist_blacklist )const {
       const auto& db = control.db();
       const auto& auth_manager = control.get_authorization_manager();
@@ -689,6 +660,5 @@ namespace bacc = boost::accumulators;
       }
    }
 
->>>>>>> otherb
 
 } } /// eosio::chain
