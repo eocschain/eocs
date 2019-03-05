@@ -1654,3 +1654,4 @@ void mongo_db_plugin::plugin_shutdown()
 
    my.reset();
 }
+}
