@@ -77,12 +77,12 @@ namespace eosiosystem {
 
       auto ct = current_time();
 
-      eosio_assert( ct - prod.last_claim_time > useconds_per_day, "already claimed rewards within past day" );
+      //eosio_assert( ct - prod.last_claim_time > useconds_per_day, "already claimed rewards within past day" );
 
       const asset token_supply   = token( N(eosio.token)).get_supply(symbol_type(system_token_symbol()).name() );
       const auto usecs_since_last_fill = ct - _gstate.last_pervote_bucket_fill;
 
-      if( usecs_since_last_fill > 0 && _gstate.last_pervote_bucket_fill > 0 ) {
+      if( usecs_since_last_fill > 0 && _gstate.last_pervote_bucket_fill > 0 && (ct - prod.last_claim_time > useconds_per_day)) {
          auto new_tokens = static_cast<int64_t>( (_gstate.continuous_rate * double(token_supply.amount) * double(usecs_since_last_fill)) / double(useconds_per_year) );
 
          auto to_producers       = static_cast<int64_t>( new_tokens * _gstate.to_producers_rate );
@@ -109,32 +109,40 @@ namespace eosiosystem {
       }
 
       int64_t producer_per_block_pay = 0;
-      if( _gstate.total_unpaid_blocks > 0 ) {
+      if( _gstate.total_unpaid_blocks > 0 && (ct - prod.last_claim_time > useconds_per_day)) {
          producer_per_block_pay = (_gstate.perblock_bucket * prod.unpaid_blocks) / _gstate.total_unpaid_blocks;
       }
       int64_t producer_per_vote_pay = 0;
-      if( _gstate.total_producer_vote_weight > 0 ) {
+      if( _gstate.total_producer_vote_weight > 0 && (ct - prod.last_claim_time > useconds_per_day)) {
          producer_per_vote_pay  = int64_t((_gstate.pervote_bucket * prod.total_votes ) / _gstate.total_producer_vote_weight);
       }
-      if( producer_per_vote_pay < _gstate.min_pervote_daily_pay ) {
-         producer_per_vote_pay = 0;
-      }
+      //if( producer_per_vote_pay < _gstate.min_pervote_daily_pay ) {
+      //   producer_per_vote_pay = 0;
+      //}
 
       int64_t producer_block_pay = prod.bp_reward + producer_per_block_pay*(10000 - prod.commission_rate)/10000;
       int64_t producer_per_last_vote_pay = prod.bp_vreward + producer_per_vote_pay*(10000 - prod.commission_rate)/10000;
 
-      _gstate.pervote_bucket      -= producer_per_vote_pay;
-      _gstate.perblock_bucket     -= producer_per_block_pay;
-      _gstate.total_unpaid_blocks -= prod.unpaid_blocks;
+      if (ct - prod.last_claim_time > useconds_per_day) {
+         _gstate.pervote_bucket      -= producer_per_vote_pay;
+         _gstate.perblock_bucket     -= producer_per_block_pay;
+         _gstate.total_unpaid_blocks -= prod.unpaid_blocks;
 
-      _producers.modify( prod, 0, [&](auto& p) {
-          p.last_claim_time = ct;
-          p.unpaid_blocks = 0;
-	  p.rote_reward += producer_per_block_pay * prod.commission_rate / 10000;
-          p.vote_vreward += producer_per_vote_pay * prod.commission_rate / 10000;
-          p.bp_reward = 0;
-          p.bp_vreward = 0;
-      });
+         _producers.modify( prod, 0, [&](auto& p) {
+             p.last_claim_time = ct;
+             p.unpaid_blocks = 0;
+	     p.rote_reward += producer_per_block_pay * prod.commission_rate / 10000;
+             p.vote_vreward += producer_per_vote_pay * prod.commission_rate / 10000;
+             p.bp_reward = 0;
+             p.bp_vreward = 0;
+         });
+      }
+      else {
+	 _producers.modify( prod, 0, [&](auto& p) {
+             p.bp_reward = 0;
+             p.bp_vreward = 0;
+         });
+      }
 
       if( producer_block_pay > 0 ) {
          INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio.bpay),N(active)},
@@ -162,11 +170,14 @@ namespace eosiosystem {
       auto curr_block_num = current_block_num();
 
       //eosio_assert( ct - prod.last_claim_time > useconds_per_day, "already claimed rewards within past day" );
+      if (ct - prod.last_claim_time <= useconds_per_day) {
+         eosio_assert( voter_info.vote_update_height < prod.voteage_update_height, "already claimed vote rewards within past day" );
+      }
 
       const asset token_supply   = token( N(eosio.token)).get_supply(symbol_type(system_token_symbol()).name() );
       const auto usecs_since_last_fill = ct - _gstate.last_pervote_bucket_fill;
 
-      if( usecs_since_last_fill > 0 && _gstate.last_pervote_bucket_fill > 0 ) {
+      if( usecs_since_last_fill > 0 && _gstate.last_pervote_bucket_fill > 0 && (ct - prod.last_claim_time > useconds_per_day)) {
          auto new_tokens = static_cast<int64_t>( (_gstate.continuous_rate * double(token_supply.amount) * double(usecs_since_last_fill)) / double(useconds_per_year) );
 
          auto to_producers       = static_cast<int64_t>( new_tokens * _gstate.to_producers_rate );
@@ -193,16 +204,16 @@ namespace eosiosystem {
       }
 
       int64_t producer_per_block_pay = 0;
-      if( _gstate.total_unpaid_blocks > 0 ) {
+      if( _gstate.total_unpaid_blocks > 0 && (ct - prod.last_claim_time > useconds_per_day)) {
          producer_per_block_pay = (_gstate.perblock_bucket * prod.unpaid_blocks) / _gstate.total_unpaid_blocks;
       }
       int64_t producer_per_vote_pay = 0;
-      if( _gstate.total_producer_vote_weight > 0 ) {
+      if( _gstate.total_producer_vote_weight > 0 && (ct - prod.last_claim_time > useconds_per_day)) {
          producer_per_vote_pay  = int64_t((_gstate.pervote_bucket * prod.total_votes ) / _gstate.total_producer_vote_weight);
       }
-      if( producer_per_vote_pay < _gstate.min_pervote_daily_pay ) {
-         producer_per_vote_pay = 0;
-      }
+      //if( producer_per_vote_pay < _gstate.min_pervote_daily_pay ) {
+      //   producer_per_vote_pay = 0;
+      //}
 
       auto total_voteage_add = static_cast<uint128_t>(double(prod.total_stake) * double(curr_block_num - prod.voteage_update_height));
       auto total_voteage = static_cast<uint128_t>(prod.total_voteage + total_voteage_add);
@@ -210,23 +221,25 @@ namespace eosiosystem {
       auto voter_rote_pay = static_cast<int64_t>(double(prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000) * double(voter_info.staked) * double(curr_block_num - voter_info.vote_update_height) / double(total_voteage));
       auto voter_vote_vpay = static_cast<int64_t>(double(prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000) * double(voter_info.staked) * double(curr_block_num - voter_info.vote_update_height) / double(total_voteage));
 
-      _gstate.pervote_bucket      -= producer_per_vote_pay;
-      _gstate.perblock_bucket     -= producer_per_block_pay;
-      _gstate.total_unpaid_blocks -= prod.unpaid_blocks;
+      if (ct - prod.last_claim_time > useconds_per_day) {
+         _gstate.pervote_bucket      -= producer_per_vote_pay;
+         _gstate.perblock_bucket     -= producer_per_block_pay;
+         _gstate.total_unpaid_blocks -= prod.unpaid_blocks;
 
-      _producers.modify( prod, 0, [&](auto& p) {
-          p.unpaid_blocks = 0;
-          p.bp_reward += producer_per_block_pay * (10000 - prod.commission_rate) / 10000;
-          p.bp_vreward += producer_per_vote_pay * (10000 - prod.commission_rate) / 10000;
-          p.total_voteage = total_voteage - voteage;
-          p.rote_reward += producer_per_block_pay*prod.commission_rate/10000 - voter_rote_pay;
-          p.vote_vreward += producer_per_vote_pay*prod.commission_rate/10000 - voter_vote_vpay;
-	  p.voteage_update_height = curr_block_num;
-      });
+         _producers.modify( prod, 0, [&](auto& p) {
+             p.unpaid_blocks = 0;
+             p.bp_reward += producer_per_block_pay * (10000 - prod.commission_rate) / 10000;
+             p.bp_vreward += producer_per_vote_pay * (10000 - prod.commission_rate) / 10000;
+             p.total_voteage = total_voteage - voteage;
+             p.rote_reward += producer_per_block_pay*prod.commission_rate/10000 - voter_rote_pay;
+             p.vote_vreward += producer_per_vote_pay*prod.commission_rate/10000 - voter_vote_vpay;
+	     p.voteage_update_height = curr_block_num;
+         });
 
-      _voters.modify( voter_info, 0, [&](auto& v) {
-         v.vote_update_height = curr_block_num;
-      });
+         _voters.modify( voter_info, 0, [&](auto& v) {
+            v.vote_update_height = curr_block_num;
+         });
+      }
 
       if( voter_rote_pay > 0 ) {
          INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio.bpay),N(active)},
