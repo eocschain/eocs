@@ -2,14 +2,9 @@
 
 VARIANT=$1
 
-<<<<<<< HEAD
-VERSION="@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@"
-
-=======
 VERSION_NO_SUFFIX="@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@"
 VERSION_SUFFIX="@VERSION_SUFFIX@"
 VERSION="@VERSION_FULL@"
->>>>>>> otherb
 BUILD_DIR="@CMAKE_BINARY_DIR@"
 
 VENDOR="@VENDOR@"
@@ -19,11 +14,8 @@ URL="@URL@"
 EMAIL="@EMAIL@"
 
 export BUILD_DIR
-<<<<<<< HEAD
-=======
 export VERSION_NO_SUFFIX
 export VERSION_SUFFIX
->>>>>>> otherb
 export VERSION
 export VENDOR
 export PROJECT
@@ -43,13 +35,9 @@ else
    echo "Error, unknown package type. Use either ['brew', 'deb', 'rpm']."
    exit -1
 fi
-<<<<<<< HEAD
-rm -r tmp
-=======
 
 BUILDSTATUS=$?
 
 rm -r tmp
 
 exit $BUILDSTATUS
->>>>>>> otherb
