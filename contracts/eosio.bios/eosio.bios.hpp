@@ -1,11 +1,7 @@
 #pragma once
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/privileged.hpp>
-<<<<<<< HEAD
 #include <eosiolib/symbol.h>
-=======
->>>>>>> otherb
-
 namespace eosio {
 
    class bios : public contract {
@@ -47,15 +43,11 @@ namespace eosio {
             require_auth( from );
          }
 
-<<<<<<< HEAD
          void setsymbol( std::string symbol) {
              require_auth( _self );
 
              set_core_symbol(symbol.c_str(), symbol.size());
          }
-
-=======
->>>>>>> otherb
       private:
    };
 
