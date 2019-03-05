@@ -1,11 +1,9 @@
 
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
+
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
+
  */
 #pragma once
 
@@ -55,8 +53,7 @@ struct genesis_state {
     * This is the SHA256 serialization of the genesis_state.
     */
    chain_id_type compute_chain_id() const;
-<<<<<<< HEAD
-=======
+
 
    friend inline bool operator==( const genesis_state& lhs, const genesis_state& rhs ) {
       return std::tie( lhs.initial_configuration, lhs.initial_timestamp, lhs.initial_key )
@@ -65,7 +62,7 @@ struct genesis_state {
 
    friend inline bool operator!=( const genesis_state& lhs, const genesis_state& rhs ) { return !(lhs == rhs); }
 
->>>>>>> otherb
+
 };
 
 } } // namespace eosio::chain
