@@ -1,10 +1,8 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
+
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
+
  */
 #pragma once
 #include <eosio/chain/abi_def.hpp>
@@ -422,19 +420,13 @@ namespace impl {
          mutable_variant_object mvo;
          auto trx = ptrx.get_transaction();
          mvo("id", trx.id());
-<<<<<<< HEAD
-         mvo("signatures", ptrx.signatures);
-         mvo("compression", ptrx.compression);
-         mvo("packed_context_free_data", ptrx.packed_context_free_data);
-         mvo("context_free_data", ptrx.get_context_free_data());
-         mvo("packed_trx", ptrx.packed_trx);
-=======
+
          mvo("signatures", ptrx.get_signatures());
          mvo("compression", ptrx.get_compression());
          mvo("packed_context_free_data", ptrx.get_packed_context_free_data());
          mvo("context_free_data", ptrx.get_context_free_data());
          mvo("packed_trx", ptrx.get_packed_transaction());
->>>>>>> otherb
+
          add(mvo, "transaction", trx, resolver, ctx);
 
          out(name, std::move(mvo));
@@ -589,34 +581,7 @@ namespace impl {
          const variant_object& vo = v.get_object();
          EOS_ASSERT(vo.contains("signatures"), packed_transaction_type_exception, "Missing signatures");
          EOS_ASSERT(vo.contains("compression"), packed_transaction_type_exception, "Missing compression");
-<<<<<<< HEAD
-         from_variant(vo["signatures"], ptrx.signatures);
-         from_variant(vo["compression"], ptrx.compression);
 
-         // TODO: Make this nicer eventually. But for now, if it works... good enough.
-         if( vo.contains("packed_trx") && vo["packed_trx"].is_string() && !vo["packed_trx"].as_string().empty() ) {
-            from_variant(vo["packed_trx"], ptrx.packed_trx);
-            auto trx = ptrx.get_transaction(); // Validates transaction data provided.
-            if( vo.contains("packed_context_free_data") && vo["packed_context_free_data"].is_string() && !vo["packed_context_free_data"].as_string().empty() ) {
-               from_variant(vo["packed_context_free_data"], ptrx.packed_context_free_data );
-            } else if( vo.contains("context_free_data") ) {
-               vector<bytes> context_free_data;
-               from_variant(vo["context_free_data"], context_free_data);
-               ptrx.set_transaction(trx, context_free_data, ptrx.compression);
-            }
-         } else {
-            EOS_ASSERT(vo.contains("transaction"), packed_transaction_type_exception, "Missing transaction");
-            transaction trx;
-            vector<bytes> context_free_data;
-            extract(vo["transaction"], trx, resolver, ctx);
-            if( vo.contains("packed_context_free_data") && vo["packed_context_free_data"].is_string() && !vo["packed_context_free_data"].as_string().empty() ) {
-               from_variant(vo["packed_context_free_data"], ptrx.packed_context_free_data );
-               context_free_data = ptrx.get_context_free_data();
-            } else if( vo.contains("context_free_data") ) {
-               from_variant(vo["context_free_data"], context_free_data);
-            }
-            ptrx.set_transaction(trx, context_free_data, ptrx.compression);
-=======
          std::vector<signature_type> signatures;
          packed_transaction::compression_type compression;
          from_variant(vo["signatures"], signatures);
@@ -653,7 +618,7 @@ namespace impl {
                trx.context_free_data = std::move(cfd);
                ptrx = packed_transaction( std::move( trx ), compression );
             }
->>>>>>> otherb
+
          }
       }
    };
@@ -666,19 +631,12 @@ namespace impl {
     * @tparam Reslover - callable with the signature (const name& code_account) -> optional<abi_def>
     */
    template<typename T, typename Resolver>
-<<<<<<< HEAD
-   class abi_from_variant_visitor : reflector_verifier_visitor<T>
-   {
-      public:
-         abi_from_variant_visitor( const variant_object& _vo, T& v, Resolver _resolver, abi_traverse_context& _ctx )
-         : reflector_verifier_visitor<T>(v)
-=======
+
    class abi_from_variant_visitor : reflector_init_visitor<T>
    {
       public:
          abi_from_variant_visitor( const variant_object& _vo, T& v, Resolver _resolver, abi_traverse_context& _ctx )
          : reflector_init_visitor<T>(v)
->>>>>>> otherb
          ,_vo(_vo)
          ,_resolver(_resolver)
          ,_ctx(_ctx)
