@@ -1,19 +1,12 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
  */
 #include <eosio/producer_plugin/producer_plugin.hpp>
 #include <eosio/chain/producer_object.hpp>
 #include <eosio/chain/plugin_interface.hpp>
 #include <eosio/chain/global_property_object.hpp>
-<<<<<<< HEAD
-=======
 #include <eosio/chain/generated_transaction_object.hpp>
->>>>>>> otherb
 #include <eosio/chain/transaction_object.hpp>
 #include <eosio/chain/snapshot.hpp>
 
@@ -139,19 +132,12 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
       std::map<chain::account_name, uint32_t>                   _producer_watermarks;
       pending_block_mode                                        _pending_block_mode;
       transaction_id_with_expiry_index                          _persistent_transactions;
-<<<<<<< HEAD
-=======
       fc::optional<boost::asio::thread_pool>                    _thread_pool;
->>>>>>> otherb
-
       int32_t                                                   _max_transaction_time_ms;
       fc::microseconds                                          _max_irreversible_block_age_us;
       int32_t                                                   _produce_time_offset_us = 0;
       int32_t                                                   _last_block_time_offset_us = 0;
-<<<<<<< HEAD
-=======
       int32_t                                                   _max_scheduled_transaction_time_per_block_ms;
->>>>>>> otherb
       fc::time_point                                            _irreversible_block_time;
       fc::microseconds                                          _keosd_provider_timeout_us;
 
@@ -160,10 +146,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
       uint32_t   _last_signed_block_num = 0;
 
       producer_plugin* _self = nullptr;
-<<<<<<< HEAD
-=======
       chain_plugin* chain_plug = nullptr;
->>>>>>> otherb
 
       incoming::channels::block::channel_type::handle         _incoming_block_subscription;
       incoming::channels::transaction::channel_type::handle   _incoming_transaction_subscription;
@@ -235,11 +218,7 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
 
          // since the watermark has to be set before a block is created, we are looking into the future to
          // determine the new schedule to identify producers that have become active
-<<<<<<< HEAD
-         chain::controller& chain = app().get_plugin<chain_plugin>().chain();
-=======
          chain::controller& chain = chain_plug->chain();
->>>>>>> otherb
          const auto hbn = bsp->block_num;
          auto new_block_header = bsp->header;
          new_block_header.timestamp = new_block_header.timestamp.next();
@@ -309,20 +288,6 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
       };
 
       void on_incoming_block(const signed_block_ptr& block) {
-<<<<<<< HEAD
-         fc_dlog(_log, "received incoming block ${id}", ("id", block->id()));
-
-         EOS_ASSERT( block->timestamp < (fc::time_point::now() + fc::seconds(7)), block_from_the_future, "received a block from the future, ignoring it" );
-
-
-         chain::controller& chain = app().get_plugin<chain_plugin>().chain();
-
-         /* de-dupe here... no point in aborting block if we already know the block */
-         auto id = block->id();
-         auto existing = chain.fetch_block_by_id( id );
-         if( existing ) { return; }
-
-=======
          auto id = block->id();
 
          fc_dlog(_log, "received incoming block ${id}", ("id", id));
@@ -339,7 +304,6 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
          // start processing of block
          auto bsf = chain.create_block_state_future( block );
 
->>>>>>> otherb
          // abort the pending block
          chain.abort_block();
 
@@ -351,15 +315,9 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
          // push the new block
          bool except = false;
          try {
-<<<<<<< HEAD
-            chain.push_block(block);
-         } catch ( const guard_exception& e ) {
-            app().get_plugin<chain_plugin>().handle_guard_exception(e);
-=======
             chain.push_block( bsf );
          } catch ( const guard_exception& e ) {
             chain_plug->handle_guard_exception(e);
->>>>>>> otherb
             return;
          } catch( const fc::exception& e ) {
             elog((e.to_detail_string()));
@@ -387,12 +345,6 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
          }
       }
 
-<<<<<<< HEAD
-      std::deque<std::tuple<packed_transaction_ptr, bool, next_function<transaction_trace_ptr>>> _pending_incoming_transactions;
-
-      void on_incoming_transaction_async(const packed_transaction_ptr& trx, bool persist_until_expired, next_function<transaction_trace_ptr> next) {
-         chain::controller& chain = app().get_plugin<chain_plugin>().chain();
-=======
       std::deque<std::tuple<transaction_metadata_ptr, bool, next_function<transaction_trace_ptr>>> _pending_incoming_transactions;
 
       void on_incoming_transaction_async(const transaction_metadata_ptr& trx, bool persist_until_expired, next_function<transaction_trace_ptr> next) {
@@ -410,7 +362,6 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
 
       void process_incoming_transaction_async(const transaction_metadata_ptr& trx, bool persist_until_expired, next_function<transaction_trace_ptr> next) {
          chain::controller& chain = chain_plug->chain();
->>>>>>> otherb
          if (!chain.pending_block_state()) {
             _pending_incoming_transactions.emplace_back(trx, persist_until_expired, next);
             return;
@@ -421,26 +372,11 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
          auto send_response = [this, &trx, &chain, &next](const fc::static_variant<fc::exception_ptr, transaction_trace_ptr>& response) {
             next(response);
             if (response.contains<fc::exception_ptr>()) {
-<<<<<<< HEAD
-               _transaction_ack_channel.publish(std::pair<fc::exception_ptr, packed_transaction_ptr>(response.get<fc::exception_ptr>(), trx));
-=======
                _transaction_ack_channel.publish(std::pair<fc::exception_ptr, transaction_metadata_ptr>(response.get<fc::exception_ptr>(), trx));
->>>>>>> otherb
                if (_pending_block_mode == pending_block_mode::producing) {
                   fc_dlog(_trx_trace_log, "[TRX_TRACE] Block ${block_num} for producer ${prod} is REJECTING tx: ${txid} : ${why} ",
                         ("block_num", chain.head_block_num() + 1)
                         ("prod", chain.pending_block_state()->header.producer)
-<<<<<<< HEAD
-                        ("txid", trx->id())
-                        ("why",response.get<fc::exception_ptr>()->what()));
-               } else {
-                  fc_dlog(_trx_trace_log, "[TRX_TRACE] Speculative execution is REJECTING tx: ${txid} : ${why} ",
-                          ("txid", trx->id())
-                          ("why",response.get<fc::exception_ptr>()->what()));
-               }
-            } else {
-               _transaction_ack_channel.publish(std::pair<fc::exception_ptr, packed_transaction_ptr>(nullptr, trx));
-=======
                         ("txid", trx->id)
                         ("why",response.get<fc::exception_ptr>()->what()));
                } else {
@@ -450,33 +386,20 @@ class producer_plugin_impl : public std::enable_shared_from_this<producer_plugin
                }
             } else {
                _transaction_ack_channel.publish(std::pair<fc::exception_ptr, transaction_metadata_ptr>(nullptr, trx));
->>>>>>> otherb
                if (_pending_block_mode == pending_block_mode::producing) {
                   fc_dlog(_trx_trace_log, "[TRX_TRACE] Block ${block_num} for producer ${prod} is ACCEPTING tx: ${txid}",
                           ("block_num", chain.head_block_num() + 1)
                           ("prod", chain.pending_block_state()->header.producer)
-<<<<<<< HEAD
-                          ("txid", trx->id()));
-               } else {
-                  fc_dlog(_trx_trace_log, "[TRX_TRACE] Speculative execution is ACCEPTING tx: ${txid}",
-                          ("txid", trx->id()));
-=======
                           ("txid", trx->id));
                } else {
                   fc_dlog(_trx_trace_log, "[TRX_TRACE] Speculative execution is ACCEPTING tx: ${txid}",
                           ("txid", trx->id));
->>>>>>> otherb
                }
             }
          };
 
-<<<<<<< HEAD
-         auto id = trx->id();
-         if( fc::time_point(trx->expiration()) < block_time ) {
-=======
          const auto& id = trx->id;
          if( fc::time_point(trx->packed_trx->expiration()) < block_time ) {
->>>>>>> otherb
             send_response(std::static_pointer_cast<fc::exception>(std::make_shared<expired_tx_exception>(FC_LOG_MESSAGE(error, "expired transaction ${id}", ("id", id)) )));
             return;
          }
