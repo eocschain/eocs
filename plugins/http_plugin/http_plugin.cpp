@@ -1,10 +1,6 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
  */
 #include <eosio/http_plugin/http_plugin.hpp>
 #include <eosio/http_plugin/local_endpoint.hpp>
@@ -552,11 +548,8 @@ namespace eosio {
          my->server.stop_listening();
       if(my->https_server.is_listening())
          my->https_server.stop_listening();
-<<<<<<< HEAD
-=======
       if(my->unix_server.is_listening())
          my->unix_server.stop_listening();
->>>>>>> otherb
    }
 
    void http_plugin::add_handler(const string& url, const url_handler& handler) {
@@ -570,12 +563,9 @@ namespace eosio {
       try {
          try {
             throw;
-<<<<<<< HEAD
-=======
          } catch (chain::unknown_block_exception& e) {
             error_results results{400, "Unknown Block", error_results::error_info(e, verbose_http_errors)};
             cb( 400, fc::json::to_string( results ));
->>>>>>> otherb
          } catch (chain::unsatisfied_authorization& e) {
             error_results results{401, "UnAuthorized", error_results::error_info(e, verbose_http_errors)};
             cb( 401, fc::json::to_string( results ));
