@@ -1,17 +1,13 @@
 /** @file 
-<<<<<<< HEAD
- *    @copyright defined in eos/LICENSE.txt 
-=======
+
  *    @copyright defined in eos/LICENSE 
->>>>>>> otherb
+
  *
  * \warning This file is machine generated. DO NOT EDIT.  See core_symbol.hpp.in for changes.
  */
 
-<<<<<<< HEAD
+
 #define CORE_SYMBOL S(4,${CORE_SYMBOL_NAME})
 
 #undef CORE_SYMBOL
-=======
-#define CORE_SYMBOL S(4,${CORE_SYMBOL_NAME})
->>>>>>> otherb
+
