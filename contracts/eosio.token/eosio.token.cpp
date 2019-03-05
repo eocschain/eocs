@@ -1,10 +1,7 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
+
  */
 
 #include "eosio.token.hpp"
@@ -23,8 +20,6 @@ void token::create( account_name issuer,
 
     stats statstable( _self, sym.name() );
     auto existing = statstable.find( sym.name() );
-<<<<<<< HEAD
-
     if (existing == statstable.end()) {
        statstable.emplace( _self, [&]( auto& s ) {
           s.supply.symbol = maximum_supply.symbol;
@@ -39,15 +34,6 @@ void token::create( account_name issuer,
           s.max_supply = maximum_supply;
        });
     }
-=======
-    eosio_assert( existing == statstable.end(), "token with symbol already exists" );
-
-    statstable.emplace( _self, [&]( auto& s ) {
-       s.supply.symbol = maximum_supply.symbol;
-       s.max_supply    = maximum_supply;
-       s.issuer        = issuer;
-    });
->>>>>>> otherb
 }
 
 
