@@ -1,8 +1,6 @@
 /**
  * @file action_test.cpp
-<<<<<<< HEAD
- * @copyright defined in eos/LICENSE.txt
-=======
+
  * @copyright defined in eos/LICENSE
 >>>>>>> otherb
  */
