@@ -433,12 +433,10 @@ namespace eosio { namespace chain {
                                                const flat_set<permission_level>&    provided_permissions,
                                                fc::microseconds                     provided_delay,
                                                const std::function<void()>&         _checktime,
-<<<<<<< HEAD
-                                               bool                                 allow_unused_keys
-=======
+
                                                bool                                 allow_unused_keys,
                                                const flat_set<permission_level>&    satisfied_authorizations
->>>>>>> otherb
+
                                              )const
    {
       const auto& checktime = ( static_cast<bool>(_checktime) ? _checktime : _noop_checktime );
