@@ -1,17 +1,9 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
- */
-#include <eosio/faucet_testnet_plugin/faucet_testnet_plugin.hpp>
-#include <eosio/chain_plugin/chain_plugin.hpp>
-#include <eosio/utilities/key_conversion.hpp>
-=======
  *  @copyright defined in eos/LICENSE
  */
 #include <eosio/faucet_testnet_plugin/faucet_testnet_plugin.hpp>
 #include <eosio/chain_plugin/chain_plugin.hpp>
->>>>>>> otherb
 
 #include <fc/variant.hpp>
 #include <fc/io/json.hpp>
