@@ -264,13 +264,10 @@
       "name": "reqauth",
       "type": "require_auth",
       "ricardian_contract": ""
-<<<<<<< HEAD
     },{
      "name": "setsymbol",
      "type": "set_symbol",
      "ricardian_contract": ""
-=======
->>>>>>> otherb
     }
    ],
    "tables": [],
