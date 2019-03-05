@@ -51,11 +51,9 @@ void apply_context::exec_one( action_trace& trace )
          privileged = a.privileged;
          auto native = control.find_apply_handler( receiver, act.account, act.name );
          if( native ) {
-<<<<<<< HEAD
-            if( trx_context.can_subjectively_fail && control.is_producing_block() ) {
-=======
+
             if( trx_context.enforce_whiteblacklist && control.is_producing_block() ) {
->>>>>>> otherb
+
                control.check_contract_list( receiver );
                control.check_action_list( act.account, act.name );
             }
@@ -65,11 +63,9 @@ void apply_context::exec_one( action_trace& trace )
          if( a.code.size() > 0
              && !(act.account == config::system_account_name && act.name == N( setcode ) &&
                   receiver == config::system_account_name) ) {
-<<<<<<< HEAD
-            if( trx_context.can_subjectively_fail && control.is_producing_block() ) {
-=======
+
             if( trx_context.enforce_whiteblacklist && control.is_producing_block() ) {
->>>>>>> otherb
+
                control.check_contract_list( receiver );
                control.check_action_list( act.account, act.name );
             }
@@ -213,8 +209,7 @@ void apply_context::execute_inline( action&& a ) {
    EOS_ASSERT( code != nullptr, action_validate_exception,
                "inline action's code account ${account} does not exist", ("account", a.account) );
 
-<<<<<<< HEAD
-=======
+
    bool enforce_actor_whitelist_blacklist = trx_context.enforce_whiteblacklist && control.is_producing_block();
    flat_set<account_name> actors;
 
@@ -227,7 +222,7 @@ void apply_context::execute_inline( action&& a ) {
       inherited_authorizations.reserve( a.authorization.size() );
    }
 
->>>>>>> otherb
+
    for( const auto& auth : a.authorization ) {
       auto* actor = control.db().find<account_object, by_name>(auth.actor);
       EOS_ASSERT( actor != nullptr, action_validate_exception,
@@ -235,24 +230,7 @@ void apply_context::execute_inline( action&& a ) {
       EOS_ASSERT( control.get_authorization_manager().find_permission(auth) != nullptr, action_validate_exception,
                   "inline action's authorizations include a non-existent permission: ${permission}",
                   ("permission", auth) );
-<<<<<<< HEAD
-   }
 
-   // No need to check authorization if: replaying irreversible blocks; contract is privileged; or, contract is calling itself.
-   if( !control.skip_auth_check() && !privileged && a.account != receiver ) {
-      control.get_authorization_manager()
-             .check_authorization( {a},
-                                   {},
-                                   {{receiver, config::eosio_code_name}},
-                                   control.pending_block_time() - trx_context.published,
-                                   std::bind(&transaction_context::checktime, &this->trx_context),
-                                   false
-                                 );
-
-      //QUESTION: Is it smart to allow a deferred transaction that has been delayed for some time to get away
-      //          with sending an inline action that requires a delay even though the decision to send that inline
-      //          action was made at the moment the deferred transaction was executed with potentially no forewarning?
-=======
       if( enforce_actor_whitelist_blacklist )
          actors.insert( auth.actor );
 
@@ -298,7 +276,7 @@ void apply_context::execute_inline( action&& a ) {
             EOS_THROW(subjective_block_production_exception, "Unexpected exception occurred validating inline action sent to self");
          }
       }
->>>>>>> otherb
+
    }
 
    _inline_actions.emplace_back( move(a) );
@@ -320,14 +298,12 @@ void apply_context::schedule_deferred_transaction( const uint128_t& sender_id, a
    EOS_ASSERT( trx.context_free_actions.size() == 0, cfa_inside_generated_tx, "context free actions are not currently allowed in generated transactions" );
    trx.expiration = control.pending_block_time() + fc::microseconds(999'999); // Rounds up to nearest second (makes expiration check unnecessary)
    trx.set_reference_block(control.head_block_id()); // No TaPoS check necessary
-<<<<<<< HEAD
-   control.validate_referenced_accounts( trx );
-=======
+
 
    bool enforce_actor_whitelist_blacklist = trx_context.enforce_whiteblacklist && control.is_producing_block()
                                              && !control.sender_avoids_whitelist_blacklist_enforcement( receiver );
    trx_context.validate_referenced_accounts( trx, enforce_actor_whitelist_blacklist );
->>>>>>> otherb
+
 
    // Charge ahead of time for the additional net usage needed to retire the deferred transaction
    // whether that be by successfully executing, soft failure, hard failure, or expiration.
@@ -342,18 +318,7 @@ void apply_context::schedule_deferred_transaction( const uint128_t& sender_id, a
          require_authorization(payer); /// uses payer's storage
       }
 
-<<<<<<< HEAD
-      // if a contract is deferring only actions to itself then there is no need
-      // to check permissions, it could have done everything anyway.
-      bool check_auth = false;
-      for( const auto& act : trx.actions ) {
-         if( act.account != receiver ) {
-            check_auth = true;
-            break;
-         }
-      }
-      if( check_auth ) {
-=======
+
       // Originally this code bypassed authorization checks if a contract was deferring only actions to itself.
       // The idea was that the code could already do whatever the deferred transaction could do, so there was no point in checking authorizations.
       // But this is not true. The original implementation didn't validate the authorizations on the actions which allowed for privilege escalation.
@@ -378,7 +343,7 @@ void apply_context::schedule_deferred_transaction( const uint128_t& sender_id, a
       };
 
       try {
->>>>>>> otherb
+
          control.get_authorization_manager()
                 .check_authorization( trx.actions,
                                       {},
@@ -387,8 +352,7 @@ void apply_context::schedule_deferred_transaction( const uint128_t& sender_id, a
                                       std::bind(&transaction_context::checktime, &this->trx_context),
                                       false
                                     );
-<<<<<<< HEAD
-=======
+
       } catch( const fc::exception& e ) {
          if( disallow_send_to_self_bypass || !is_sending_only_to_self(receiver) ) {
             throw;
@@ -405,7 +369,7 @@ void apply_context::schedule_deferred_transaction( const uint128_t& sender_id, a
          } else if( control.is_producing_block() ) {
             EOS_THROW(subjective_block_production_exception, "Unexpected exception occurred validating sent deferred transaction consisting only of actions to self");
          }
->>>>>>> otherb
+
       }
    }
 
@@ -571,14 +535,10 @@ int apply_context::db_store_i64( uint64_t code, uint64_t scope, uint64_t table, 
    const auto& obj = db.create<key_value_object>( [&]( auto& o ) {
       o.t_id        = tableid;
       o.primary_key = id;
-<<<<<<< HEAD
-      o.value.resize( buffer_size );
-      o.payer       = payer;
-      memcpy( o.value.data(), buffer, buffer_size );
-=======
+
       o.value.assign( buffer, buffer_size );
       o.payer       = payer;
->>>>>>> otherb
+
    });
 
    db.modify( tab, [&]( auto& t ) {
@@ -617,12 +577,9 @@ void apply_context::db_update_i64( int iterator, account_name payer, const char*
    }
 
    db.modify( obj, [&]( auto& o ) {
-<<<<<<< HEAD
-     o.value.resize( buffer_size );
-     memcpy( o.value.data(), buffer, buffer_size );
-=======
+
      o.value.assign( buffer, buffer_size );
->>>>>>> otherb
+
      o.payer = payer;
    });
 }
@@ -786,13 +743,10 @@ uint64_t apply_context::next_auth_sequence( account_name actor ) {
    return rs.auth_sequence;
 }
 
-<<<<<<< HEAD
+
 void apply_context::add_ram_usage( account_name account, int64_t ram_delta, bool includes_mrs_ram ) {
    trx_context.add_ram_usage( account, ram_delta, includes_mrs_ram );
-=======
-void apply_context::add_ram_usage( account_name account, int64_t ram_delta ) {
-   trx_context.add_ram_usage( account, ram_delta );
->>>>>>> otherb
+
 
    auto p = _account_ram_deltas.emplace( account, ram_delta );
    if( !p.second ) {
