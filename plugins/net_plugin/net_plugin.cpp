@@ -1907,11 +1907,7 @@ namespace eosio {
          } );
    }
 
-<<<<<<< HEAD
-   bool net_plugin_impl::start_session( connection_ptr con ) {
-=======
    bool net_plugin_impl::start_session(const connection_ptr& con) {
->>>>>>> otherb
       boost::asio::ip::tcp::no_delay nodelay( true );
       boost::system::error_code ec;
       con->socket->set_option( nodelay, ec );
