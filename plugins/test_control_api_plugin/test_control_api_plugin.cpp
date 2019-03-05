@@ -1,10 +1,6 @@
 /**
  *  @file
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
  */
 #include <eosio/test_control_api_plugin/test_control_api_plugin.hpp>
 #include <eosio/chain/exceptions.hpp>
