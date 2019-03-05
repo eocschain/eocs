@@ -1,10 +1,8 @@
 /**
  *  @file db.h
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
+
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
+
  *  @brief Defines C API for interfacing with blockchain database
  */
 #pragma once
