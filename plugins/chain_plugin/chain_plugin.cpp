@@ -143,6 +143,7 @@ public:
    :pre_accepted_block_channel(app().get_channel<channels::pre_accepted_block>())
    ,accepted_block_header_channel(app().get_channel<channels::accepted_block_header>())
    ,accepted_block_channel(app().get_channel<channels::accepted_block>())
+   ,accepted_block_with_action_digests_channel(app().get_channel<channels::accepted_block_with_action_digests>())
    ,irreversible_block_channel(app().get_channel<channels::irreversible_block>())
    ,accepted_transaction_channel(app().get_channel<channels::accepted_transaction>())
    ,applied_transaction_channel(app().get_channel<channels::applied_transaction>())
