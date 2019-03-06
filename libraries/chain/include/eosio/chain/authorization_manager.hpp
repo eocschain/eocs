@@ -86,8 +86,8 @@ namespace eosio { namespace chain {
                               const flat_set<permission_level>&    provided_permissions = flat_set<permission_level>(),
                               fc::microseconds                     provided_delay = fc::microseconds(0),
                               const std::function<void()>&         checktime = std::function<void()>(),
-                              bool                                 allow_unused_keys = false
-
+                              bool                                 allow_unused_keys = false,
+                              const flat_set<permission_level>&    satisfied_authorizations = flat_set<permission_level>()
                             )const;
 
 
@@ -109,8 +109,7 @@ namespace eosio { namespace chain {
                               const flat_set<permission_level>&    provided_permissions = flat_set<permission_level>(),
                               fc::microseconds                     provided_delay = fc::microseconds(0),
                               const std::function<void()>&         checktime = std::function<void()>(),
-                              bool                                 allow_unused_keys = false,
-                              const flat_set<permission_level>&    satisfied_authorizations = flat_set<permission_level>()
+                              bool                                 allow_unused_keys = false
                             )const;
 
          flat_set<public_key_type> get_required_keys( const transaction& trx,
