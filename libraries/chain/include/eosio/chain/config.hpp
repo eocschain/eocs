@@ -82,6 +82,8 @@ const static uint32_t   default_max_trx_delay                  = 45*24*3600; // 
 const static uint32_t   default_max_inline_action_size         = 4 * 1024;   // 4 KB
 const static uint16_t   default_max_inline_action_depth        = 4;
 const static uint16_t   default_max_auth_depth                 = 6;
+const static uint32_t   default_sig_cpu_bill_pct               = 50 * percent_1; // billable percentage of signature recovery
+const static uint16_t   default_controller_thread_pool_size    = 2;
 
 // Minimal Resource Security (MRS)
 const static uint32_t   default_mrs_cpu_us = 200'000; // 200 microseconds
