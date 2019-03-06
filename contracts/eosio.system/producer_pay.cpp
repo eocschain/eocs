@@ -212,42 +212,60 @@ namespace eosiosystem {
          producer_per_vote_pay  = int64_t((_gstate.pervote_bucket * prod.total_votes ) / _gstate.total_producer_vote_weight);
       }
       //if( producer_per_vote_pay < _gstate.min_pervote_daily_pay ) {
-      //   producer_per_vote_pay = 0;
+         //producer_per_vote_pay = 0;
       //}
-
-      auto total_voteage_add = static_cast<uint128_t>(double(prod.total_stake) * double(curr_block_num - prod.voteage_update_height));
-      auto total_voteage = static_cast<uint128_t>(prod.total_voteage + total_voteage_add);
-      auto voteage = static_cast<uint128_t>(double(voter_info.staked) * double(curr_block_num - voter_info.vote_update_height));
-      auto voter_rote_pay = static_cast<int64_t>(double(prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000) * double(voter_info.staked) * double(curr_block_num - voter_info.vote_update_height) / double(total_voteage));
-      auto voter_vote_vpay = static_cast<int64_t>(double(prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000) * double(voter_info.staked) * double(curr_block_num - voter_info.vote_update_height) / double(total_voteage));
 
       if (ct - prod.last_claim_time > useconds_per_day) {
          _gstate.pervote_bucket      -= producer_per_vote_pay;
          _gstate.perblock_bucket     -= producer_per_block_pay;
          _gstate.total_unpaid_blocks -= prod.unpaid_blocks;
+      }
 
+      uint32_t curr_block_num_calc = curr_block_num;
+      if (ct - prod.last_claim_time <= useconds_per_day) {
+         curr_block_num_calc = prod.voteage_update_height;
+      }
+      auto total_voteage_add = static_cast<uint128_t>(double(prod.total_stake) * double(curr_block_num_calc - prod.voteage_update_height));
+      uint128_t voteage = 0;
+      if (curr_block_num_calc > voter_info.vote_update_height) {
+         voteage = (uint128_t)(double(voter_info.staked) * double(curr_block_num_calc - voter_info.vote_update_height));
+      }
+      auto total_voteage = static_cast<uint128_t>(prod.total_voteage + total_voteage_add);
+      auto voter_rote_pay = static_cast<int64_t>(double(prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000) * double(voteage) / double(total_voteage));
+      auto voter_vote_vpay = static_cast<int64_t>(double(prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000) * double(voteage) / double(total_voteage));
+
+      if (ct - prod.last_claim_time > useconds_per_day) {
          _producers.modify( prod, 0, [&](auto& p) {
-             p.unpaid_blocks = 0;
-             p.bp_reward += producer_per_block_pay * (10000 - prod.commission_rate) / 10000;
-             p.bp_vreward += producer_per_vote_pay * (10000 - prod.commission_rate) / 10000;
-             p.total_voteage = total_voteage - voteage;
-             p.rote_reward += producer_per_block_pay*prod.commission_rate/10000 - voter_rote_pay;
-             p.vote_vreward += producer_per_vote_pay*prod.commission_rate/10000 - voter_vote_vpay;
-	     p.voteage_update_height = curr_block_num;
-         });
-
-         _voters.modify( voter_info, 0, [&](auto& v) {
-            v.vote_update_height = curr_block_num;
+            p.last_claim_time = ct;
+            p.unpaid_blocks = 0;
+            p.bp_reward += producer_per_block_pay * (10000 - prod.commission_rate) / 10000;
+            p.bp_vreward += producer_per_vote_pay * (10000 - prod.commission_rate) / 10000;
+            p.total_voteage = total_voteage - voteage;
+            p.rote_reward += producer_per_block_pay*prod.commission_rate/10000 - voter_rote_pay;
+            p.vote_vreward += producer_per_vote_pay*prod.commission_rate/10000 - voter_vote_vpay;
+            p.voteage_update_height = curr_block_num;
          });
       }
+      else
+      {
+         _producers.modify( prod, 0, [&](auto& p) {
+            p.total_voteage = total_voteage - voteage;
+            p.rote_reward = p.rote_reward - voter_rote_pay;
+            p.vote_vreward = p.vote_vreward - voter_vote_vpay;
+         });
+      }
+
+      _voters.modify( voter_info, 0, [&](auto& v) {
+         v.vote_update_height = curr_block_num_calc;
+      });
 
       if( voter_rote_pay > 0 ) {
          INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio.bpay),N(active)},
-                                                       { N(eosio.bpay), owner, asset(voter_rote_pay), std::string("voter get vote pay") } );
+                                                       { N(eosio.bpay), owner, asset(voter_rote_pay), std::string("voter get vote bpay") } );
       }
       if( voter_vote_vpay > 0 ) {
          INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio.vpay),N(active)},
-                                                       { N(eosio.vpay), owner, asset(voter_vote_vpay), std::string("voter get producer_vpay's vote pay") } );
+                                                       { N(eosio.vpay), owner, asset(voter_vote_vpay), std::string("voter get vote vpay") } );
       }
    }
 
