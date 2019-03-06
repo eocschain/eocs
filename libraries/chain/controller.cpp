@@ -2245,34 +2245,6 @@ bool controller::is_ram_billing_in_notify_allowed()const {
    return !is_producing_block() || my->conf.allow_ram_billing_in_notify;
 }
 
-
-void controller::validate_referenced_accounts( const transaction& trx )const {
-   for( const auto& a : trx.context_free_actions ) {
-      auto* code = my->db.find<account_object, by_name>(a.account);
-      EOS_ASSERT( code != nullptr, transaction_exception,
-                  "action's code account '${account}' does not exist", ("account", a.account) );
-      EOS_ASSERT( a.authorization.size() == 0, transaction_exception,
-                  "context-free actions cannot have authorizations" );
-   }
-   bool one_auth = false;
-   for( const auto& a : trx.actions ) {
-      auto* code = my->db.find<account_object, by_name>(a.account);
-      EOS_ASSERT( code != nullptr, transaction_exception,
-                  "action's code account '${account}' does not exist", ("account", a.account) );
-      for( const auto& auth : a.authorization ) {
-         one_auth = true;
-         auto* actor = my->db.find<account_object, by_name>(auth.actor);
-         EOS_ASSERT( actor  != nullptr, transaction_exception,
-                     "action's authorizing actor '${account}' does not exist", ("account", auth.actor) );
-         EOS_ASSERT( my->authorization.find_permission(auth) != nullptr, transaction_exception,
-                     "action's authorizations include a non-existent permission: {permission}",
-                     ("permission", auth) );
-      }
-   }
-   EOS_ASSERT( one_auth, tx_no_auths, "transaction must have at least one authorization" );
-}
-
-
 void controller::validate_expiration( const transaction& trx )const { try {
    const auto& chain_configuration = get_global_properties().configuration;
 
