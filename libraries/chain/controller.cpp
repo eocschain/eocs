@@ -125,6 +125,8 @@ struct pending_state {
 
    optional<block_id_type>            _producer_block_id;
 
+   std::function<signature_type(digest_type)> _signer;
+
    void push() {
       _db_session.push();
    }
@@ -1166,7 +1168,8 @@ struct controller_impl {
 
 
    void start_block( block_timestamp_type when, uint16_t confirm_block_count, controller::block_status s,
-                     const optional<block_id_type>& producer_block_id )
+                     const optional<block_id_type>& producer_block_id ,
+                     std::function<signature_type(digest_type)> signer = nullptr )
    {
       EOS_ASSERT( !pending, block_validate_exception, "pending block already exists" );
 
@@ -1185,6 +1188,7 @@ struct controller_impl {
 
       pending->_block_status = s;
       pending->_producer_block_id = producer_block_id;
+      pending->_signer = signer;
       pending->_pending_block_state = std::make_shared<block_state>( *head, when ); // promotes pending schedule (if any) to active
       pending->_pending_block_state->in_current_chain = true;
 
@@ -1252,10 +1256,13 @@ struct controller_impl {
 
    void apply_block( const signed_block_ptr& b, controller::block_status s ) { try {
       try {
-         EOS_ASSERT( b->block_extensions.size() == 0, block_validate_exception, "no supported extensions" );
+//         EOS_ASSERT( b->block_extensions.size() == 0, block_validate_exception, "no supported extensions" );
          auto producer_block_id = b->id();
          start_block( b->timestamp, b->confirmed, s , producer_block_id);
 
+
+         pending->_pending_block_state->block->header_extensions = b->header_extensions;
+         pending->_pending_block_state->block->block_extensions = b->block_extensions;
 
          std::vector<transaction_metadata_ptr> packed_transactions;
          packed_transactions.reserve( b->transactions.size() );
@@ -1520,6 +1527,12 @@ struct controller_impl {
       pending->_pending_block_state->header.transaction_mroot = merkle( move(trx_digests) );
    }
 
+    void set_block_extensions_hash() {
+       const auto& e = pending->_pending_block_state->block->block_extensions;
+       if (not e.empty()) {
+          pending->_pending_block_state->header.set_block_extensions_hash(digest_type::hash(e));
+       }
+    }
 
    void finalize_block()
    {
@@ -1554,6 +1567,7 @@ struct controller_impl {
 
       set_action_merkle();
       set_trx_merkle();
+      set_block_extensions_hash();
 
       auto p = pending->_pending_block_state;
       p->id = p->header.id();
@@ -1840,9 +1854,10 @@ chainbase::database& controller::mutable_db()const { return my->db; }
 const fork_database& controller::fork_db()const { return my->fork_db; }
 
 
-void controller::start_block( block_timestamp_type when, uint16_t confirm_block_count) {
-   validate_db_available_size();
-   my->start_block(when, confirm_block_count, block_status::incomplete, optional<block_id_type>() );
+void controller::start_block( block_timestamp_type when, uint16_t confirm_block_count,
+                             std::function<signature_type(digest_type)> signer ) {
+  validate_db_available_size();
+   my->start_block(when, confirm_block_count, block_status::incomplete, optional<block_id_type>() , signer);
 }
 
 void controller::finalize_block() {
@@ -1986,6 +2001,11 @@ optional<block_id_type> controller::pending_producer_block_id()const {
 
 uint32_t controller::last_irreversible_block_num() const {
    return std::max(std::max(my->head->bft_irreversible_blocknum, my->head->dpos_irreversible_blocknum), my->snapshot_head_block);
+}
+
+std::function<signature_type(digest_type)> controller::pending_producer_signer()const {
+   EOS_ASSERT( my->pending, block_validate_exception, "no pending block" );
+   return my->pending->_signer;
 }
 
 block_id_type controller::last_irreversible_block_id() const {
