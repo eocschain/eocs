@@ -1,10 +1,6 @@
 /**
  *  @file api_tests.cpp
-<<<<<<< HEAD
- *  @copyright defined in eos/LICENSE.txt
-=======
  *  @copyright defined in eos/LICENSE
->>>>>>> otherb
  */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-compare"
