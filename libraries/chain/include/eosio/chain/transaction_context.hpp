@@ -33,7 +33,7 @@ namespace eosio { namespace chain {
 
          void init_for_input_trx( uint64_t packed_trx_unprunable_size,
                                   uint64_t packed_trx_prunable_size,
-                                  uint32_t num_signatures,
+
                                   bool skip_recording);
 
          void init_for_deferred_trx( fc::time_point published );
@@ -56,13 +56,18 @@ namespace eosio { namespace chain {
 
          std::tuple<int64_t, int64_t, bool, bool> max_bandwidth_billed_accounts_can_pay( bool force_elastic_limits = false )const;
 
+         void validate_referenced_accounts( const transaction& trx, bool enforce_actor_whitelist_blacklist )const;
          void emplace_validate_ram_usage( account_name account, bool includes_mrs_ram = true);
+
       private:
 
          friend struct controller_impl;
          friend class apply_context;
 
+
          void add_ram_usage( account_name account, int64_t ram_delta, bool includes_mrs_ram = true );
+
+ 
 
          void dispatch_action( action_trace& trace, const action& a, account_name receiver, bool context_free = false, uint32_t recurse_depth = 0 );
          inline void dispatch_action( action_trace& trace, const action& a, bool context_free = false ) {
@@ -88,7 +93,9 @@ namespace eosio { namespace chain {
 
          vector<action_receipt>        executed;
          flat_set<account_name>        bill_to_accounts;
+
          flat_map<account_name, bool>  validate_ram_usage;
+
 
          /// the maximum number of virtual CPU instructions of the transaction that can be safely billed to the billable accounts
          uint64_t                      initial_max_billable_cpu = 0;
@@ -96,7 +103,9 @@ namespace eosio { namespace chain {
          fc::microseconds              delay;
          bool                          is_input           = false;
          bool                          apply_context_free = true;
-         bool                          can_subjectively_fail = true;
+
+         bool                          enforce_whiteblacklist = true;
+
 
          fc::time_point                deadline = fc::time_point::maximum();
          fc::microseconds              leeway = fc::microseconds(3000);

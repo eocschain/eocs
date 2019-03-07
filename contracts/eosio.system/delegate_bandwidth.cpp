@@ -1,6 +1,6 @@
 /**
  *  @file
- *  @copyright defined in eos/LICENSE.txt
+ *  @copyright defined in eos/LICENSE
  */
 #include "eosio.system.hpp"
 
@@ -28,8 +28,10 @@ namespace eosiosystem {
    using std::map;
    using std::pair;
 
-   // static constexpr time refund_delay = 3*24*3600;
-   // static constexpr time refund_expiration_time = 3600;
+
+   static constexpr time refund_delay = 3*24*3600;
+   static constexpr time refund_expiration_time = 3600;
+
 
    struct user_resources {
       account_name  owner;
@@ -89,6 +91,7 @@ namespace eosiosystem {
       auto itr = _rammarket.find(S(4,RAMCORE));
       auto tmp = *itr;
       auto eosout = tmp.convert( asset(bytes,S(0,RAM)), core_symbol() );
+
 
       buyram( payer, receiver, eosout );
    }
@@ -173,6 +176,7 @@ namespace eosiosystem {
       _rammarket.modify( itr, 0, [&]( auto& es ) {
           /// the cast to int64_t of bytes is safe because we certify bytes is <= quota which is limited by prior purchases
           tokens_out = es.convert( asset(bytes,S(0,RAM)), core_symbol());
+
       });
 
       eosio_assert( tokens_out.amount > 1, "token amount received from selling ram is too low" );
@@ -365,99 +369,6 @@ namespace eosiosystem {
                   v.staked = total_update.amount;
                });
          } else {
-            if( (from_voter->staked > 0) && (from_voter->has_voted == 1) && (_gstate.total_activated_stake >= _gstate.min_activated_stake)) {
-               const auto curr_block_num = current_block_num();
-
-               const auto& voter_info = _voters.get( from );
-               const account_name producer_name = from_voter->producers[0];
-
-               const auto& prod = _producers.get( producer_name );
-               eosio_assert( prod.active(), "producer does not have an active key" );
-
-               eosio_assert( _gstate.total_activated_stake >= _gstate.min_activated_stake,
-                           "cannot claim rewards until the chain is activated (at least 15% of all tokens participate in voting)" );
-
-               auto ct = current_time();
-               //auto curr_block_num = current_block_num();
-
-               //eosio_assert( ct - prod.last_claim_time > useconds_per_day, "already claimed rewards within past day" );
-
-               const asset token_supply   = token( N(eosio.token)).get_supply(symbol_type(system_token_symbol()).name() );
-               const auto usecs_since_last_fill = ct - _gstate.last_pervote_bucket_fill;
-
-               if( usecs_since_last_fill > 0 && _gstate.last_pervote_bucket_fill > 0 ) {
-                  auto new_tokens = static_cast<int64_t>( (_gstate.continuous_rate * double(token_supply.amount) * double(usecs_since_last_fill)) / double(useconds_per_year) );
-
-                  auto to_producers       = static_cast<int64_t>( new_tokens * _gstate.to_producers_rate );
-                  auto to_savings         = new_tokens - to_producers;
-                  auto to_per_block_pay   = static_cast<int64_t>( to_producers * _gstate.to_bpay_rate );
-                  auto to_per_vote_pay    = to_producers - to_per_block_pay;
-
-                  INLINE_ACTION_SENDER(eosio::token, issue)( N(eosio.token), {{N(eosio),N(active)}},
-                                                            {N(eosio), asset(new_tokens), std::string("issue tokens for producer pay and savings")} );
-
-                  INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio),N(active)},
-                                                               { N(eosio), N(eosio.saving), asset(to_savings), "unallocated inflation" } );
-
-                  INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio),N(active)},
-                                                               { N(eosio), N(eosio.bpay), asset(to_per_block_pay), "fund per-block bucket" } );
-
-                  INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio),N(active)},
-                                                               { N(eosio), N(eosio.vpay), asset(to_per_vote_pay), "fund per-vote bucket" } );
-
-                  _gstate.pervote_bucket  += to_per_vote_pay;
-                  _gstate.perblock_bucket += to_per_block_pay;
-
-                  _gstate.last_pervote_bucket_fill = ct;
-               }
-
-               int64_t producer_per_block_pay = 0;
-               if( _gstate.total_unpaid_blocks > 0 ) {
-                  producer_per_block_pay = (_gstate.perblock_bucket * prod.unpaid_blocks) / _gstate.total_unpaid_blocks;
-               }
-               int64_t producer_per_vote_pay = 0;
-               if( _gstate.total_producer_vote_weight > 0 ) {
-                  producer_per_vote_pay  = int64_t((_gstate.pervote_bucket * prod.total_votes ) / _gstate.total_producer_vote_weight);
-               }
-               if( producer_per_vote_pay < _gstate.min_pervote_daily_pay ) {
-                  producer_per_vote_pay = 0;
-               }
-
-               auto total_voteage_add = prod.total_stake * (curr_block_num - prod.voteage_update_height);
-               auto total_voteage = prod.total_voteage + total_voteage_add;
-               int64_t voter_rote_pay = (prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000) * voter_info.staked * (curr_block_num - voter_info.vote_update_height) / total_voteage;
-               //int64_t rote_reward_reduce = prod.rote_reward * voter_info.staked * (curr_block_num - voter_info.vote_update_height) / total_voteage;
-               int64_t voter_vote_vpay = (prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000) * voter_info.staked * (curr_block_num - voter_info.vote_update_height) / total_voteage;
-
-               _gstate.pervote_bucket      -= producer_per_vote_pay;
-               _gstate.perblock_bucket     -= producer_per_block_pay;
-               _gstate.total_unpaid_blocks -= prod.unpaid_blocks;
-
-               _producers.modify( prod, 0, [&](auto& p) {
-                  p.unpaid_blocks = 0;
-                  p.bp_reward += producer_per_block_pay * (10000 - prod.commission_rate) / 10000;
-                  p.bp_vreward += producer_per_vote_pay * (10000 - prod.commission_rate) / 10000;
-                  p.total_stake += total_update.amount;
-                  p.total_voteage = total_voteage - voter_info.staked*(curr_block_num - voter_info.vote_update_height);
-                  //p.rote_reward = prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000 - rote_reward_reduce;
-                  p.rote_reward = prod.rote_reward + producer_per_block_pay*prod.commission_rate/10000 - voter_rote_pay;
-                  p.vote_vreward = prod.vote_vreward + producer_per_vote_pay*prod.commission_rate/10000 - voter_vote_vpay;
-                  p.voteage_update_height = curr_block_num;
-               });
-
-               _voters.modify( voter_info, 0, [&](auto& v) {
-                  v.vote_update_height = curr_block_num;
-               });
-
-               if( voter_rote_pay > 0 ) {
-                  INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio.bpay),N(active)},
-                                                               { N(eosio.bpay), from, asset(voter_rote_pay), std::string("voter get vote pay") } );
-               }
-               if( voter_vote_vpay > 0 ) {
-                  INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {N(eosio.vpay),N(active)},
-                                                               { N(eosio.vpay), from, asset(voter_vote_vpay), std::string("voter get producer_vpay's vote pay") } );
-               }
-            }
             _voters.modify( from_voter, 0, [&]( auto& v ) {
                   v.staked += total_update.amount;
                });
@@ -491,7 +402,9 @@ namespace eosiosystem {
       eosio_assert( asset() <= unstake_cpu_quantity, "must unstake a positive amount" );
       eosio_assert( asset() <= unstake_net_quantity, "must unstake a positive amount" );
       eosio_assert( asset() < unstake_cpu_quantity + unstake_net_quantity, "must unstake a positive amount" );
+
       eosio_assert( _gstate.total_activated_stake >= _gstate.min_activated_stake,
+
                     "cannot undelegate bandwidth until the chain is activated (at least 15% of all tokens participate in voting)" );
 
       changebw( from, receiver, -unstake_net_quantity, -unstake_cpu_quantity, false);
@@ -504,7 +417,9 @@ namespace eosiosystem {
       refunds_table refunds_tbl( _self, owner );
       auto req = refunds_tbl.find( owner );
       eosio_assert( req != refunds_tbl.end(), "refund request not found" );
+
       eosio_assert( req->request_time + _gstate.refund_delay <= now(), "refund is not available yet" );
+
       // Until now() becomes NOW, the fact that now() is the timestamp of the previous block could in theory
       // allow people to get their tokens earlier than the 3 day delay if the unstake happened immediately after many
       // consecutive missed blocks.

@@ -1,7 +1,9 @@
 
 /**
  *  @file
- *  @copyright defined in eos/LICENSE.txt
+
+ *  @copyright defined in eos/LICENSE
+
  */
 #pragma once
 #include <eosio/chain/types.hpp>

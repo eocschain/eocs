@@ -1,6 +1,8 @@
+
+    
 /**
  *  @file
- *  @copyright defined in eos/LICENSE.txt
+ *  @copyright defined in eos/LICENSE
  */
 #include <eosio/mongo_db_plugin/mongo_db_plugin.hpp>
 #include <eosio/chain/eosio_contract.hpp>
@@ -98,7 +100,8 @@ public:
 
    bool add_action_trace( mongocxx::bulk_write& bulk_action_traces, const chain::action_trace& atrace,
                           const chain::transaction_trace_ptr& t,
-                          bool executed, const std::chrono::milliseconds& now );
+                          bool executed, const std::chrono::milliseconds& now,
+                          bool& write_ttrace );
 
    void update_account(const chain::action& act);
 
@@ -569,6 +572,15 @@ void handle_mongo_exception( const std::string& desc, int line_num ) {
    }
 }
 
+// custom oid to avoid monotonic throttling
+// https://docs.mongodb.com/master/core/bulk-write-operations/#avoid-monotonic-throttling
+bsoncxx::oid make_custom_oid() {
+   bsoncxx::oid x = bsoncxx::oid();
+   const char* p = x.bytes();
+   std::swap((short&)p[0], (short&)p[10]);
+   return x;
+}
+
 } // anonymous namespace
 
 void mongo_db_plugin_impl::purge_abi_cache() {
@@ -724,7 +736,7 @@ void mongo_db_plugin_impl::_process_accepted_transaction( const chain::transacti
    using bsoncxx::builder::basic::make_array;
    namespace bbb = bsoncxx::builder::basic;
 
-   const auto& trx = t->trx;
+   const signed_transaction& trx = t->packed_trx->get_signed_transaction();
 
    if( !filter_include( trx ) ) return;
    
@@ -760,9 +772,10 @@ void mongo_db_plugin_impl::_process_accepted_transaction( const chain::transacti
    if( t->signing_keys.valid() ) {
       signing_keys_json = fc::json::to_string( t->signing_keys->second );
    } else {
-      auto signing_keys = trx.get_signature_keys( *chain_id, false, false );
-      if( !signing_keys.empty() ) {
-         signing_keys_json = fc::json::to_string( signing_keys );
+      flat_set<public_key_type> keys;
+      trx.get_signature_keys( *chain_id, fc::time_point::maximum(), keys, false );
+      if( !keys.empty() ) {
+         signing_keys_json = fc::json::to_string( keys );
       }
    }
 
@@ -799,7 +812,8 @@ void mongo_db_plugin_impl::_process_accepted_transaction( const chain::transacti
 bool
 mongo_db_plugin_impl::add_action_trace( mongocxx::bulk_write& bulk_action_traces, const chain::action_trace& atrace,
                                         const chain::transaction_trace_ptr& t,
-                                        bool executed, const std::chrono::milliseconds& now )
+                                        bool executed, const std::chrono::milliseconds& now,
+                                        bool& write_ttrace )
 {
    using namespace bsoncxx::types;
    using bsoncxx::builder::basic::kvp;
@@ -809,10 +823,15 @@ mongo_db_plugin_impl::add_action_trace( mongocxx::bulk_write& bulk_action_traces
    }
 
    bool added = false;
-   if( start_block_reached && store_action_traces &&
-       filter_include( atrace.receipt.receiver, atrace.act.name, atrace.act.authorization ) ) {
+   const bool in_filter = (store_action_traces || store_transaction_traces) && start_block_reached &&
+                    filter_include( atrace.receipt.receiver, atrace.act.name, atrace.act.authorization );
+   write_ttrace |= in_filter;
+   if( start_block_reached && store_action_traces && in_filter ) {
       auto action_traces_doc = bsoncxx::builder::basic::document{};
       const chain::base_action_trace& base = atrace; // without inline action traces
+
+      // improve data distributivity when using mongodb sharding
+      action_traces_doc.append( kvp( "_id", make_custom_oid() ) );
 
       auto v = to_variant_with_abi( base );
       string json = fc::json::to_string( v );
@@ -841,7 +860,7 @@ mongo_db_plugin_impl::add_action_trace( mongocxx::bulk_write& bulk_action_traces
    }
 
    for( const auto& iline_atrace : atrace.inline_traces ) {
-      added |= add_action_trace( bulk_action_traces, iline_atrace, t, executed, now );
+      added |= add_action_trace( bulk_action_traces, iline_atrace, t, executed, now, write_ttrace );
    }
 
    return added;
@@ -861,22 +880,22 @@ void mongo_db_plugin_impl::_process_applied_transaction( const chain::transactio
    bulk_opts.ordered(false);
    mongocxx::bulk_write bulk_action_traces = _action_traces.create_bulk_write(bulk_opts);
    bool write_atraces = false;
+   bool write_ttrace = false; // filters apply to transaction_traces as well
    bool executed = t->receipt.valid() && t->receipt->status == chain::transaction_receipt_header::executed;
 
    for( const auto& atrace : t->action_traces ) {
       try {
-         write_atraces |= add_action_trace( bulk_action_traces, atrace, t, executed, now );
+         write_atraces |= add_action_trace( bulk_action_traces, atrace, t, executed, now, write_ttrace );
       } catch(...) {
          handle_mongo_exception("add action traces", __LINE__);
       }
    }
 
    if( !start_block_reached ) return; //< add_action_trace calls update_account which must be called always
-   if( !write_atraces ) return; //< do not insert transaction_trace if all action_traces filtered out
 
    // transaction trace insert
 
-   if( store_transaction_traces ) {
+   if( store_transaction_traces && write_ttrace ) {
       try {
          auto v = to_variant_with_abi( *t );
          string json = fc::json::to_string( v );
@@ -909,13 +928,15 @@ void mongo_db_plugin_impl::_process_applied_transaction( const chain::transactio
    }
 
    // insert action_traces
-   try {
-      if( !bulk_action_traces.execute() ) {
-         EOS_ASSERT( false, chain::mongo_db_insert_fail,
-                     "Bulk action traces insert failed for transaction trace: ${id}", ("id", t->id) );
+   if( write_atraces ) {
+      try {
+         if( !bulk_action_traces.execute() ) {
+            EOS_ASSERT( false, chain::mongo_db_insert_fail,
+                        "Bulk action traces insert failed for transaction trace: ${id}", ("id", t->id) );
+         }
+      } catch( ... ) {
+         handle_mongo_exception( "action traces insert", __LINE__ );
       }
-   } catch( ... ) {
-      handle_mongo_exception( "action traces insert", __LINE__ );
    }
 
 }
@@ -1076,11 +1097,8 @@ void mongo_db_plugin_impl::_process_irreversible_block(const chain::block_state_
          string trx_id_str;
          if( receipt.trx.contains<packed_transaction>() ) {
             const auto& pt = receipt.trx.get<packed_transaction>();
-            // get id via get_raw_transaction() as packed_transaction.id() mutates internal transaction state
-            const auto& raw = pt.get_raw_transaction();
-            const auto& trx = fc::raw::unpack<transaction>( raw );
-            if( !filter_include( trx ) ) continue;
-            const auto& id = trx.id();
+            if( !filter_include( pt.get_signed_transaction() ) ) continue;
+            const auto& id = pt.id();
             trx_id_str = id.str();
          } else {
             const auto& id = receipt.trx.get<transaction_id_type>();
@@ -1420,7 +1438,7 @@ void mongo_db_plugin_impl::init() {
 
             // action traces indexes
             auto action_traces = mongo_conn[db_name][action_traces_col];
-            action_traces.create_index( bsoncxx::from_json( R"xxx({ "trx_id" : 1 })xxx" ));
+            action_traces.create_index( bsoncxx::from_json( R"xxx({ "block_num" : 1 })xxx" ));
 
             // pub_keys indexes
             auto pub_keys = mongo_conn[db_name][pub_keys_col];
@@ -1636,5 +1654,4 @@ void mongo_db_plugin::plugin_shutdown()
 
    my.reset();
 }
-
-} // namespace eosio
+}

@@ -277,15 +277,7 @@
          {"name":"url",             "type":"string"},
          {"name":"unpaid_blocks",   "type":"uint32"},
          {"name":"last_claim_time", "type":"uint64"},
-         {"name":"location",        "type":"uint16"},
-         {"name":"commission_rate", "type":"uint16"},
-         {"name":"total_stake",     "type":"uint64"},
-         {"name":"total_voteage",   "type":"uint64"},
-         {"name":"voteage_update_height", "type":"uint32"},
-         {"name":"rote_reward",     "type":"int64"},
-         {"name":"bp_reward",       "type":"int64"},
-         {"name":"vote_vreward",    "type":"int64"},
-         {"name":"bp_vreward",      "type":"int64"}
+         {"name":"location",        "type":"uint16"}
       ]
     },{
       "name": "regproducer",
@@ -331,9 +323,6 @@
         {"name":"proxy",                "type":"account_name"},
         {"name":"producers",            "type":"account_name[]"},
         {"name":"staked",               "type":"int64"},
-        {"name":"vote_update_height",   "type":"uint32"},
-        {"name":"has_voted",            "type":"bool"},
-        {"name":"last_vote_time",       "type":"int64"},
         {"name":"last_vote_weight",     "type":"float64"},
         {"name":"proxied_vote_weight",  "type":"float64"},
         {"name":"is_proxy",             "type":"bool"}
@@ -343,19 +332,6 @@
       "base": "",
       "fields": [
         {"name":"owner",   "type":"account_name"}
-      ]
-    },{
-      "name": "roterewards",
-      "base": "",
-      "fields": [
-        {"name":"owner",   "type":"account_name"}
-      ]
-    },{
-      "name": "setcomrate",
-      "base": "",
-      "fields": [
-        {"name":"owner",   "type":"account_name"},
-        {"name":"commission_rate", "type":"int16"}
       ]
     },{
       "name": "setpriv",
@@ -434,6 +410,7 @@
           {"name":"high_bid", "type":"int64"},
           {"name":"last_bid_time", "type":"uint64"}
        ]
+
     }, {
        "name": "setglobal",
        "base": "",
@@ -538,14 +515,6 @@
    },{
       "name": "claimrewards",
       "type": "claimrewards",
-      "ricardian_contract": ""
-   },{
-      "name": "roterewards",
-      "type": "roterewards",
-      "ricardian_contract": ""
-   },{
-      "name": "setcomrate",
-      "type": "setcomrate",
       "ricardian_contract": ""
    },{
       "name": "setpriv",

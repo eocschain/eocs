@@ -1,12 +1,15 @@
 /**
  *  @file
- *  @copyright defined in eos/LICENSE.txt
+
+ *  @copyright defined in eos/LICENSE
+
  */
 #pragma once
 
 #include <fc/crypto/sha256.hpp>
 
 struct hello;
+
 
 namespace eoc_icp{
   class relay;
@@ -17,13 +20,16 @@ namespace eoc_icp{
   struct icp_handshake_message;
 }
 
+
 namespace eosio {
 
    class net_plugin_impl;
    struct handshake_message;
+
    struct difchain_message;
    struct connection_impl;
    
+
 
    namespace chain_apis {
       class read_only;
@@ -34,7 +40,9 @@ namespace chain {
    struct chain_id_type : public fc::sha256 {
       using fc::sha256::sha256;
 
+
       chain_id_type() = default;
+
 
       template<typename T>
       inline friend T& operator<<( T& ds, const chain_id_type& cid ) {
@@ -48,9 +56,12 @@ namespace chain {
         return ds;
       }
 
-      void reflector_verify()const;
+
+      void reflector_init()const;
 
       private:
+
+
          // Some exceptions are unfortunately necessary:
          template<typename T>
          friend T fc::variant::as()const;
@@ -68,6 +79,7 @@ namespace chain {
          friend struct eoc_icp::get_info_results;
          friend class eoc_icp::icp_connection;
          friend struct eoc_icp::icp_handshake_message;
+
    };
 
 } }  // namespace eosio::chain

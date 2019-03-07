@@ -1,6 +1,8 @@
 /**
  *  @file
- *  @copyright defined in eos/LICENSE.txt
+
+ *  @copyright defined in eos/LICENSE
+
  */
 #pragma once
 #include <eosiolib/print.h>
