@@ -194,15 +194,12 @@
       "fields": [
         {"name":"from", "type":"account_name"}
       ]
-<<<<<<< HEAD
     },{
       "name": "set_symbol",
       "base": "",
       "fields": [
         {"name":"symbol", "type":"string"}
       ]
-=======
->>>>>>> otherb
     }],
    "actions": [{
       "name": "newaccount",
