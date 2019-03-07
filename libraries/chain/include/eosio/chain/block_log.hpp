@@ -1,7 +1,5 @@
 /**
- *  @file
-<<<<<<< HEAD
- 
+ *  @file 
  *  @copyright defined in eos/LICENSE
 
  */
