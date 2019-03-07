@@ -1,6 +1,7 @@
 /**
  *  @file
- *  @copyright defined in eos/LICENSE.txt
+ *  @copyright defined in eos/LICENSE
+
  */
 
 #include "eosio.token.hpp"
@@ -19,7 +20,6 @@ void token::create( account_name issuer,
 
     stats statstable( _self, sym.name() );
     auto existing = statstable.find( sym.name() );
-
     if (existing == statstable.end()) {
        statstable.emplace( _self, [&]( auto& s ) {
           s.supply.symbol = maximum_supply.symbol;

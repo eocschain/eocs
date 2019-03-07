@@ -1,6 +1,8 @@
 /**
  *    @file test_compiler_builtins.cpp
- *    @copyright defined in eos/LICENSE.txt
+
+ *    @copyright defined in eos/LICENSE
+
  */
 
 #include <eosiolib/eosio.hpp>

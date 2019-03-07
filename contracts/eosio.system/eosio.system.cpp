@@ -9,10 +9,12 @@
 
 namespace eosiosystem {
 
+
    uint64_t system_token_symbol() {
      static auto symbol =  core_symbol();
      return symbol;
    }
+
 
    system_contract::system_contract( account_name s )
    :native(s),
@@ -28,6 +30,7 @@ namespace eosiosystem {
 
       if( itr == _rammarket.end() ) {
          auto system_token_supply   = eosio::token(N(eosio.token)).get_supply(eosio::symbol_type(system_token_symbol()).name()).amount;
+
          if( system_token_supply > 0 ) {
             itr = _rammarket.emplace( _self, [&]( auto& m ) {
                m.supply.amount = 100000000000000ll;
@@ -36,6 +39,7 @@ namespace eosiosystem {
                m.base.balance.symbol = S(0,RAM);
                m.quote.balance.amount = system_token_supply / 1000;
                m.quote.balance.symbol = core_symbol();
+
             });
          }
       } else {
@@ -249,11 +253,14 @@ EOSIO_ABI( eosiosystem::system_contract,
      // native.hpp (newaccount definition is actually in eosio.system.cpp)
      (newaccount)(updateauth)(deleteauth)(linkauth)(unlinkauth)(canceldelay)(onerror)
      // eosio.system.cpp
+
      (setram)(setparams)(setpriv)(rmvproducer)(bidname)(setglobal)(setmrs)
+
      // delegate_bandwidth.cpp
      (buyrambytes)(buyram)(sellram)(delegatebw)(undelegatebw)(refund)
      // voting.cpp
      (regproducer)(unregprod)(voteproducer)(regproxy)
      // producer_pay.cpp
-     (onblock)(claimrewards)(roterewards)(setcomrate)
+     (onblock)(claimrewards)
+
 )

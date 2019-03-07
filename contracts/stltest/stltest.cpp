@@ -1,6 +1,8 @@
 /**
  *  @file
- *  @copyright defined in eos/LICENSE.txt
+
+ *  @copyright defined in eos/LICENSE
+
  */
 // include entire libc
 #include <alloca.h>

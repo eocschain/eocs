@@ -3,7 +3,9 @@
 #include <eosiolib/print.hpp>
 #include <eosiolib/system.h>
 #include <eosiolib/symbol.hpp>
+
 #include <eosiolib/symbol.h>
+
 #include <tuple>
 #include <limits>
 
@@ -64,7 +66,9 @@ namespace eosio {
          eosio_assert( symbol.is_valid(),        "invalid symbol name" );
       }
 
+
       explicit asset( int64_t a = 0 ) : asset(a, core_symbol()) {}
+
 
       /**
        * Check if the amount doesn't exceed the max amount

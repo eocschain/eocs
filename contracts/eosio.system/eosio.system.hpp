@@ -1,6 +1,6 @@
 /**
  *  @file
- *  @copyright defined in eos/LICENSE.txt
+ *  @copyright defined in eos/LICENSE
  */
 #pragma once
 
@@ -9,9 +9,11 @@
 #include <eosiolib/time.hpp>
 #include <eosiolib/privileged.hpp>
 #include <eosiolib/singleton.hpp>
+
 #include <eosiolib/symbol.h>
 #include <eosio.system/exchange_state.hpp>
 #include <eosiolib/chain.h>
+
 #include <string>
 
 namespace eosiosystem {
@@ -54,6 +56,7 @@ namespace eosiosystem {
       double               total_producer_vote_weight = 0; /// the sum of all producer votes
       block_timestamp      last_name_close;
 
+
       uint8_t              max_producer_schedule_size = 21;
       int64_t              min_pervote_daily_pay      = 100'0000;
       int64_t              min_activated_stake        = 150'000'000'0000;
@@ -63,6 +66,7 @@ namespace eosiosystem {
 
       time                 refund_delay = 3*24*3600;
 
+
       // explicit serialization macro is not necessary, used here only to improve compilation time
       EOSLIB_SERIALIZE_DERIVED( eosio_global_state, eosio::blockchain_parameters,
                                 (max_ram_size)(total_ram_bytes_reserved)(total_ram_stake)
@@ -71,6 +75,7 @@ namespace eosiosystem {
                                 (last_producer_schedule_size)(total_producer_vote_weight)(last_name_close)
                                 (max_producer_schedule_size)(min_pervote_daily_pay)(min_activated_stake)(continuous_rate)(to_producers_rate)(to_bpay_rate)
                                 (refund_delay) )
+
    };
 
    struct producer_info {
@@ -82,33 +87,16 @@ namespace eosiosystem {
       uint32_t              unpaid_blocks = 0;
       uint64_t              last_claim_time = 0;
       uint16_t              location = 0;
-
-      uint16_t              commission_rate = 2000; // 0 - 10000 for 0% - 100%
-      int64_t               total_stake     = 0; // sum( every voter's stake ) 
-      int64_t               total_voteage   = 0; // sum( all voter's stake * every block height )
-      uint32_t              voteage_update_height = 0;
-      int64_t               rote_reward = 0; //reward to voter
-      int64_t               bp_reward = 0; //reward to block producer
-      int64_t               vote_vreward = 0; //vote_pay's reward to voter
-      int64_t               bp_vreward = 0; //vote_pay's reward to block producer
-
       uint64_t primary_key()const { return owner;                                   }
       double   by_votes()const    { return is_active ? -total_votes : total_votes;  }
       bool     active()const      { return is_active;                               }
       void     deactivate()       { producer_key = public_key(); is_active = false; }
 
-      void     update_commission_rate( uint16_t rate ) {
-         commission_rate = rate;
-      }
-
-      void     update_vote_height( uint64_t height ) {
-         voteage_update_height = height;
-      }
 
       // explicit serialization macro is not necessary, used here only to improve compilation time
       EOSLIB_SERIALIZE( producer_info, (owner)(total_votes)(producer_key)(is_active)(url)
-                        (unpaid_blocks)(last_claim_time)(location)(commission_rate)
-		        (total_stake)(total_voteage)(voteage_update_height)(rote_reward)(bp_reward)(vote_vreward)(bp_vreward) )
+                        (unpaid_blocks)(last_claim_time)(location) )
+
    };
 
    struct voter_info {
@@ -116,11 +104,6 @@ namespace eosiosystem {
       account_name                proxy = 0; /// the proxy set by the voter, if any
       std::vector<account_name>   producers; /// the producers approved by this voter if no proxy set
       int64_t                     staked = 0;
-
-      uint32_t                    vote_update_height = 0; //the block number when vote
-      bool                        has_voted = 0; //whether the voter has voted
-      uint64_t                    last_vote_time = 0;
-
       /**
        *  Every time a vote is cast we must first "undo" the last vote weight, before casting the
        *  new vote weight.  Vote weight is calculated as:
@@ -143,7 +126,9 @@ namespace eosiosystem {
       uint64_t primary_key()const { return owner; }
 
       // explicit serialization macro is not necessary, used here only to improve compilation time
-      EOSLIB_SERIALIZE( voter_info, (owner)(proxy)(producers)(staked)(vote_update_height)(has_voted)(last_vote_time)(last_vote_weight)(proxied_vote_weight)(is_proxy)(reserved1)(reserved2)(reserved3) )
+
+      EOSLIB_SERIALIZE( voter_info, (owner)(proxy)(producers)(staked)(last_vote_weight)(proxied_vote_weight)(is_proxy)(reserved1)(reserved2)(reserved3) )
+
    };
 
    typedef eosio::multi_index< N(voters), voter_info>  voters_table;
@@ -157,6 +142,7 @@ namespace eosiosystem {
 
    //   static constexpr uint32_t     max_inflation_rate = 5;  // 5% annual inflation
    static constexpr uint32_t     seconds_per_day = 24 * 3600;
+
    uint64_t system_token_symbol();
 
    class system_contract : public native {
@@ -244,15 +230,12 @@ namespace eosiosystem {
          // functions defined in producer_pay.cpp
          void claimrewards( const account_name& owner );
 
-	 void roterewards( const account_name& owner );
-
-         void setcomrate( const account_name& owner, uint16_t commission_rate );
-
          void setpriv( account_name account, uint8_t ispriv );
 
          void rmvproducer( account_name producer );
 
          void bidname( account_name bidder, account_name newname, asset bid );
+
 
          void setglobal( std::string name, std::string value );
 
@@ -263,6 +246,7 @@ namespace eosiosystem {
           * @param ram_bytes
           */
          void setmrs(int64_t cpu_us, int64_t net_bytes, int64_t ram_bytes);
+
 
       private:
          void update_elected_producers( block_timestamp timestamp );
