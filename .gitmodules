@@ -27,3 +27,6 @@
 [submodule "libraries/wabt"]
 	path = libraries/wabt
 	url = https://github.com/EOSIO/wabt
+[submodule "contracts/libc++/upstream"]
+	path = contracts/libc++/upstream
+	url = https://github.com/eoscochain/libcxx.git
