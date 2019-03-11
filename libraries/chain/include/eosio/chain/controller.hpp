@@ -127,10 +127,6 @@ namespace eosio { namespace chain {
           *  The caller is responsible for calling drop_unapplied_transaction on a failing transaction that
           *  they never intend to retry
           *
-<<<<<<< HEAD
-
-=======
->>>>>>> eosiobranch
           *  @return map of transactions which have been unapplied
           */
          unapplied_transactions_type& get_unapplied_transactions();
