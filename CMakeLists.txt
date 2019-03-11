@@ -16,17 +16,11 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
 
 if (UNIX)
    if (APPLE)
-<<<<<<< HEAD
-      if (LLVM_DIR STREQUAL "" OR NOT LLVM_DIR)
-         set(LLVM_DIR "/usr/local/opt/llvm@4/lib/cmake/llvm/")
-      endif()
-=======
       execute_process(COMMAND xcrun --show-sdk-path
                       OUTPUT_VARIABLE CMAKE_OSX_SYSROOT
                       OUTPUT_STRIP_TRAILING_WHITESPACE)
       list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/llvm@4")
       list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/gettext")
->>>>>>> eosiobranch
    endif()
 endif()
 
@@ -42,14 +36,9 @@ set( CMAKE_CXX_EXTENSIONS ON )
 set( CXX_STANDARD_REQUIRED ON)
 
 set(VERSION_MAJOR 1)
-<<<<<<< HEAD
-set(VERSION_MINOR 6)
-set(VERSION_PATCH 2)
-=======
 set(VERSION_MINOR 7)
 set(VERSION_PATCH 0)
 set(VERSION_SUFFIX rc2)
->>>>>>> eosiobranch
 
 if(VERSION_SUFFIX)
     set(VERSION_FULL "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-${VERSION_SUFFIX}")
