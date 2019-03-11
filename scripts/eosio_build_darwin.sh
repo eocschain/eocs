@@ -68,35 +68,6 @@ then
 fi
 printf " - Ruby installation found @ ${RUBY}\\n"
 
-<<<<<<< HEAD
-	printf "\\tChecking Home Brew installation\\n"
-	if ! BREW=$( command -v brew )
-	then
-		printf "\\tHomebrew must be installed to compile EOS.IO\\n\\n"
-		printf "\\tDo you wish to install Home Brew?\\n"
-		if is_noninteractive; then exec <<< "1"; fi
-		select yn in "Yes" "No"; do
-			case "${yn}" in
-				[Yy]* )
-				"${XCODESELECT}" --install 2>/dev/null;
-				if ! "${RUBY}" -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-				then
-					echo "Unable to install homebrew at this time. Exiting now."
-					exit 1;
-				else
-					BREW=$( command -v brew )
-				fi
-				break;;
-				[Nn]* ) echo "User aborted homebrew installation. Exiting now.";
-						exit 1;;
-				* ) echo "Please enter 1 for yes or 2 for no.";;
-			esac
-		done
-	fi
-
-	printf "\\tHome Brew installation found @\\n"
-	printf "\\t%s\\n\\n" "${BREW}"
-=======
 printf "Checking Home Brew installation...\\n"
 if ! BREW=$( command -v brew )
 then
@@ -115,7 +86,6 @@ then
 		[Nn]* ) echo "User aborted homebrew installation. Exiting now."; exit 1;;
 		* ) echo "Please type 'y' for yes or 'n' for no."; exit;;
 	esac
->>>>>>> eosiobranch
 
 fi
 printf " - Home Brew installation found @ ${BREW}\\n"
@@ -142,40 +112,6 @@ while read -r name tester testee brewname uri; do
 done < "${REPO_ROOT}/scripts/eosio_build_darwin_deps"
 IFS="${var_ifs}"
 
-<<<<<<< HEAD
-	if [ $COUNT -gt 1 ]; then
-		printf "\\n\\tThe following dependencies are required to install EOSIO.\\n"
-		printf "\\n\\t${DISPLAY}\\n\\n"
-		echo "Do you wish to install these packages?"
-		if is_noninteractive; then exec <<< "1"; fi
-		select yn in "Yes" "No"; do
-			case $yn in
-				[Yy]* )
-					if [ $PERMISSION_GETTEXT -eq 1 ]; then
-						sudo chown -R "$(whoami)" /usr/local/share
-					fi
-					"${XCODESELECT}" --install 2>/dev/null;
-					printf "\\tUpdating Home Brew.\\n"
-					if ! brew update
-					then
-						printf "\\tUnable to update Home Brew at this time.\\n"
-						printf "\\tExiting now.\\n\\n"
-						exit 1;
-					fi
-					printf "\\tInstalling Dependencies.\\n"
-					if ! "${BREW}" install --force ${DEP}
-					then
-						printf "\\tHomebrew exited with the above errors.\\n"
-						printf "\\tExiting now.\\n\\n"
-						exit 1;
-					fi
-					if [ $PERMISSION_GETTEXT -eq 1 ]; then
-						if ! "${BREW}" link --force gettext; then
-							printf "\\tHomebrew exited with the above errors.\\n"
-							printf "\\tExiting now.\\n\\n"
-							exit 1;
-						fi
-=======
 if [ ! -d /usr/local/Frameworks ]; then
 	printf "\\n${bldred}/usr/local/Frameworks is necessary to brew install python@3. Run the following commands as sudo and try again:${txtrst}\\n"
 	printf "sudo mkdir /usr/local/Frameworks && sudo chown $(whoami):admin /usr/local/Frameworks\\n\\n"
@@ -197,7 +133,6 @@ if [ $COUNT -gt 1 ]; then
 						exit 1;
 					else
 						printf " - Brew update complete.\\n"
->>>>>>> eosiobranch
 					fi
 				;;
 				[Nn]* ) echo "Proceeding without update!";;
@@ -227,70 +162,7 @@ else
 fi
 
 
-<<<<<<< HEAD
-	printf "\\n\\tChecking boost library installation.\\n"
-	BVERSION=$( grep "#define BOOST_VERSION" "/usr/local/include/boost/version.hpp" 2>/dev/null | tail -1 | tr -s ' ' | cut -d\  -f3 )
-	if [ "${BVERSION}" != "106700" ]; then
-		if [ ! -z "${BVERSION}" ]; then
-			printf "\\tFound Boost Version %s.\\n" "${BVERSION}"
-			printf "\\tEOS.IO requires Boost version 1.67.\\n"
-			printf "\\tWould you like to uninstall version %s and install Boost version 1.67.\\n" "${BVERSION}"
-			if is_noninteractive; then exec <<< "1"; fi
-			select yn in "Yes" "No"; do
-				case $yn in
-					[Yy]* )
-						if "${BREW}" list | grep "boost"
-						then
-							printf "\\tUninstalling Boost Version %s.\\n" "${BVERSION}"
-							if ! "${BREW}" uninstall --force boost
-							then
-								printf "\\tUnable to remove boost libraries at this time. 0\\n"
-								printf "\\tExiting now.\\n\\n"
-								exit 1;
-							fi
-						else
-							printf "\\tRemoving Boost Version %s.\\n" "${BVERSION}"
-							if ! sudo rm -rf "/usr/local/include/boost"
-							then
-								printf "\\tUnable to remove boost libraries at this time. 1\\n"
-								printf "\\tExiting now.\\n\\n"
-								exit 1;
-							fi
-							if ! sudo rm -rf /usr/local/lib/libboost*
-							then
-								printf "\\tUnable to remove boost libraries at this time. 2\\n"
-								printf "\\tExiting now.\\n\\n"
-								exit 1;
-							fi
-						fi
-					break;;
-					[Nn]* ) echo "User cancelled installation of Boost libraries, Exiting now."; exit;;
-					* ) echo "Please type 1 for yes or 2 for no.";;
-				esac
-			done
-		fi
-		printf "\\tInstalling boost libraries.\\n"
-		if ! "${BREW}" install "${SOURCE_DIR}/scripts/boost.rb"
-		then
-			printf "\\tUnable to install boost 1.67 libraries at this time. 0\\n"
-			printf "\\tExiting now.\\n\\n"
-			exit 1;
-		fi
-		if [ -d "$BUILD_DIR" ]; then
-			if ! rm -rf "$BUILD_DIR"
-			then
-			printf "\\tUnable to remove directory %s. Please remove this directory and run this script %s again. 0\\n" "$BUILD_DIR" "${BASH_SOURCE[0]}"
-			printf "\\tExiting now.\\n\\n"
-			exit 1;
-			fi
-		fi
-		printf "\\tBoost 1.67.0 successfully installed @ /usr/local.\\n"
-	else
-		printf "\\tBoost 1.67.0 found at /usr/local.\\n"
-	fi
-=======
 printf "\\n"
->>>>>>> eosiobranch
 
 
 export CPATH="$(python-config --includes | awk '{print $1}' | cut -dI -f2):$CPATH" # Boost has trouble finding pyconfig.h
