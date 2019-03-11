@@ -15,11 +15,6 @@ if (LLVM_DIR STREQUAL "" OR NOT LLVM_DIR)
    set(LLVM_DIR @LLVM_DIR@)
 endif()
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> eosiobranch
 find_package( Gperftools QUIET )
 if( GPERFTOOLS_FOUND )
     message( STATUS "Found gperftools; compiling tests with TCMalloc")
