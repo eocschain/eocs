@@ -3,19 +3,7 @@
  *  @copyright defined in eos/LICENSE.txt
  */
 #include <eosio/chain/abi_serializer.hpp>
-<<<<<<< HEAD
-
-#include <eosio.system/eosio.system.wast.hpp>
-#include <eosio.system/eosio.system.abi.hpp>
-// These contracts are still under dev
-
-#include <eosio.token/eosio.token.wast.hpp>
-#include <eosio.token/eosio.token.abi.hpp>
-#include <eosio.msig/eosio.msig.wast.hpp>
-#include <eosio.msig/eosio.msig.abi.hpp>
-=======
 #include <eosio/testing/tester.hpp>
->>>>>>> eosiobranch
 
 #include <Runtime/Runtime.h>
 
