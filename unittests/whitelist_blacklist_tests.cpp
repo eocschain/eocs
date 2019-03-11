@@ -5,13 +5,7 @@
 #include <eosio/chain/generated_transaction_object.hpp>
 #include <eosio/testing/tester.hpp>
 #include <eosio/testing/tester_network.hpp>
-
-<<<<<<< HEAD
-
 #include <eosio/chain/generated_transaction_object.hpp>
-
-=======
->>>>>>> eosiobranch
 #include <fc/variant_object.hpp>
 
 #include <boost/test/unit_test.hpp>
