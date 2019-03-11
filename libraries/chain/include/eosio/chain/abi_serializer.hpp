@@ -639,12 +639,8 @@ namespace impl {
     * @tparam Reslover - callable with the signature (const name& code_account) -> optional<abi_def>
     */
    template<typename T, typename Resolver>
-<<<<<<< HEAD
 
-   class abi_from_variant_visitor : reflector_init_visitor<T>
-=======
    class abi_from_variant_visitor : public reflector_init_visitor<T>
->>>>>>> eosiobranch
    {
       public:
          abi_from_variant_visitor( const variant_object& _vo, T& v, Resolver _resolver, abi_traverse_context& _ctx )
