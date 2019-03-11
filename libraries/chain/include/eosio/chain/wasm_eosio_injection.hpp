@@ -37,7 +37,7 @@ namespace eosio { namespace chain { namespace wasm_injections {
 
       static void build_type_slots( Module& mod ) {
          // add the module types to the type_slots map
-         for ( int i=0; i < mod.types.size(); i++ ) {
+         for ( size_t i=0; i < mod.types.size(); i++ ) {
             std::vector<uint16_t> type_slot_list = { static_cast<uint16_t>(mod.types[i]->ret) };
             for ( auto param : mod.types[i]->parameters )
                type_slot_list.push_back( static_cast<uint16_t>(param) );
@@ -78,7 +78,7 @@ namespace eosio { namespace chain { namespace wasm_injections {
             injected_index_mapping.emplace( index, actual_index ); 
 
             // shift all exported functions by 1
-            for ( int i=0; i < module.exports.size(); i++ ) {
+            for ( size_t i=0; i < module.exports.size(); i++ ) {
                if ( module.exports[i].kind == IR::ObjectKind::function ) {
                   module.exports[i].index++;
                }
@@ -272,7 +272,10 @@ namespace eosio { namespace chain { namespace wasm_injections {
 
    };
    
+<<<<<<< HEAD
 
+=======
+>>>>>>> eosiobranch
    struct call_depth_check_and_insert_checktime {
       static constexpr bool kills = true;
       static constexpr bool post = false;
@@ -291,9 +294,13 @@ namespace eosio { namespace chain { namespace wasm_injections {
          injector_utils::add_import<ResultType::none>(*(arg.module), "call_depth_assert", assert_idx);
 
          wasm_ops::op_types<>::call_t call_assert;
+<<<<<<< HEAD
 
          wasm_ops::op_types<>::call_t call_checktime;
 
+=======
+         wasm_ops::op_types<>::call_t call_checktime;
+>>>>>>> eosiobranch
          wasm_ops::op_types<>::get_global_t get_global_inst; 
          wasm_ops::op_types<>::set_global_t set_global_inst;
 
@@ -305,9 +312,13 @@ namespace eosio { namespace chain { namespace wasm_injections {
          wasm_ops::op_types<>::else__t else_inst; 
 
          call_assert.field = assert_idx;
+<<<<<<< HEAD
 
          call_checktime.field = checktime_injection::chktm_idx;
 
+=======
+         call_checktime.field = checktime_injection::chktm_idx;
+>>>>>>> eosiobranch
          get_global_inst.field = global_idx;
          set_global_inst.field = global_idx;
          const_inst.field = -1;
@@ -341,6 +352,7 @@ namespace eosio { namespace chain { namespace wasm_injections {
          INSERT_INJECTED(const_inst);
          INSERT_INJECTED(add_inst);
          INSERT_INJECTED(set_global_inst);
+         INSERT_INJECTED(call_checktime);
 
          INSERT_INJECTED(call_checktime);
 
@@ -689,10 +701,15 @@ namespace eosio { namespace chain { namespace wasm_injections {
    };
 
    struct pre_op_injectors : wasm_ops::op_types<pass_injector> {
+<<<<<<< HEAD
 
       using call_t            = wasm_ops::call                    <call_depth_check_and_insert_checktime>;
       using call_indirect_t   = wasm_ops::call_indirect           <call_depth_check_and_insert_checktime>;
 
+=======
+      using call_t            = wasm_ops::call                    <call_depth_check_and_insert_checktime>;
+      using call_indirect_t   = wasm_ops::call_indirect           <call_depth_check_and_insert_checktime>;
+>>>>>>> eosiobranch
       
       // float binops 
       using f32_add_t         = wasm_ops::f32_add                 <f32_binop_injector<wasm_ops::f32_add_code>>;
@@ -797,9 +814,13 @@ namespace eosio { namespace chain { namespace wasm_injections {
             // initialize static fields of injectors
             injector_utils::init( mod );
             checktime_injection::init();
+<<<<<<< HEAD
 
             call_depth_check_and_insert_checktime::init();
 
+=======
+            call_depth_check_and_insert_checktime::init();
+>>>>>>> eosiobranch
          }
 
          void inject() {

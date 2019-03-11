@@ -32,9 +32,12 @@
 
 #include <fc/variant_object.hpp>
 
+<<<<<<< HEAD
 #include <eosio/chain/eosio_contract.hpp>
 
 
+=======
+>>>>>>> eosiobranch
 namespace eosio { namespace chain {
 
 using resource_limits::resource_limits_manager;
@@ -164,9 +167,13 @@ struct controller_impl {
     *  are removed from this list if they are re-applied in other blocks. Producers
     *  can query this list when scheduling new transactions into blocks.
     */
+<<<<<<< HEAD
 
    unapplied_transactions_type     unapplied_transactions;
 
+=======
+   unapplied_transactions_type     unapplied_transactions;
+>>>>>>> eosiobranch
 
    void pop_block() {
       auto prev = fork_db.get_block( head->header.previous );
@@ -340,16 +347,19 @@ struct controller_impl {
       auto start = fc::time_point::now();
       while( auto next = blog.read_block_by_num( head->block_num + 1 ) ) {
          replay_push_block( next, controller::block_status::irreversible );
-         if( next->block_num() % 100 == 0 ) {
-            std::cerr << std::setw(10) << next->block_num() << " of " << blog_head->block_num() <<"\r";
+         if( next->block_num() % 500 == 0 ) {
+            ilog( "${n} of ${head}", ("n", next->block_num())("head", blog_head->block_num()) );
             if( shutdown() ) break;
          }
       }
-      std::cerr<< "\n";
       ilog( "${n} blocks replayed", ("n", head->block_num - start_block_num) );
 
+<<<<<<< HEAD
 
       // if the irreverible log is played without undo sessions enabled, we need to sync the
+=======
+      // if the irreversible log is played without undo sessions enabled, we need to sync the
+>>>>>>> eosiobranch
       // revision ordinal to the appropriate expected value here.
       if( self.skip_db_sessions( controller::block_status::irreversible ) )
          db.set_revision(head->block_num);
@@ -1059,6 +1069,9 @@ struct controller_impl {
       try {
 
          auto start = fc::time_point::now();
+         const bool check_auth = !self.skip_auth_check() && !trx->implicit;
+         // call recover keys so that trx->sig_cpu_usage is set correctly
+         const flat_set<public_key_type>& recovered_keys = check_auth ? trx->recover_keys( chain_id ) : flat_set<public_key_type>();
          if( !explicit_billed_cpu_time ) {
             fc::microseconds already_consumed_time( EOS_PERCENT(trx->sig_cpu_usage.count(), conf.sig_cpu_bill_pct) );
 
@@ -1093,16 +1106,18 @@ struct controller_impl {
 
             trx_context.delay = fc::seconds(trn.delay_sec);
 
-            if( !self.skip_auth_check() && !trx->implicit ) {
+            if( check_auth ) {
                authorization.check_authorization(
                        trn.actions,
+<<<<<<< HEAD
 
                        trx->recover_keys( chain_id ),
+=======
+                       recovered_keys,
+>>>>>>> eosiobranch
                        {},
                        trx_context.delay,
-                       [](){}
-                       /*std::bind(&transaction_context::add_cpu_usage_and_check_time, &trx_context,
-                                 std::placeholders::_1)*/,
+                       [&trx_context](){ trx_context.checktime(); },
                        false
                );
             }
@@ -1838,13 +1853,29 @@ void controller::add_indices() {
 void controller::startup( std::function<bool()> shutdown, const snapshot_reader_ptr& snapshot ) {
 
    my->head = my->fork_db.head();
-   if( !my->head ) {
+   if( snapshot ) {
+      ilog( "Starting initialization from snapshot, this may take a significant amount of time" );
+   }
+   else if( !my->head ) {
       elog( "No head block in fork db, perhaps we need to replay" );
    }
 
+<<<<<<< HEAD
    my->init(shutdown, snapshot);
    core_symbol(symbol(get_core_symbol().core_symbol).name());
 
+=======
+   try {
+      my->init(shutdown, snapshot);
+   } catch (boost::interprocess::bad_alloc& e) {
+      if ( snapshot )
+         elog( "db storage not configured to have enough storage for the provided snapshot, please increase and retry snapshot" );
+      throw e;
+   }
+   if( snapshot ) {
+      ilog( "Finished initialization from snapshot" );
+   }
+>>>>>>> eosiobranch
 }
 
 const chainbase::database& controller::db()const { return my->db; }
@@ -2225,7 +2256,10 @@ const account_object& controller::get_account( account_name name )const
    return my->db.get<account_object, by_name>(name);
 } FC_CAPTURE_AND_RETHROW( (name) ) }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> eosiobranch
 unapplied_transactions_type& controller::get_unapplied_transactions() {
    if ( my->read_mode != db_read_mode::SPECULATIVE ) {
       EOS_ASSERT( my->unapplied_transactions.empty(), transaction_exception,

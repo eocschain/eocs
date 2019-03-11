@@ -1,14 +1,30 @@
+<<<<<<< HEAD
 #include <boost/test/unit_test.hpp>
 #include <eosio/testing/tester.hpp>
 #include <eosio/chain/abi_serializer.hpp>
 
 #include <eosio.token/eosio.token.wast.hpp>
 #include <eosio.token/eosio.token.abi.hpp>
+=======
+/**
+ *  @file
+ *  @copyright defined in eos/LICENSE.txt
+ */
+#include <eosio/chain/abi_serializer.hpp>
+#include <eosio/testing/tester.hpp>
+>>>>>>> eosiobranch
 
 #include <Runtime/Runtime.h>
 
 #include <fc/variant_object.hpp>
 
+<<<<<<< HEAD
+=======
+#include <boost/test/unit_test.hpp>
+
+#include <contracts.hpp>
+
+>>>>>>> eosiobranch
 using namespace eosio::testing;
 using namespace eosio;
 using namespace eosio::chain;
@@ -27,8 +43,13 @@ public:
       create_accounts( { N(alice), N(bob), N(carol), N(eosio.token) } );
       produce_blocks( 2 );
 
+<<<<<<< HEAD
       set_code( N(eosio.token), eosio_token_wast );
       set_abi( N(eosio.token), eosio_token_abi );
+=======
+      set_code( N(eosio.token), contracts::eosio_token_wasm() );
+      set_abi( N(eosio.token), contracts::eosio_token_abi().data() );
+>>>>>>> eosiobranch
 
       produce_blocks();
 
