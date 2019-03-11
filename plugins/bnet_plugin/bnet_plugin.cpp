@@ -1559,12 +1559,6 @@ namespace eosio {
 
       auto ptr = std::make_shared<transaction_metadata>(p);
 
-<<<<<<< HEAD
-      app().get_channel<incoming::channels::transaction>().publish(ptr);
-   } 
-}
-=======
       app().get_channel<incoming::channels::transaction>().publish(priority::low, ptr);
    }
 } /// namespace eosio
->>>>>>> eosiobranch
