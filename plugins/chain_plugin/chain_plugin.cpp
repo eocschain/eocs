@@ -632,6 +632,7 @@ void chain_plugin::plugin_initialize(const variables_map& options) {
                         "Genesis state provided via command line arguments does not match the existing genesis state in blocks.log. "
                         "It is not necessary to provide genesis state arguments when a blocks.log file already exists."
                       );
+            EOS_ASSERT(!my->exit_after_init_chain, plugin_config_exception, "Only can exit after a new blockchain is initialized");
          }
       }
 
@@ -691,7 +692,7 @@ void chain_plugin::plugin_initialize(const variables_map& options) {
       } );
 
       my->accepted_block_with_action_digests_connection = my->chain->accepted_block_with_action_digests.connect( [this]( const block_state_with_action_digests_ptr& blk ) {
-         my->accepted_block_with_action_digests_channel.publish( blk );
+         my->accepted_block_with_action_digests_channel.publish( priority::high, blk );
       } );
 
       my->irreversible_block_connection = my->chain->irreversible_block.connect( [this]( const block_state_ptr& blk ) {
@@ -1405,6 +1406,35 @@ read_only::get_producers_result read_only::get_producers( const read_only::get_p
    return result;
 }
 
+vector<fc::variant> read_only::get_producers_by_names ( const get_producers_by_names_params& params ) const {
+   const abi_def abi = eosio::chain_apis::get_abi(db, config::system_account_name);
+   const auto table_type = get_table_type(abi, N(producers));
+   EOS_ASSERT(table_type == KEYi64, chain::contract_table_query_exception, "Invalid table type ${type} for table producers", ("type",table_type));
+
+   vector<fc::variant> result;
+   result.reserve(params.producers.size());
+
+   get_table_rows_params p;
+   p.json = params.json;
+   p.code = config::system_account_name;
+   p.scope = name(config::system_account_name).to_string();
+   p.table = N(producers);
+   p.limit = 1;
+   p.key_type = "name";
+
+   for (const auto& producer: params.producers) {
+      p.lower_bound = producer;
+      auto r = get_table_rows_ex<key_value_index>(p, abi);
+      if (not r.rows.empty()) {
+         result.push_back(fc::move(r.rows.front()));
+      } else {
+         EOS_ASSERT(params.allow_missing, chain::contract_table_query_exception, "Producer ${p} not found", ("p", producer));
+      }
+   }
+
+   return result;
+}
+
 read_only::get_producer_schedule_result read_only::get_producer_schedule( const read_only::get_producer_schedule_params& p ) const {
    read_only::get_producer_schedule_result result;
    to_variant(db.active_producers(), result.active);
@@ -1536,6 +1566,16 @@ fc::variant read_only::get_block(const read_only::get_block_params& params) cons
            ("ref_block_prefix", ref_block_prefix);
 }
 
+vector<fc::variant> read_only::get_blocks(const get_blocks_params& params) const {
+   vector<fc::variant> result;
+   result.reserve(params.block_num_or_id_list.size());
+   for (auto& block_num_or_id: params.block_num_or_id_list) {
+      auto b = get_block(get_block_params{block_num_or_id});
+      result.push_back(fc::move(b));
+   }
+   return result;
+}
+
 fc::variant read_only::get_block_header_state(const get_block_header_state_params& params) const {
    block_state_ptr b;
    optional<uint64_t> block_num;
@@ -1592,6 +1632,7 @@ void read_write::push_transaction(const read_write::push_transaction_params& par
                } catch( chain::abi_exception& ) {
                   output = *trx_trace_ptr;
                }
+
                const chain::transaction_id_type& id = trx_trace_ptr->id;
                next(read_write::push_transaction_results{id, output});
             } CATCH_AND_CALL(next);
