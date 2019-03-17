@@ -11,11 +11,9 @@
 #include <eosio/chain/wasm_eosio_validation.hpp>
 #include <eosio/chain/wasm_eosio_injection.hpp>
 #include <eosio/chain/global_property_object.hpp>
-#include <eosio/chain/core_symbol_object.hpp>
 #include <eosio/chain/account_object.hpp>
 #include <eosio/chain/blackwhitelist_object.hpp>
 #include <eosio/chain/symbol.hpp>
-#include <eosio/chain/account_object.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/sha1.hpp>
@@ -966,10 +964,6 @@ class system_api : public context_aware_api {
          return static_cast<uint64_t>( context.trx_context.published.time_since_epoch().count() );
       }
 
-      uint32_t current_block_num() {
-         return ( context.control.head_block_num() );
-      }
-
 };
 
 constexpr size_t max_assert_message = 1024;
@@ -1038,28 +1032,6 @@ class action_api : public context_aware_api {
       bool is_inline(){
          return context.recurse_depth > 0;
       }
-};
-
-class core_symbol_api : public context_aware_api {
-   public:
-      core_symbol_api( apply_context& ctx )
-      : context_aware_api(ctx,true) {}
-
-      uint64_t core_symbol() {
-         return ::eosio::chain::core_symbol();
-      }
-
-      void set_core_symbol(array_ptr<const char> str, size_t str_len) {
-         auto s = ::eosio::chain::core_symbol(string(str, str_len));
-
-         auto& original = context.control.get_core_symbol();
-         EOS_ASSERT(s != original.core_symbol, symbol_type_exception, "core symbol not changed");
-
-         context.db.modify( original,
-            [&]( auto& cs ) {
-                 cs.core_symbol = s;
-         });
-      }   
 };
 
 class console_api : public context_aware_api {
@@ -1740,23 +1712,10 @@ class call_depth_api : public context_aware_api {
       }
 };
 
-/*
- * This api will be removed with fix for missing `strtod`
- */
-class strtod_api : public context_aware_api {
-public:
-    strtod_api(apply_context& ctx)
-    : context_aware_api(ctx, true) {}
-
-    double strtod(const char *nptr, char **endptr) {
-         return std::strtod(nptr, endptr);
-    }
-};
-
 class random_seed_api : public context_aware_api {
 public:
    random_seed_api(apply_context& ctx)
-           : context_aware_api(ctx) {}
+      : context_aware_api(ctx) {}
 
    int random_seed(array_ptr<char> sig, size_t siglen) {
       auto data = source();
@@ -1863,12 +1822,8 @@ private:
 };
 
 REGISTER_INTRINSICS(random_seed_api,
-(random_seed,           int(int, int)               )
-(producer_random_seed,  int(int, int)               )
-);
-
-REGISTER_INTRINSICS(strtod_api,
-   (strtod,  double(int, int)               )
+   (random_seed,           int(int, int)               )
+   (producer_random_seed,  int(int, int)               )
 );
 
 REGISTER_INJECTED_INTRINSICS(call_depth_api,
@@ -2011,7 +1966,6 @@ REGISTER_INTRINSICS(permission_api,
 REGISTER_INTRINSICS(system_api,
    (current_time, int64_t()       )
    (publication_time,   int64_t() )
-   (current_block_num,  int() )
 );
 
 REGISTER_INTRINSICS(context_free_system_api,
@@ -2035,12 +1989,6 @@ REGISTER_INTRINSICS(authorization_api,
    (require_authorization, void(int64_t, int64_t), "require_auth2", void(authorization_api::*)(const account_name&, const permission_name& permission) )
    (has_authorization,     int(int64_t), "has_auth", bool(authorization_api::*)(const account_name&)const )
    (is_account,            int(int64_t)           )
-);
-
-
-REGISTER_INTRINSICS(core_symbol_api,
-   (core_symbol, int64_t())
-   (set_core_symbol, void(int, int))
 );
 
 REGISTER_INTRINSICS(console_api,
