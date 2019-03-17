@@ -1,367 +1,362 @@
+/**
+ *  @file
+ *  @copyright defined in eos/LICENSE
+ */
+#include <iostream>
+
 #include <boost/test/unit_test.hpp>
-#include <eosio/testing/tester.hpp>
-#include <eosio/chain/abi_serializer.hpp>
-#include <eosio/chain/wast_to_wasm.hpp>
 
-#include <eosio.msig/eosio.msig.wast.hpp>
-#include <eosio.msig/eosio.msig.abi.hpp>
+#include <fc/network/message_buffer.hpp>
 
-#include <eosio.sudo/eosio.sudo.wast.hpp>
-#include <eosio.sudo/eosio.sudo.abi.hpp>
+namespace eosio {
+using namespace std;
 
-#include <test_api/test_api.wast.hpp>
+size_t mb_size(boost::asio::mutable_buffer& mb) {
+#if BOOST_VERSION >= 106600
+   return mb.size();
+#else
+   return boost::asio::detail::buffer_size_helper(mb);
+#endif
+}
 
-#include <Runtime/Runtime.h>
+void* mb_data(boost::asio::mutable_buffer& mb) {
+#if BOOST_VERSION >= 106600
+   return mb.data();
+#else
+   return boost::asio::detail::buffer_cast_helper(mb);
+#endif
+}
 
-#include <fc/variant_object.hpp>
+BOOST_AUTO_TEST_SUITE(message_buffer_tests)
 
-using namespace eosio::testing;
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::testing;
-using namespace fc;
+constexpr size_t     def_buffer_size_mb = 4;
+constexpr size_t     def_buffer_size = 1024*1024*def_buffer_size_mb;
 
-using mvo = fc::mutable_variant_object;
+/// Test default construction and buffer sequence generation
+BOOST_AUTO_TEST_CASE(message_buffer_construction)
+{
+  try {
+    fc::message_buffer<def_buffer_size> mb;
+    BOOST_CHECK_EQUAL(mb.total_bytes(), def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.bytes_to_write(), def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.bytes_to_read(), 0u);
+    BOOST_CHECK_EQUAL(mb.read_ptr(), mb.write_ptr());
 
-class eosio_sudo_tester : public tester {
-public:
+    auto mbs = mb.get_buffer_sequence_for_boost_async_read();
+    auto mbsi = mbs.begin();
+    BOOST_CHECK_EQUAL(mb_size(*mbsi), def_buffer_size);
+    BOOST_CHECK_EQUAL(mb_data(*mbsi), mb.write_ptr());
+    mbsi++;
+    BOOST_CHECK(mbsi == mbs.end());
+  }
+  FC_LOG_AND_RETHROW()
+}
 
-   eosio_sudo_tester() {
-      create_accounts( { N(eosio.msig), N(prod1), N(prod2), N(prod3), N(prod4), N(prod5), N(alice), N(bob), N(carol) } );
-      produce_block();
+/// Test buffer growth and shrinking
+BOOST_AUTO_TEST_CASE(message_buffer_growth)
+{
+  try {
+    fc::message_buffer<def_buffer_size> mb;
+    mb.add_buffer_to_chain();
+    BOOST_CHECK_EQUAL(mb.total_bytes(), 2 * def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.bytes_to_write(), 2 * def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.bytes_to_read(), 0u);
+    BOOST_CHECK_EQUAL(mb.read_ptr(), mb.write_ptr());
 
+    {
+      auto mbs = mb.get_buffer_sequence_for_boost_async_read();
+      auto mbsi = mbs.begin();
+      BOOST_CHECK_EQUAL(mb_size(*mbsi), def_buffer_size);
+      BOOST_CHECK_EQUAL(mb_data(*mbsi), mb.write_ptr());
+      mbsi++;
+      BOOST_CHECK(mbsi != mbs.end());
+      BOOST_CHECK_EQUAL(mb_size(*mbsi), def_buffer_size);
+      BOOST_CHECK_NE(mb_data(*mbsi), nullptr);
+      mbsi++;
+      BOOST_CHECK(mbsi == mbs.end());
+    }
 
-      base_tester::push_action(config::system_account_name, N(setpriv),
-                                 config::system_account_name,  mutable_variant_object()
-                                 ("account", "eosio.msig")
-                                 ("is_priv", 1)
-      );
+    mb.advance_write_ptr(100);
+    BOOST_CHECK_EQUAL(mb.total_bytes(), 2 * def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.bytes_to_write(), 2 * def_buffer_size - 100);
+    BOOST_CHECK_EQUAL(mb.bytes_to_read(), 100u);
+    BOOST_CHECK_NE(mb.read_ptr(), nullptr);
+    BOOST_CHECK_NE(mb.write_ptr(), nullptr);
+    BOOST_CHECK_EQUAL((mb.read_ptr() + 100), mb.write_ptr());
 
-      set_code( N(eosio.msig), eosio_msig_wast );
-      set_abi( N(eosio.msig), eosio_msig_abi );
+    {
+      auto mbs = mb.get_buffer_sequence_for_boost_async_read();
+      auto mbsi = mbs.begin();
+      BOOST_CHECK_EQUAL(mb_size(*mbsi), def_buffer_size - 100);
+      BOOST_CHECK_EQUAL(mb_data(*mbsi), mb.write_ptr());
+      mbsi++;
+      BOOST_CHECK(mbsi != mbs.end());
+      BOOST_CHECK_EQUAL(mb_size(*mbsi), def_buffer_size);
+      BOOST_CHECK_NE(mb_data(*mbsi), nullptr);
+      mbsi++;
+      BOOST_CHECK(mbsi == mbs.end());
+    }
 
-      produce_blocks();
+    mb.advance_read_ptr(50);
+    BOOST_CHECK_EQUAL(mb.total_bytes(), 2 * def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.bytes_to_write(), 2 * def_buffer_size - 100);
+    BOOST_CHECK_EQUAL(mb.bytes_to_read(), 50u);
 
-      signed_transaction trx;
-      set_transaction_headers(trx);
-      authority auth( 1, {}, {{{config::system_account_name, config::active_name}, 1}} );
-      trx.actions.emplace_back( vector<permission_level>{{config::system_account_name, config::active_name}},
-                                newaccount{
-                                   .creator  = config::system_account_name,
-                                   .name     = N(eosio.sudo),
-                                   .owner    = auth,
-                                   .active   = auth,
-                                });
+    mb.advance_write_ptr(def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.total_bytes(), 2 * def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.bytes_to_write(), def_buffer_size - 100);
+    BOOST_CHECK_EQUAL(mb.bytes_to_read(), 50 + def_buffer_size);
 
-      set_transaction_headers(trx);
-      trx.sign( get_private_key( config::system_account_name, "active" ), control->get_chain_id()  );
-      push_transaction( trx );
+    // Moving read_ptr into second block should reset second block to first
+    mb.advance_read_ptr(def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.total_bytes(), def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.bytes_to_write(), def_buffer_size - 100);
+    BOOST_CHECK_EQUAL(mb.bytes_to_read(), 50u);
 
-      base_tester::push_action(config::system_account_name, N(setpriv),
-                                 config::system_account_name,  mutable_variant_object()
-                                 ("account", "eosio.sudo")
-                                 ("is_priv", 1)
-      );
+    // Moving read_ptr to write_ptr should shrink chain and reset ptrs
+    mb.advance_read_ptr(50);
+    BOOST_CHECK_EQUAL(mb.total_bytes(), def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.bytes_to_write(), def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.bytes_to_read(), 0u);
 
-      auto system_private_key = get_private_key( config::system_account_name, "active" );
-      set_code( N(eosio.sudo), eosio_sudo_wast, &system_private_key );
-      set_abi( N(eosio.sudo), eosio_sudo_abi, &system_private_key );
+    mb.add_buffer_to_chain();
+    BOOST_CHECK_EQUAL(mb.total_bytes(), 2 * def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.bytes_to_write(), 2 * def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.bytes_to_read(), 0u);
 
-      produce_blocks();
+    mb.advance_write_ptr(50);
+    BOOST_CHECK_EQUAL(mb.total_bytes(), 2 * def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.bytes_to_write(), 2 * def_buffer_size - 50);
+    BOOST_CHECK_EQUAL(mb.bytes_to_read(), 50u);
 
-      set_authority( config::system_account_name, config::active_name,
-                     authority( 1, {{get_public_key( config::system_account_name, "active" ), 1}},
-                                   {{{config::producers_account_name, config::active_name}, 1}} ),
-                     config::owner_name,
-                     { { config::system_account_name, config::owner_name } },
-                     { get_private_key( config::system_account_name, "active" ) }
-                   );
+    // Moving read_ptr to write_ptr should shrink chain and reset ptrs
+    mb.advance_read_ptr(50);
+    BOOST_CHECK_EQUAL(mb.total_bytes(), def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.bytes_to_write(), def_buffer_size);
+    BOOST_CHECK_EQUAL(mb.bytes_to_read(), 0u);
+  }
+  FC_LOG_AND_RETHROW()
+}
 
-      set_producers( {N(prod1), N(prod2), N(prod3), N(prod4), N(prod5)} );
+/// Test peek and read across multiple buffers
+BOOST_AUTO_TEST_CASE(message_buffer_peek_read)
+{
+  try {
+    {
+      const uint32_t small = 32;
+      fc::message_buffer<small> mb;
+      BOOST_CHECK_EQUAL(mb.total_bytes(), small);
+      BOOST_CHECK_EQUAL(mb.bytes_to_write(), small);
+      BOOST_CHECK_EQUAL(mb.bytes_to_read(), 0);
+      BOOST_CHECK_EQUAL(mb.read_ptr(), mb.write_ptr());
+      BOOST_CHECK_EQUAL(mb.read_index().first, 0);
+      BOOST_CHECK_EQUAL(mb.read_index().second, 0);
+      BOOST_CHECK_EQUAL(mb.write_index().first, 0);
+      BOOST_CHECK_EQUAL(mb.write_index().second, 0);
 
-      produce_blocks();
+      mb.add_space(100 - small);
+      BOOST_CHECK_EQUAL(mb.total_bytes(), 4 * small);
+      BOOST_CHECK_EQUAL(mb.bytes_to_write(), 4 * small);
+      BOOST_CHECK_EQUAL(mb.bytes_to_read(), 0);
+      BOOST_CHECK_EQUAL(mb.read_ptr(), mb.write_ptr());
 
-      const auto& accnt = control->db().get<account_object,by_name>( N(eosio.sudo) );
-      abi_def abi;
-      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
-      abi_ser.set_abi(abi, abi_serializer_max_time);
-
-      while( control->pending_block_state()->header.producer.to_string() == "eosio" ) {
-         produce_block();
+      char* write_ptr = mb.write_ptr();
+      for (char ind = 0; ind < 100; ) {
+        *write_ptr = ind;
+        ind++;
+        if (ind % small == 0) {
+          mb.advance_write_ptr(small);
+          write_ptr = mb.write_ptr();
+        } else {
+          write_ptr++;
+        }
       }
-   }
+      mb.advance_write_ptr(100 % small);
 
-   void propose( name proposer, name proposal_name, vector<permission_level> requested_permissions, const transaction& trx ) {
-      push_action( N(eosio.msig), N(propose), proposer, mvo()
-                     ("proposer",      proposer)
-                     ("proposal_name", proposal_name)
-                     ("requested",     requested_permissions)
-                     ("trx",           trx)
-      );
-   }
+      BOOST_CHECK_EQUAL(mb.total_bytes(), 4 * small);
+      BOOST_CHECK_EQUAL(mb.bytes_to_write(), 4 * small - 100);
+      BOOST_CHECK_EQUAL(mb.bytes_to_read(), 100);
+      BOOST_CHECK_NE((void*) mb.read_ptr(), (void*) mb.write_ptr());
+      BOOST_CHECK_EQUAL(mb.read_index().first, 0);
+      BOOST_CHECK_EQUAL(mb.read_index().second, 0);
+      BOOST_CHECK_EQUAL(mb.write_index().first, 3);
+      BOOST_CHECK_EQUAL(mb.write_index().second, 4);
 
-   void approve( name proposer, name proposal_name, name approver ) {
-      push_action( N(eosio.msig), N(approve), approver, mvo()
-                     ("proposer",      proposer)
-                     ("proposal_name", proposal_name)
-                     ("level",         permission_level{approver, config::active_name} )
-      );
-   }
+      char buffer[100];
+      auto index = mb.read_index();
+      mb.peek(buffer, 50, index);
+      mb.peek(buffer+50, 50, index);
+      for (int i=0; i < 100; i++) {
+        BOOST_CHECK_EQUAL(i, buffer[i]);
+      }
 
-   void unapprove( name proposer, name proposal_name, name unapprover ) {
-      push_action( N(eosio.msig), N(unapprove), unapprover, mvo()
-                     ("proposer",      proposer)
-                     ("proposal_name", proposal_name)
-                     ("level",         permission_level{unapprover, config::active_name})
-      );
-   }
+      BOOST_CHECK_EQUAL(mb.total_bytes(), 4 * small);
+      BOOST_CHECK_EQUAL(mb.bytes_to_write(), 4 * small - 100);
+      BOOST_CHECK_EQUAL(mb.bytes_to_read(), 100);
+      BOOST_CHECK_NE((void*) mb.read_ptr(), (void*) mb.write_ptr());
 
-   transaction sudo_exec( account_name executer, const transaction& trx, uint32_t expiration = base_tester::DEFAULT_EXPIRATION_DELTA );
+      char buffer2[100];
+      mb.read(buffer2, 100);
+      for (int i=0; i < 100; i++) {
+        BOOST_CHECK_EQUAL(i, buffer2[i]);
+      }
 
-   transaction reqauth( account_name from, const vector<permission_level>& auths, uint32_t expiration = base_tester::DEFAULT_EXPIRATION_DELTA );
-
-   abi_serializer abi_ser;
-};
-
-transaction eosio_sudo_tester::sudo_exec( account_name executer, const transaction& trx, uint32_t expiration ) {
-   fc::variants v;
-   v.push_back( fc::mutable_variant_object()
-                  ("actor", executer)
-                  ("permission", name{config::active_name})
-              );
-  v.push_back( fc::mutable_variant_object()
-                 ("actor", "eosio.sudo")
-                 ("permission", name{config::active_name})
-             );
-   auto act_obj = fc::mutable_variant_object()
-                     ("account", "eosio.sudo")
-                     ("name", "exec")
-                     ("authorization", v)
-                     ("data", fc::mutable_variant_object()("executer", executer)("trx", trx) );
-   transaction trx2;
-   set_transaction_headers(trx2, expiration);
-   action act;
-   abi_serializer::from_variant( act_obj, act, get_resolver(), abi_serializer_max_time );
-   trx2.actions.push_back( std::move(act) );
-   return trx2;
+      BOOST_CHECK_EQUAL(mb.total_bytes(), small);
+      BOOST_CHECK_EQUAL(mb.bytes_to_write(), small);
+      BOOST_CHECK_EQUAL(mb.bytes_to_read(), 0);
+      BOOST_CHECK_EQUAL(mb.read_ptr(), mb.write_ptr());
+    }
+  }
+  FC_LOG_AND_RETHROW()
 }
 
-transaction eosio_sudo_tester::reqauth( account_name from, const vector<permission_level>& auths, uint32_t expiration ) {
-   fc::variants v;
-   for ( auto& level : auths ) {
-      v.push_back(fc::mutable_variant_object()
-                  ("actor", level.actor)
-                  ("permission", level.permission)
-      );
-   }
-   auto act_obj = fc::mutable_variant_object()
-                     ("account", name{config::system_account_name})
-                     ("name", "reqauth")
-                     ("authorization", v)
-                     ("data", fc::mutable_variant_object() ("from", from) );
-   transaction trx;
-   set_transaction_headers(trx, expiration);
-   action act;
-   abi_serializer::from_variant( act_obj, act, get_resolver(), abi_serializer_max_time );
-   trx.actions.push_back( std::move(act) );
-   return trx;
+/// Test automatic allocation when advancing the read_ptr to the end.
+BOOST_AUTO_TEST_CASE(message_buffer_write_ptr_to_end)
+{
+  try {
+    {
+      const uint32_t small = 32;
+      fc::message_buffer<small> mb;
+      BOOST_CHECK_EQUAL(mb.total_bytes(), small);
+      BOOST_CHECK_EQUAL(mb.bytes_to_write(), small);
+      BOOST_CHECK_EQUAL(mb.bytes_to_read(), 0);
+      BOOST_CHECK_EQUAL(mb.read_ptr(), mb.write_ptr());
+      BOOST_CHECK_EQUAL(mb.read_index().first, 0);
+      BOOST_CHECK_EQUAL(mb.read_index().second, 0);
+      BOOST_CHECK_EQUAL(mb.write_index().first, 0);
+      BOOST_CHECK_EQUAL(mb.write_index().second, 0);
+
+      char* write_ptr = mb.write_ptr();
+      for (uint32_t ind = 0; ind < small; ind++) {
+        *write_ptr = ind;
+        write_ptr++;
+      }
+      mb.advance_write_ptr(small);
+
+      BOOST_CHECK_EQUAL(mb.total_bytes(), 2 * small);
+      BOOST_CHECK_EQUAL(mb.bytes_to_write(), small);
+      BOOST_CHECK_EQUAL(mb.bytes_to_read(), small);
+      BOOST_CHECK_NE((void*) mb.read_ptr(), (void*) mb.write_ptr());
+      BOOST_CHECK_EQUAL(mb.read_index().first, 0);
+      BOOST_CHECK_EQUAL(mb.read_index().second, 0);
+      BOOST_CHECK_EQUAL(mb.write_index().first, 1);
+      BOOST_CHECK_EQUAL(mb.write_index().second, 0);
+
+      auto mbs = mb.get_buffer_sequence_for_boost_async_read();
+      auto mbsi = mbs.begin();
+      BOOST_CHECK_EQUAL(mb_size(*mbsi), small);
+      BOOST_CHECK_EQUAL(mb_data(*mbsi), mb.write_ptr());
+      BOOST_CHECK_EQUAL(mb.read_ptr()+small, mb.write_ptr());
+      mbsi++;
+      BOOST_CHECK(mbsi == mbs.end());
+    }
+  }
+  FC_LOG_AND_RETHROW()
 }
 
-BOOST_AUTO_TEST_SUITE(eosio_sudo_tests)
+BOOST_AUTO_TEST_CASE(message_buffer_read_peek_bounds) {
+   using my_message_buffer_t = fc::message_buffer<1024>;
+   my_message_buffer_t mbuff;
+   unsigned char stuff[] = {
+      0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+   };
+   memcpy(mbuff.write_ptr(), stuff, sizeof(stuff));
+   mbuff.advance_write_ptr(sizeof(stuff));
 
-BOOST_FIXTURE_TEST_CASE( sudo_exec_direct, eosio_sudo_tester ) try {
-   auto trx = reqauth( N(bob), {permission_level{N(bob), config::active_name}} );
+   my_message_buffer_t::index_t index = mbuff.read_index();
+   uint8_t throw_away_buffer[4];
+   mbuff.peek(&throw_away_buffer, 4, index); //8 bytes left to peek afterwards
+   mbuff.peek(&throw_away_buffer, 4, index); //4 bytes left to peek afterwards
+   mbuff.peek(&throw_away_buffer, 2, index); //2 bytes left to peek afterwards
+   BOOST_CHECK_THROW(mbuff.peek(&throw_away_buffer, 3, index), fc::out_of_range_exception);
+   mbuff.peek(&throw_away_buffer, 1, index); //1 byte left to peek afterwards
+   mbuff.peek(&throw_away_buffer, 0, index); //1 byte left to peek afterwards
+   mbuff.peek(&throw_away_buffer, 1, index); //no bytes left to peek afterwards
+   BOOST_CHECK_THROW(mbuff.peek(&throw_away_buffer, 1, index), fc::out_of_range_exception);
 
-   transaction_trace_ptr trace;
-   control->applied_transaction.connect([&]( const transaction_trace_ptr& t) { if (t->scheduled) { trace = t; } } );
+   mbuff.read(&throw_away_buffer, 4); //8 bytes left to read afterwards
+   mbuff.read(&throw_away_buffer, 4); //4 bytes left to read afterwards
+   mbuff.read(&throw_away_buffer, 2); //2 bytes left to read afterwards
+   BOOST_CHECK_THROW(mbuff.read(&throw_away_buffer, 4), fc::out_of_range_exception);
+   mbuff.read(&throw_away_buffer, 1); //1 byte left to read afterwards
+   mbuff.read(&throw_away_buffer, 0); //1 byte left to read afterwards
+   mbuff.read(&throw_away_buffer, 1); //no bytes left to read afterwards
+   BOOST_CHECK_THROW(mbuff.read(&throw_away_buffer, 1), fc::out_of_range_exception);
+}
+
+BOOST_AUTO_TEST_CASE(message_buffer_read_peek_bounds_multi) {
+   using my_message_buffer_t = fc::message_buffer<5>;
+   my_message_buffer_t mbuff;
+   unsigned char stuff[] = {
+      0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+   };
+   memcpy(mbuff.write_ptr(), stuff, 5);
+   mbuff.advance_write_ptr(5);
+   memcpy(mbuff.write_ptr(), stuff+5, 5);
+   mbuff.advance_write_ptr(5);
+   memcpy(mbuff.write_ptr(), stuff+10, 2);
+   mbuff.advance_write_ptr(2);
+
+   my_message_buffer_t::index_t index = mbuff.read_index();
+   uint8_t throw_away_buffer[4];
+   mbuff.peek(&throw_away_buffer, 4, index); //8 bytes left to peek afterwards
+   mbuff.peek(&throw_away_buffer, 4, index); //4 bytes left to peek afterwards
+   mbuff.peek(&throw_away_buffer, 2, index); //2 bytes left to peek afterwards
+   BOOST_CHECK_THROW(mbuff.peek(&throw_away_buffer, 3, index), fc::out_of_range_exception);
+   mbuff.peek(&throw_away_buffer, 1, index); //1 bytes left to peek afterwards
+   mbuff.peek(&throw_away_buffer, 0, index); //1 bytes left to peek afterwards
+   mbuff.peek(&throw_away_buffer, 1, index); //no bytes left to peek afterwards
+   BOOST_CHECK_THROW(mbuff.peek(&throw_away_buffer, 1, index), fc::out_of_range_exception);
+
+   mbuff.read(&throw_away_buffer, 4); //8 bytes left to read afterwards
+   mbuff.read(&throw_away_buffer, 4); //4 bytes left to read afterwards
+   mbuff.read(&throw_away_buffer, 2); //2 bytes left to read afterwards
+   BOOST_CHECK_THROW(mbuff.read(&throw_away_buffer, 4), fc::out_of_range_exception);
+   mbuff.read(&throw_away_buffer, 1); //1 bytes left to read afterwards
+   mbuff.read(&throw_away_buffer, 0); //1 bytes left to read afterwards
+   mbuff.read(&throw_away_buffer, 1); //no bytes left to read afterwards
+   BOOST_CHECK_THROW(mbuff.read(&throw_away_buffer, 1), fc::out_of_range_exception);
+}
+
+BOOST_AUTO_TEST_CASE(message_buffer_datastream) {
+   using my_message_buffer_t = fc::message_buffer<1024>;
+   my_message_buffer_t mbuff;
+
+   char buf[1024];
+   fc::datastream<char*> ds( buf, 1024 );
+
+   int v = 13;
+   fc::raw::pack( ds, v );
+   v = 42;
+   fc::raw::pack( ds, 42 );
+   fc::raw::pack( ds, std::string( "hello" ) );
+
+   memcpy(mbuff.write_ptr(), buf, 1024);
+   mbuff.advance_write_ptr(1024);
+
+   for( int i = 0; i < 3; ++i ) {
+      auto ds2 = mbuff.create_peek_datastream();
+      fc::raw::unpack( ds2, v );
+      BOOST_CHECK_EQUAL( 13, v );
+      fc::raw::unpack( ds2, v );
+      BOOST_CHECK_EQUAL( 42, v );
+      std::string s;
+      fc::raw::unpack( ds2, s );
+      BOOST_CHECK_EQUAL( s, std::string( "hello" ) );
+   }
 
    {
-      signed_transaction sudo_trx( sudo_exec( N(alice), trx ), {}, {} );
-      /*
-      set_transaction_headers( sudo_trx );
-      sudo_trx.actions.emplace_back( get_action( N(eosio.sudo), N(exec),
-                                                 {{N(alice), config::active_name}, {N(eosio.sudo), config::active_name}},
-                                                 mvo()
-                                                   ("executer", "alice")
-                                                   ("trx", trx)
-      ) );
-      */
-      sudo_trx.sign( get_private_key( N(alice), "active" ), control->get_chain_id() );
-      for( const auto& actor : {"prod1", "prod2", "prod3", "prod4"} ) {
-         sudo_trx.sign( get_private_key( actor, "active" ), control->get_chain_id() );
-      }
-      push_transaction( sudo_trx );
+      auto ds2 = mbuff.create_datastream();
+      fc::raw::unpack( ds2, v );
+      BOOST_CHECK_EQUAL( 13, v );
+      fc::raw::unpack( ds2, v );
+      BOOST_CHECK_EQUAL( 42, v );
+      std::string s;
+      fc::raw::unpack( ds2, s );
+      BOOST_CHECK_EQUAL( s, std::string( "hello" ) );
    }
-
-   produce_block();
-
-   BOOST_REQUIRE( bool(trace) );
-   BOOST_REQUIRE_EQUAL( 1, trace->action_traces.size() );
-   BOOST_REQUIRE_EQUAL( "eosio", name{trace->action_traces[0].act.account} );
-   BOOST_REQUIRE_EQUAL( "reqauth", name{trace->action_traces[0].act.name} );
-   BOOST_REQUIRE_EQUAL( transaction_receipt::executed, trace->receipt->status );
-
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( sudo_with_msig, eosio_sudo_tester ) try {
-   auto trx = reqauth( N(bob), {permission_level{N(bob), config::active_name}} );
-   auto sudo_trx = sudo_exec( N(alice), trx );
-
-   propose( N(carol), N(first),
-            { {N(alice), N(active)},
-              {N(prod1), N(active)}, {N(prod2), N(active)}, {N(prod3), N(active)}, {N(prod4), N(active)}, {N(prod5), N(active)} },
-            sudo_trx );
-
-   approve( N(carol), N(first), N(alice) ); // alice must approve since she is the executer of the sudo::exec action
-
-   // More than 2/3 of block producers approve
-   approve( N(carol), N(first), N(prod1) );
-   approve( N(carol), N(first), N(prod2) );
-   approve( N(carol), N(first), N(prod3) );
-   approve( N(carol), N(first), N(prod4) );
-
-   vector<transaction_trace_ptr> traces;
-   control->applied_transaction.connect([&]( const transaction_trace_ptr& t) {
-      if (t->scheduled) {
-         traces.push_back( t );
-      }
-   } );
-
-   // Now the proposal should be ready to execute
-   push_action( N(eosio.msig), N(exec), N(alice), mvo()
-                  ("proposer",      "carol")
-                  ("proposal_name", "first")
-                  ("executer",      "alice")
-   );
-
-   produce_block();
-
-   BOOST_REQUIRE_EQUAL( 2, traces.size() );
-
-   BOOST_REQUIRE_EQUAL( 1, traces[0]->action_traces.size() );
-   BOOST_REQUIRE_EQUAL( "eosio.sudo", name{traces[0]->action_traces[0].act.account} );
-   BOOST_REQUIRE_EQUAL( "exec", name{traces[0]->action_traces[0].act.name} );
-   BOOST_REQUIRE_EQUAL( transaction_receipt::executed, traces[0]->receipt->status );
-
-   BOOST_REQUIRE_EQUAL( 1, traces[1]->action_traces.size() );
-   BOOST_REQUIRE_EQUAL( "eosio", name{traces[1]->action_traces[0].act.account} );
-   BOOST_REQUIRE_EQUAL( "reqauth", name{traces[1]->action_traces[0].act.name} );
-   BOOST_REQUIRE_EQUAL( transaction_receipt::executed, traces[1]->receipt->status );
-
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( sudo_with_msig_unapprove, eosio_sudo_tester ) try {
-   auto trx = reqauth( N(bob), {permission_level{N(bob), config::active_name}} );
-   auto sudo_trx = sudo_exec( N(alice), trx );
-
-   propose( N(carol), N(first),
-            { {N(alice), N(active)},
-              {N(prod1), N(active)}, {N(prod2), N(active)}, {N(prod3), N(active)}, {N(prod4), N(active)}, {N(prod5), N(active)} },
-            sudo_trx );
-
-   approve( N(carol), N(first), N(alice) ); // alice must approve since she is the executer of the sudo::exec action
-
-   // 3 of the 4 needed producers approve
-   approve( N(carol), N(first), N(prod1) );
-   approve( N(carol), N(first), N(prod2) );
-   approve( N(carol), N(first), N(prod3) );
-
-   // first producer takes back approval
-   unapprove( N(carol), N(first), N(prod1) );
-
-   // fourth producer approves but the total number of approving producers is still 3 which is less than two-thirds of producers
-   approve( N(carol), N(first), N(prod4) );
-
-   produce_block();
-
-   // The proposal should not have sufficient approvals to pass the authorization checks of eosio.sudo::exec.
-   BOOST_REQUIRE_EXCEPTION( push_action( N(eosio.msig), N(exec), N(alice), mvo()
-                                          ("proposer",      "carol")
-                                          ("proposal_name", "first")
-                                          ("executer",      "alice")
-                                       ), eosio_assert_message_exception,
-                                          eosio_assert_message_is("transaction authorization failed")
-   );
-
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( sudo_with_msig_producers_change, eosio_sudo_tester ) try {
-   create_accounts( { N(newprod1) } );
-
-   auto trx = reqauth( N(bob), {permission_level{N(bob), config::active_name}} );
-   auto sudo_trx = sudo_exec( N(alice), trx, 36000 );
-
-   propose( N(carol), N(first),
-            { {N(alice), N(active)},
-              {N(prod1), N(active)}, {N(prod2), N(active)}, {N(prod3), N(active)}, {N(prod4), N(active)}, {N(prod5), N(active)} },
-            sudo_trx );
-
-   approve( N(carol), N(first), N(alice) ); // alice must approve since she is the executer of the sudo::exec action
-
-   // 2 of the 4 needed producers approve
-   approve( N(carol), N(first), N(prod1) );
-   approve( N(carol), N(first), N(prod2) );
-
-   produce_block();
-
-   set_producers( {N(prod1), N(prod2), N(prod3), N(prod4), N(prod5), N(newprod1)} ); // With 6 producers, the 2/3+1 threshold becomes 5
-
-   while( control->pending_block_state()->active_schedule.producers.size() != 6 ) {
-      produce_block();
-   }
-
-   // Now two more block producers approve which would have been sufficient under the old schedule but not the new one.
-   approve( N(carol), N(first), N(prod3) );
-   approve( N(carol), N(first), N(prod4) );
-
-   produce_block();
-
-   // The proposal has four of the five requested approvals but they are not sufficient to satisfy the authorization checks of eosio.sudo::exec.
-   BOOST_REQUIRE_EXCEPTION( push_action( N(eosio.msig), N(exec), N(alice), mvo()
-                                          ("proposer",      "carol")
-                                          ("proposal_name", "first")
-                                          ("executer",      "alice")
-                                       ), eosio_assert_message_exception,
-                                          eosio_assert_message_is("transaction authorization failed")
-   );
-
-   // Unfortunately the new producer cannot approve because they were not in the original requested approvals.
-   BOOST_REQUIRE_EXCEPTION( approve( N(carol), N(first), N(newprod1) ),
-                            eosio_assert_message_exception,
-                            eosio_assert_message_is("approval is not on the list of requested approvals")
-   );
-
-   // But prod5 still can provide the fifth approval necessary to satisfy the 2/3+1 threshold of the new producer set
-   approve( N(carol), N(first), N(prod5) );
-
-   vector<transaction_trace_ptr> traces;
-   control->applied_transaction.connect([&]( const transaction_trace_ptr& t) {
-      if (t->scheduled) {
-         traces.push_back( t );
-      }
-   } );
-
-   // Now the proposal should be ready to execute
-   push_action( N(eosio.msig), N(exec), N(alice), mvo()
-                  ("proposer",      "carol")
-                  ("proposal_name", "first")
-                  ("executer",      "alice")
-   );
-
-   produce_block();
-
-   BOOST_REQUIRE_EQUAL( 2, traces.size() );
-
-   BOOST_REQUIRE_EQUAL( 1, traces[0]->action_traces.size() );
-   BOOST_REQUIRE_EQUAL( "eosio.sudo", name{traces[0]->action_traces[0].act.account} );
-   BOOST_REQUIRE_EQUAL( "exec", name{traces[0]->action_traces[0].act.name} );
-   BOOST_REQUIRE_EQUAL( transaction_receipt::executed, traces[0]->receipt->status );
-
-   BOOST_REQUIRE_EQUAL( 1, traces[1]->action_traces.size() );
-   BOOST_REQUIRE_EQUAL( "eosio", name{traces[1]->action_traces[0].act.account} );
-   BOOST_REQUIRE_EQUAL( "reqauth", name{traces[1]->action_traces[0].act.name} );
-   BOOST_REQUIRE_EQUAL( transaction_receipt::executed, traces[1]->receipt->status );
-
-} FC_LOG_AND_RETHROW()
+}
 
 BOOST_AUTO_TEST_SUITE_END()
+
+} // namespace eosio
