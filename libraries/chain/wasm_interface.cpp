@@ -11,11 +11,9 @@
 #include <eosio/chain/wasm_eosio_validation.hpp>
 #include <eosio/chain/wasm_eosio_injection.hpp>
 #include <eosio/chain/global_property_object.hpp>
-#include <eosio/chain/core_symbol_object.hpp>
 #include <eosio/chain/account_object.hpp>
 #include <eosio/chain/blackwhitelist_object.hpp>
 #include <eosio/chain/symbol.hpp>
-#include <eosio/chain/account_object.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/sha1.hpp>
@@ -275,6 +273,8 @@ class softfloat_api : public context_aware_api {
       softfloat_api( apply_context& ctx )
       :context_aware_api(ctx, true) {}
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
       // float binops
       float _eosio_f32_add( float a, float b ) {
          float32_t ret = f32_add( to_softfloat32(a), to_softfloat32(b) );
@@ -292,6 +292,7 @@ class softfloat_api : public context_aware_api {
          float32_t ret = f32_mul( to_softfloat32(a), to_softfloat32(b) );
          return *reinterpret_cast<float*>(&ret);
       }
+#pragma GCC diagnostic pop
       float _eosio_f32_min( float af, float bf ) {
          float32_t a = to_softfloat32(af);
          float32_t b = to_softfloat32(bf);
@@ -963,11 +964,9 @@ class system_api : public context_aware_api {
          return static_cast<uint64_t>( context.trx_context.published.time_since_epoch().count() );
       }
 
-      uint32_t current_block_num() {
-         return ( context.control.head_block_num() );
-      }
-
 };
+
+constexpr size_t max_assert_message = 1024;
 
 class context_free_system_api :  public context_aware_api {
 public:
@@ -981,14 +980,16 @@ public:
    // Kept as intrinsic rather than implementing on WASM side (using eosio_assert_message and strlen) because strlen is faster on native side.
    void eosio_assert( bool condition, null_terminated_ptr msg ) {
       if( BOOST_UNLIKELY( !condition ) ) {
-         std::string message( msg );
+         const size_t sz = strnlen( msg, max_assert_message );
+         std::string message( msg, sz );
          EOS_THROW( eosio_assert_message_exception, "assertion failure with message: ${s}", ("s",message) );
       }
    }
 
    void eosio_assert_message( bool condition, array_ptr<const char> msg, size_t msg_len ) {
       if( BOOST_UNLIKELY( !condition ) ) {
-         std::string message( msg, msg_len );
+         const size_t sz = msg_len > max_assert_message ? max_assert_message : msg_len;
+         std::string message( msg, sz );
          EOS_THROW( eosio_assert_message_exception, "assertion failure with message: ${s}", ("s",message) );
       }
    }
@@ -1031,28 +1032,6 @@ class action_api : public context_aware_api {
       bool is_inline(){
          return context.recurse_depth > 0;
       }
-};
-
-class core_symbol_api : public context_aware_api {
-   public:
-      core_symbol_api( apply_context& ctx )
-      : context_aware_api(ctx,true) {}
-
-      uint64_t core_symbol() {
-         return ::eosio::chain::core_symbol();
-      }
-
-      void set_core_symbol(array_ptr<const char> str, size_t str_len) {
-         auto s = ::eosio::chain::core_symbol(string(str, str_len));
-
-         auto& original = context.control.get_core_symbol();
-         EOS_ASSERT(s != original.core_symbol, symbol_type_exception, "core symbol not changed");
-
-         context.db.modify( original,
-            [&]( auto& cs ) {
-                 cs.core_symbol = s;
-         });
-      }   
 };
 
 class console_api : public context_aware_api {
@@ -1160,7 +1139,10 @@ class console_api : public context_aware_api {
             console.precision( std::numeric_limits<long double>::digits10 );
             extFloat80_t val_approx;
             f128M_to_extF80M(&val, &val_approx);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
             context.console_append( *(long double*)(&val_approx) );
+#pragma GCC diagnostic pop
 #else
             console.precision( std::numeric_limits<double>::digits10 );
             double val_approx = from_softfloat64( f128M_to_f64(&val) );
@@ -1359,7 +1341,7 @@ class memory_api : public context_aware_api {
       :context_aware_api(ctx,true){}
 
       char* memcpy( array_ptr<char> dest, array_ptr<const char> src, size_t length) {
-         EOS_ASSERT((std::abs((ptrdiff_t)dest.value - (ptrdiff_t)src.value)) >= length,
+         EOS_ASSERT((size_t)(std::abs((ptrdiff_t)dest.value - (ptrdiff_t)src.value)) >= length,
                overlapping_memory_error, "memcpy can only accept non-aliasing pointers");
          return (char *)::memcpy(dest, src, length);
       }
@@ -1730,23 +1712,10 @@ class call_depth_api : public context_aware_api {
       }
 };
 
-/*
- * This api will be removed with fix for missing `strtod`
- */
-class strtod_api : public context_aware_api {
-public:
-    strtod_api(apply_context& ctx)
-    : context_aware_api(ctx, true) {}
-
-    double strtod(const char *nptr, char **endptr) {
-         return std::strtod(nptr, endptr);
-    }
-};
-
 class random_seed_api : public context_aware_api {
 public:
    random_seed_api(apply_context& ctx)
-           : context_aware_api(ctx) {}
+      : context_aware_api(ctx) {}
 
    int random_seed(array_ptr<char> sig, size_t siglen) {
       auto data = source();
@@ -1853,12 +1822,8 @@ private:
 };
 
 REGISTER_INTRINSICS(random_seed_api,
-(random_seed,           int(int, int)               )
-(producer_random_seed,  int(int, int)               )
-);
-
-REGISTER_INTRINSICS(strtod_api,
-   (strtod,  double(int, int)               )
+   (random_seed,           int(int, int)               )
+   (producer_random_seed,  int(int, int)               )
 );
 
 REGISTER_INJECTED_INTRINSICS(call_depth_api,
@@ -2001,7 +1966,6 @@ REGISTER_INTRINSICS(permission_api,
 REGISTER_INTRINSICS(system_api,
    (current_time, int64_t()       )
    (publication_time,   int64_t() )
-   (current_block_num,  int() )
 );
 
 REGISTER_INTRINSICS(context_free_system_api,
@@ -2025,12 +1989,6 @@ REGISTER_INTRINSICS(authorization_api,
    (require_authorization, void(int64_t, int64_t), "require_auth2", void(authorization_api::*)(const account_name&, const permission_name& permission) )
    (has_authorization,     int(int64_t), "has_auth", bool(authorization_api::*)(const account_name&)const )
    (is_account,            int(int64_t)           )
-);
-
-
-REGISTER_INTRINSICS(core_symbol_api,
-   (core_symbol, int64_t())
-   (set_core_symbol, void(int, int))
 );
 
 REGISTER_INTRINSICS(console_api,

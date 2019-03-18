@@ -38,6 +38,7 @@ namespace eosio { namespace chain {
    class account_object;
    using resource_limits::resource_limits_manager;
    using apply_handler = std::function<void(apply_context&)>;
+   using unapplied_transactions_type = map<transaction_id_type, transaction_metadata_ptr>;
 
    using unapplied_transactions_type = map<transaction_id_type, transaction_metadata_ptr>;
 
@@ -133,7 +134,6 @@ namespace eosio { namespace chain {
           *  The caller is responsible for calling drop_unapplied_transaction on a failing transaction that
           *  they never intend to retry
           *
-
           *  @return map of transactions which have been unapplied
           */
          unapplied_transactions_type& get_unapplied_transactions();
@@ -284,7 +284,6 @@ namespace eosio { namespace chain {
          signal<void(const block_state_ptr&)>          irreversible_block;
          signal<void(const transaction_metadata_ptr&)> accepted_transaction;
          signal<void(const transaction_trace_ptr&)>    applied_transaction;
-         signal<void(const header_confirmation&)>      accepted_confirmation;
          signal<void(const int&)>                      bad_alloc;
 
          /*
