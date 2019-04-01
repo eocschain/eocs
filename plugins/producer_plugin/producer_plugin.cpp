@@ -1159,7 +1159,7 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
       if (!persisted_by_expiry.empty()) {
          int num_expired_persistent = 0;
          int orig_count = _persistent_transactions.size();
-
+         
          while(!persisted_by_expiry.empty() && persisted_by_expiry.begin()->expiry <= pbs->header.timestamp.to_time_point()) {
             if (preprocess_deadline <= fc::time_point::now()) {
                exhausted = true;
@@ -1226,7 +1226,9 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
                   if( preprocess_deadline <= fc::time_point::now() ) exhausted = true;
                   if( exhausted ) break;
                   const auto& trx = itr->second;
+                  ilog("before calculate_transaction_category " );
                   auto category = calculate_transaction_category(trx);
+                  ilog("after calculate_transaction_category ");
                   if (category == tx_category::EXPIRED ||
                      (category == tx_category::UNEXPIRED_UNPERSISTED && _producers.empty()))
                   {
