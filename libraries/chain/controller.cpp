@@ -164,7 +164,11 @@ struct controller_impl {
       if ( read_mode == db_read_mode::SPECULATIVE ) {
          EOS_ASSERT( head->block, block_validate_exception, "attempting to pop a block that was sparsely loaded from a snapshot");
          for( const auto& t : head->trxs )
+         {
             unapplied_transactions[t->signed_id] = t;
+            ilog("pop_block, trx->signed_id is ${signed_id}",("signed_id",t->signed_id));
+         }
+            
       }
       head = prev;
       db.undo();
@@ -797,6 +801,7 @@ struct controller_impl {
 
    bool failure_is_subjective( const fc::exception& e ) const {
       auto code = e.code();
+      ilog("code is ${code}",("code",code));
       return    (code == subjective_block_production_exception::code_value)
              || (code == block_net_usage_exceeded::code_value)
              || (code == greylist_net_usage_exceeded::code_value)
@@ -1055,6 +1060,7 @@ struct controller_impl {
                );
             }
             trx_context.exec();
+            ilog("trx_context.exec() success, trx->id is :${id}",("id",trx->id));
             trx_context.finalize(); // Automatically rounds up network and CPU usage in trace and bills payers if successful
 
             auto restore = make_block_restore_point();
@@ -1072,7 +1078,7 @@ struct controller_impl {
                r.net_usage_words = trace->net_usage / 8;
                trace->receipt = r;
             }
-
+            ilog("before move_append,trx->id is :${id}",("id",trx->id));
             fc::move_append(pending->_actions, move(trx_context.executed));
 
             // call the accept signal but only once for this transaction
@@ -1083,16 +1089,20 @@ struct controller_impl {
 
             emit(self.applied_transaction, trace);
 
-
+            ilog("emit applied_transaction success, trx->id is : ${id}",("id",trx->id));
             if ( read_mode != db_read_mode::SPECULATIVE && pending->_block_status == controller::block_status::incomplete ) {
                //this may happen automatically in destructor, but I prefere make it more explicit
                trx_context.undo();
+               ilog("trx_context.undo() success!! trx->id is : ${id}",("id",trx->id));
             } else {
                restore.cancel();
                trx_context.squash();
+               ilog("trx_context.squash() success!! trx->id ${id}",("id",trx->id));
             }
 
             if (!trx->implicit) {
+               ilog("erase unapplied_transactions1, signed_id is ${trx->signed_id}",("trx->signed_id",trx->signed_id));
+               ilog("erase unapplied_transactions1, id is ${trx->signed_id}",("trx->signed_id",trx->id));
                unapplied_transactions.erase( trx->signed_id );
             }
             return trace;
@@ -1102,6 +1112,8 @@ struct controller_impl {
          }
 
          if (!failure_is_subjective(*trace->except)) {
+            ilog("erase unapplied_transactions2, signed_id is ${trx->signed_id}",("trx->signed_id",trx->signed_id));
+            ilog("erase unapplied_transactions2, id is ${trx->signed_id}",("trx->signed_id",trx->id));
             unapplied_transactions.erase( trx->signed_id );
          }
 
@@ -1421,7 +1433,10 @@ struct controller_impl {
       if( pending ) {
          if ( read_mode == db_read_mode::SPECULATIVE ) {
             for( const auto& t : pending->_pending_block_state->trxs )
-               unapplied_transactions[t->signed_id] = t;
+               {
+                  unapplied_transactions[t->signed_id] = t;
+                  ilog("abort_block, trx->signed_id is ${signed_id}",("signed_id",t->signed_id));
+               }
          }
          pending.reset();
       }

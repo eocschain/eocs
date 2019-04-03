@@ -1193,16 +1193,18 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
 
       try {
          size_t orig_pending_txn_size = _pending_incoming_transactions.size();
-
+         ilog("before _producers.empty() && persisted_by_id.empty()");
          // Processing unapplied transactions...
          //
          if (_producers.empty() && persisted_by_id.empty()) {
             // if this node can never produce and has no persisted transactions,
             // there is no need for unapplied transactions they can be dropped
+            ilog("_producers.empty() && persisted_by_id.empty()");
             chain.get_unapplied_transactions().clear();
          } else {
             // derive appliable transactions from unapplied_transactions and drop droppable transactions
             unapplied_transactions_type& unapplied_trxs = chain.get_unapplied_transactions();
+            ilog("before loop, unapplied_trxs.size() is ${n}",("n",unapplied_trxs.size()) );
             if( !unapplied_trxs.empty() ) {
                auto unapplied_trxs_size = unapplied_trxs.size();
                int num_applied = 0;
@@ -1217,7 +1219,6 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
                      return tx_category::UNEXPIRED_UNPERSISTED;
                   }
                };
-
                auto itr = unapplied_trxs.begin();
                while( itr != unapplied_trxs.end() ) {
                   auto itr_next = itr; // save off next since itr may be invalidated by loop
@@ -1226,8 +1227,15 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
                   if( preprocess_deadline <= fc::time_point::now() ) exhausted = true;
                   if( exhausted ) break;
                   const auto& trx = itr->second;
-                  ilog("before calculate_transaction_category " );
+
+                  ilog("before calculate_transaction_category222222222222222 " );
+                  ilog("trx is ${trx->id}",("trx->id",trx->id));
+                  ilog("trx->signed_id ${id}",("id",trx->signed_id));
+                  ilog("print trx 222222222222222222222222222222");
                   auto category = calculate_transaction_category(trx);
+                  ilog("after calculate transaction print trx 222222222222");
+                  ilog("trx is ${trx->id}",("trx->id",trx->id));
+                  ilog("trx->signed_id ${id}",("id",trx->signed_id));
                   ilog("after calculate_transaction_category ");
                   if (category == tx_category::EXPIRED ||
                      (category == tx_category::UNEXPIRED_UNPERSISTED && _producers.empty()))
@@ -1236,7 +1244,9 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
                         fc_dlog(_trx_trace_log, "[TRX_TRACE] Node with producers configured is dropping an EXPIRED transaction that was PREVIOUSLY ACCEPTED : ${txid}",
                                ("txid", trx->id));
                      }
+                     ilog("unapplied_trxs.erase 111111111"); 
                      itr = unapplied_trxs.erase( itr ); // unapplied_trxs map has not been modified, so simply erase and continue
+                     ilog("unapplied_trxs.erase 222222222"); 
                      continue;
                   } else if (category == tx_category::PERSISTED ||
                             (category == tx_category::UNEXPIRED_UNPERSISTED && _pending_block_mode == pending_block_mode::producing))
@@ -1259,7 +1269,21 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
                            } else {
                               // this failed our configured maximum transaction time, we don't want to replay it
                               // chain.plus_transactions can modify unapplied_trxs, so erase by id
-                              unapplied_trxs.erase( trx->signed_id );
+                              if (trx == nullptr)
+                              {   
+                                 ilog("empty unapplied_trx!!!");
+                              }
+                              else
+                              {
+                                 /* code */
+                                 ilog("unapplied_trxs.erase 333333333");
+                                 ilog("trx is ${trx->id}",("trx->id",trx->id));
+                                 ilog("trx->signed_id ${id}",("id",trx->signed_id));
+                                 ilog("unapplied_trxs.erase 333333333========"); 
+                                 unapplied_trxs.erase( trx->signed_id );
+                                 ilog("unapplied_trxs.erase 444444444");
+                              }
+                              
                               ++num_failed;
                            }
                         } else {
@@ -1281,6 +1305,8 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
                              ("failed", num_failed));
             }
          }
+
+         ilog("unapplied_trxs. 55555555555555555");
 
          if (_pending_block_mode == pending_block_mode::producing) {
             auto& blacklist_by_id = _blacklisted_transactions.get<by_id>();
@@ -1399,10 +1425,11 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
                         ( "applied", num_applied )
                         ( "failed", num_failed ) );
             }
-
+         ilog("unapplied_trxs. 666666666666666");
          }
 
          if (exhausted || preprocess_deadline <= fc::time_point::now()) {
+            ilog("unapplied_trxs. 7777777777777777");
             return start_block_result::exhausted;
          } else {
             // attempt to apply any pending incoming transactions
@@ -1417,7 +1444,10 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
                   --orig_pending_txn_size;
                   process_incoming_transaction_async(std::get<0>(e), std::get<1>(e), std::get<2>(e));
                }
+
+               ilog("unapplied_trxs. 888888888888888");
             }
+            ilog("unapplied_trxs. 999999999999");
             return start_block_result::succeeded;
          }
 
@@ -1428,6 +1458,7 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
 
    }
 
+   ilog("unapplied_trxs. 10000000000");
    return start_block_result::failed;
 }
 
