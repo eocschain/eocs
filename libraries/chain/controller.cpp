@@ -153,6 +153,7 @@ struct controller_impl {
    unapplied_transactions_type     unapplied_transactions;
 
    void pop_block() {
+      ilog("pop_block begin");
       auto prev = fork_db.get_block( head->header.previous );
       EOS_ASSERT( prev, block_validate_exception, "attempt to pop beyond last irreversible block" );
 
@@ -717,6 +718,7 @@ struct controller_impl {
       } catch (...) {
          // dont bother resetting pending, instead abort the block
          reset_pending_on_exit.cancel();
+         ilog("commit block catch abort block");
          abort_block();
          throw;
       }
@@ -1114,11 +1116,16 @@ struct controller_impl {
          if (!failure_is_subjective(*trace->except)) {
             ilog("erase unapplied_transactions2, signed_id is ${trx->signed_id}",("trx->signed_id",trx->signed_id));
             ilog("erase unapplied_transactions2, id is ${trx->signed_id}",("trx->signed_id",trx->id));
+            std::cerr << "before unapplied_transactions erase trx value" << trx << std::endl;
+            std::cerr << "before unapplied_transactions erase map value" << unapplied_transactions[trx->signed_id] <<std::endl;
             unapplied_transactions.erase( trx->signed_id );
+            std::cerr << "after unapplied_transactions erase trx value" << trx << std::endl;
          }
 
          emit( self.accepted_transaction, trx );
-         emit( self.applied_transaction, trace );
+         std::cerr << "after emit  self.accepted_transaction trx value" << trx << std::endl;
+         //emit( self.applied_transaction, trace );
+         std::cerr << "after emit  self.applied_transaction trx value" << trx << std::endl;
 
          return trace;
       } FC_CAPTURE_AND_RETHROW((trace))
@@ -1289,6 +1296,7 @@ struct controller_impl {
          return;
       } catch ( const fc::exception& e ) {
          edump((e.to_detail_string()));
+         ilog("apply_block catch abort_block");
          abort_block();
          throw;
       }
@@ -1430,6 +1438,7 @@ struct controller_impl {
    } /// push_block
 
    void abort_block() {
+      ilog("abort_block begin");
       if( pending ) {
          if ( read_mode == db_read_mode::SPECULATIVE ) {
             for( const auto& t : pending->_pending_block_state->trxs )

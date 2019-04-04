@@ -1231,11 +1231,13 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
                   ilog("before calculate_transaction_category222222222222222 " );
                   ilog("trx is ${trx->id}",("trx->id",trx->id));
                   ilog("trx->signed_id ${id}",("id",trx->signed_id));
+                  std::cerr << "trx is ${trx} " << trx <<std::endl;
                   ilog("print trx 222222222222222222222222222222");
                   auto category = calculate_transaction_category(trx);
                   ilog("after calculate transaction print trx 222222222222");
                   ilog("trx is ${trx->id}",("trx->id",trx->id));
                   ilog("trx->signed_id ${id}",("id",trx->signed_id));
+                  std::cerr << "trx is ${trx} " << trx <<std::endl;
                   ilog("after calculate_transaction_category ");
                   if (category == tx_category::EXPIRED ||
                      (category == tx_category::UNEXPIRED_UNPERSISTED && _producers.empty()))
@@ -1260,8 +1262,11 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
                            deadline_is_subjective = true;
                            deadline = preprocess_deadline;
                         }
-
+                        ilog("before chain.push_transaction...................");
+                        std::cerr << "trx is ${trx} " << trx <<std::endl;
                         auto trace = chain.push_transaction(trx, deadline);
+                        ilog("after chain.push_transaction......");
+                        std::cerr << "trx is ${trx} " << trx <<std::endl;
                         if (trace->except) {
                            if (failure_is_subjective(*trace->except, deadline_is_subjective)) {
                               exhausted = true;
@@ -1277,6 +1282,7 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
                               {
                                  /* code */
                                  ilog("unapplied_trxs.erase 333333333");
+                                 std::cerr << "trx is ${trx} " << trx <<std::endl;
                                  ilog("trx is ${trx->id}",("trx->id",trx->id));
                                  ilog("trx->signed_id ${id}",("id",trx->signed_id));
                                  ilog("unapplied_trxs.erase 333333333========"); 

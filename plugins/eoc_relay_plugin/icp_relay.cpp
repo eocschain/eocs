@@ -337,7 +337,11 @@ void relay::on_applied_transaction(const transaction_trace_ptr& t) {
       }
    }
 
-   if (st.empty()) return;
+   if (st.empty()) 
+   {
+      ilog("send_transaction empty!!!!");
+      return;
+   }
 
    //send_transactions_.insert(st);
     update_send_transaction_index(st);
