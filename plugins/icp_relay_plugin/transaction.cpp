@@ -97,12 +97,12 @@ void relay::push_transaction(vector<action> actions, function<void(bool)> callba
    auto pp = app().find_plugin<producer_plugin>();
    FC_ASSERT(pp and pp->get_state() == abstract_plugin::started, "producer_plugin not found");
 
-   if (signer_required_keys_.empty()) {
+//   if (signer_required_keys_.empty()) {
       auto available_keys = pp->get_producer_keys();
       auto ro_api = chain.get_read_only_api();
       fc::variant v{static_cast<const transaction&>(trx)};
       signer_required_keys_ = ro_api.get_required_keys(chain_apis::read_only::get_required_keys_params{v, available_keys}).required_keys;
-   }
+//   }
 
    auto digest = trx.sig_digest(chain.get_chain_id(), trx.context_free_data);
    for (auto& k: signer_required_keys_) {
