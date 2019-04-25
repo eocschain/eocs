@@ -20,6 +20,7 @@ $ ./scripts/eosio_build.sh
 
 ** The EOCS cross-chain components are as follows:
 
+
 #### Isomorphic cross-chain protocol
 ```sh
 $ Inter-chain protocols are meant to be able to express state transitions in decentralized inter-chain interoperability. Interoperability is the only point to be taken into consideration in building isomorphic inter-chain protocols, which are symmetric and two-way protocols. Based on the starting point of avoiding changes to the underlying EOSIO softwar e, we will implement inter-chain contracts that are deployed to both isomorphic chains. Therefore, the isomorphic inter-chain protocol is designed to contain data packets of state data and block certificates, and the Replay performs chain-to-chain packet relay, that is, the interface that calls the inter-chain contract.
