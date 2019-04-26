@@ -278,7 +278,7 @@ namespace eoc_icp {
                {
                   ilog("icp_connection closure detected on write to ${p}", ("p", pname));
                }
-               // my_impl->close(conn);
+                my_impl->close(conn);
                return;
             }
             while (conn->out_queue.size() > 0)
