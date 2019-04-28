@@ -259,6 +259,10 @@ void relay::update_send_transaction_index(const send_transaction& t)
 
 
 void relay::on_applied_transaction(const transaction_trace_ptr& t) {
+   if(t->except){
+      ilog("on_applied_transaction failed");
+      return;
+   }
    //ilog("on applied transaction");
    auto &transaction_set = send_transactions_.get<by_id>();
    auto trace_iter = transaction_set.find(t->id);

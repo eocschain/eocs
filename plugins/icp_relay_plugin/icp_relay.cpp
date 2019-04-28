@@ -246,6 +246,10 @@ void relay::update_local_head(bool force) {
 }
 
 void relay::on_applied_transaction(const transaction_trace_ptr& t) {
+   if(t->except){
+      ilog("on_applied_transaction failed");
+      return;
+   }
   //Modify the logic, cover  
   // if (send_transactions_.find(t->id) != send_transactions_.end()) return; // has been handled
    auto &transaction_set = send_transactions_.get<by_id>();

@@ -255,7 +255,7 @@ namespace eoc_icp {
          out_queue.push_back(m);
          write_queue.pop_front();
       }
-      boost::asio::async_write(*socket, bufs, [c](boost::system::error_code ec, std::size_t w) {
+      boost::asio::async_write(*socket, bufs, [c,this](boost::system::error_code ec, std::size_t w) {
          try
          {
             auto conn = c.lock();
@@ -278,7 +278,7 @@ namespace eoc_icp {
                {
                   ilog("icp_connection closure detected on write to ${p}", ("p", pname));
                }
-                my_impl->close(conn);
+               my_impl->close(conn);
                return;
             }
             while (conn->out_queue.size() > 0)
