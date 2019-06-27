@@ -6,7 +6,7 @@
 #include <eosio/chain/exceptions.hpp>
 #include <boost/core/ignore_unused.hpp>
 #include <eosio/chain/authorization_manager.hpp>
-#include <eosio/chain/resource_limits.hpp>
+//#include <eosio/chain/resource_limits.hpp>
 #include <eosio/chain/wasm_interface_private.hpp>
 #include <eosio/chain/wasm_eosio_validation.hpp>
 #include <eosio/chain/wasm_eosio_injection.hpp>
@@ -141,6 +141,7 @@ class privileged_api : public context_aware_api {
        * @param net_weight - the weight for determining share of network capacity
        * @param cpu_weight - the weight for determining share of compute capacity
        */
+      /*
       void set_resource_limits( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight) {
          EOS_ASSERT(ram_bytes >= -1, wasm_execution_error, "invalid value for ram resource limit expected [-1,INT64_MAX]");
          EOS_ASSERT(net_weight >= -1, wasm_execution_error, "invalid value for net resource weight expected [-1,INT64_MAX]");
@@ -152,7 +153,7 @@ class privileged_api : public context_aware_api {
 
       void get_resource_limits( account_name account, int64_t& ram_bytes, int64_t& net_weight, int64_t& cpu_weight ) {
          context.control.get_resource_limits_manager().get_account_limits( account, ram_bytes, net_weight, cpu_weight);
-      }
+      }*/
 
       int64_t set_proposed_producers( array_ptr<char> packed_producer_schedule, size_t datalen) {
          datastream<const char*> ds( packed_producer_schedule, datalen );
@@ -194,7 +195,7 @@ class privileged_api : public context_aware_api {
                  gprops.configuration = cfg;
          });
       }
-
+      /*
       void set_minimum_resource_security(int64_t ram_bytes, int64_t net_bytes, int64_t cpu_us) {
          EOS_ASSERT(cpu_us >= 0, wasm_execution_error, "cpu_us must be >= 0");
          EOS_ASSERT(net_bytes >= 0, wasm_execution_error, "net_bytes must be >= 0");
@@ -206,7 +207,7 @@ class privileged_api : public context_aware_api {
                  "ram_bytes cannot be reduced, current_ram_bytes: '${current_ram_bytes}', set_ram_bytes: '${set_ram_bytes}'",
                     ("current_ram_bytes", current_ram_bytes)("set_ram_bytes", ram_bytes));
          resource_limits.set_mrs_parameters(ram_bytes, net_bytes, cpu_us);
-       }
+       }*/
 
       bool is_privileged( account_name n )const {
          return context.db.get<account_object, by_name>( n ).privileged;
@@ -1879,13 +1880,13 @@ REGISTER_INTRINSICS(compiler_builtins,
 REGISTER_INTRINSICS(privileged_api,
    (is_feature_active,                int(int64_t)                          )
    (activate_feature,                 void(int64_t)                         )
-   (get_resource_limits,              void(int64_t,int,int,int)             )
-   (set_resource_limits,              void(int64_t,int64_t,int64_t,int64_t) )
+   /*(get_resource_limits,              void(int64_t,int,int,int)             )
+   (set_resource_limits,              void(int64_t,int64_t,int64_t,int64_t) )*/
    (set_proposed_producers,           int64_t(int,int)                      )
    (update_blackwhitelist,            void()                         )
    (get_blockchain_parameters_packed, int(int, int)                         )
    (set_blockchain_parameters_packed, void(int,int)                         )
-   (set_minimum_resource_security,    void(int64_t,int64_t,int64_t)         )
+   //(set_minimum_resource_security,    void(int64_t,int64_t,int64_t)         )
    (is_privileged,                    int(int64_t)                          )
    (set_privileged,                   void(int64_t, int)                    )
 );
