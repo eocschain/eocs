@@ -2,7 +2,7 @@
 #include <eosio/chain/transaction_context.hpp>
 #include <eosio/chain/authorization_manager.hpp>
 #include <eosio/chain/exceptions.hpp>
-#include <eosio/chain/resource_limits.hpp>
+//#include <eosio/chain/resource_limits.hpp>
 #include <eosio/chain/generated_transaction_object.hpp>
 #include <eosio/chain/transaction_object.hpp>
 #include <eosio/chain/global_property_object.hpp>
@@ -175,10 +175,13 @@ namespace bacc = boost::accumulators;
       const static int64_t large_number_no_overflow = std::numeric_limits<int64_t>::max()/2;
 
       const auto& cfg = control.get_global_properties().configuration;
+      /*
       auto& rl = control.get_mutable_resource_limits_manager();
 
       net_limit = rl.get_block_net_limit();
+      */
 
+     /*
       objective_duration_limit = fc::microseconds( rl.get_block_cpu_limit() );
       _deadline = start + objective_duration_limit;
 
@@ -266,6 +269,7 @@ namespace bacc = boost::accumulators;
       if( initial_net_usage > 0 )
          add_net_usage( initial_net_usage );  // Fail early if current net usage is already greater than the calculated limit
 
+      */
       checktime(); // Fail early if deadline has already been exceeded
 
       if(control.skip_trx_checks())
@@ -360,6 +364,7 @@ namespace bacc = boost::accumulators;
          }
       }
 
+      /*
       auto& rl = control.get_mutable_resource_limits_manager();
       for( auto a : validate_ram_usage ) {
          rl.verify_account_ram_usage( a.first, a.second );
@@ -401,6 +406,8 @@ namespace bacc = boost::accumulators;
 
       rl.add_transaction_usage( bill_to_accounts, static_cast<uint64_t>(billed_cpu_time_us), net_usage,
                                 block_timestamp_type(control.pending_block_time()).slot ); // Should never fail
+
+      */
    }
 
    void transaction_context::squash() {
@@ -523,12 +530,13 @@ namespace bacc = boost::accumulators;
    }
 
    void transaction_context::add_ram_usage( account_name account, int64_t ram_delta, bool includes_mrs_ram ) {
+      /*
       auto& rl = control.get_mutable_resource_limits_manager();
       rl.add_pending_ram_usage( account, ram_delta );
       if( ram_delta > 0 )
       {
           emplace_validate_ram_usage(account, includes_mrs_ram);
-      }
+      }*/
    }
 
    void transaction_context::emplace_validate_ram_usage( account_name account, bool includes_mrs_ram ) {
@@ -547,6 +555,7 @@ namespace bacc = boost::accumulators;
       return static_cast<uint32_t>(billed_cpu_time_us);
    }
 
+   /*
    std::tuple<int64_t, int64_t, bool, bool> transaction_context::max_bandwidth_billed_accounts_can_pay( bool force_elastic_limits ) const{
       // Assumes rl.update_account_usage( bill_to_accounts, block_timestamp_type(control.pending_block_time()).slot ) was already called prior
 
@@ -572,7 +581,7 @@ namespace bacc = boost::accumulators;
       }
 
       return std::make_tuple(account_net_limit, account_cpu_limit, greylisted_net, greylisted_cpu);
-   }
+   }*/
 
    void transaction_context::dispatch_action( action_trace& trace, const action& a, account_name receiver, bool context_free, uint32_t recurse_depth ) {
       apply_context  acontext( control, *this, a, recurse_depth );

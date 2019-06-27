@@ -170,8 +170,8 @@ namespace eosio { namespace chain {
 
          const core_symbol_object& get_core_symbol()const;
 
-         const resource_limits_manager&        get_resource_limits_manager()const;
-         resource_limits_manager&              get_mutable_resource_limits_manager();
+         //const resource_limits_manager&        get_resource_limits_manager()const;
+         //resource_limits_manager&              get_mutable_resource_limits_manager();
          const authorization_manager&          get_authorization_manager()const;
          authorization_manager&                get_mutable_authorization_manager();
 
