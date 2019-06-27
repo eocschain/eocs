@@ -1,4 +1,4 @@
-#pragma once
+1#pragma once
 #include <eosio/chain/controller.hpp>
 #include <eosio/chain/trace.hpp>
 #include <signal.h>
