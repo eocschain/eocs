@@ -1039,7 +1039,7 @@ std::string itoh(I n, size_t hlen = sizeof(I)<<1) {
 }
 
 read_only::get_info_results read_only::get_info(const read_only::get_info_params&) const {
-   const auto& rm = db.get_resource_limits_manager();
+   //const auto& rm = db.get_resource_limits_manager();
    return {
       itoh(static_cast<uint32_t>(app().version())),
       db.get_chain_id(),
@@ -1049,10 +1049,10 @@ read_only::get_info_results read_only::get_info(const read_only::get_info_params
       db.fork_db_head_block_id(),
       db.fork_db_head_block_time(),
       db.fork_db_head_block_producer(),
-      rm.get_virtual_block_cpu_limit(),
+      /*rm.get_virtual_block_cpu_limit(),
       rm.get_virtual_block_net_limit(),
       rm.get_block_cpu_limit(),
-      rm.get_block_net_limit(),
+      rm.get_block_net_limit(),*/
       //std::bitset<64>(db.get_dynamic_global_properties().recent_slots_filled).to_string(),
       //__builtin_popcountll(db.get_dynamic_global_properties().recent_slots_filled) / 64.0,
       app().version_string(),
@@ -1757,12 +1757,12 @@ read_only::get_account_results read_only::get_account( const get_account_params&
    result.account_name = params.account_name;
 
    const auto& d = db.db();
-   const auto& rm = db.get_resource_limits_manager();
+   //const auto& rm = db.get_resource_limits_manager();
 
    result.head_block_num  = db.head_block_num();
    result.head_block_time = db.head_block_time();
 
-   rm.get_account_limits( result.account_name, result.ram_quota, result.net_weight, result.cpu_weight );
+   //rm.get_account_limits( result.account_name, result.ram_quota, result.net_weight, result.cpu_weight );
 
    const auto& a = db.get_account(result.account_name);
 
@@ -1771,9 +1771,9 @@ read_only::get_account_results read_only::get_account( const get_account_params&
    result.created          = a.creation_date;
 
    bool grelisted = db.is_resource_greylisted(result.account_name);
-   result.net_limit = rm.get_account_net_limit_ex( result.account_name, !grelisted);
+   /*result.net_limit = rm.get_account_net_limit_ex( result.account_name, !grelisted);
    result.cpu_limit = rm.get_account_cpu_limit_ex( result.account_name, !grelisted);
-   result.ram_usage = rm.get_account_ram_usage( result.account_name );
+   result.ram_usage = rm.get_account_ram_usage( result.account_name );*/
 
    const auto& permissions = d.get_index<permission_index,by_owner>();
    auto perm = permissions.lower_bound( boost::make_tuple( params.account_name ) );

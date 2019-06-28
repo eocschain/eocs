@@ -114,14 +114,14 @@ void apply_eosio_newaccount(apply_context& context) {
    const auto& active_permission = authorization.create_permission( create.name, config::active_name, owner_permission.id,
                                                                     std::move(create.active) );
 
-   context.control.get_mutable_resource_limits_manager().initialize_account(create.name);
+   /*context.control.get_mutable_resource_limits_manager().initialize_account(create.name);
 
    int64_t ram_delta = config::overhead_per_account_ram_bytes;
    ram_delta += 2*config::billable_size_v<permission_object>;
    ram_delta += owner_permission.auth.get_billable_size();
    ram_delta += active_permission.auth.get_billable_size();
 
-   context.add_ram_usage(create.name, ram_delta, false);
+   context.add_ram_usage(create.name, ram_delta, false);*/
 
 
 } FC_CAPTURE_AND_RETHROW( (create) ) }
