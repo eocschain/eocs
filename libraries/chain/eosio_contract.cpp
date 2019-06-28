@@ -22,7 +22,7 @@
 #include <eosio/chain/abi_serializer.hpp>
 
 #include <eosio/chain/authorization_manager.hpp>
-#include <eosio/chain/resource_limits.hpp>
+//#include <eosio/chain/resource_limits.hpp>
 
 namespace eosio { namespace chain {
 
@@ -114,7 +114,7 @@ void apply_eosio_newaccount(apply_context& context) {
    const auto& active_permission = authorization.create_permission( create.name, config::active_name, owner_permission.id,
                                                                     std::move(create.active) );
 
-   context.control.get_mutable_resource_limits_manager().initialize_account(create.name);
+   //context.control.get_mutable_resource_limits_manager().initialize_account(create.name);
 
    int64_t ram_delta = config::overhead_per_account_ram_bytes;
    ram_delta += 2*config::billable_size_v<permission_object>;

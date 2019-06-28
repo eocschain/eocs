@@ -1,4 +1,4 @@
-3#include <eosio/chain/controller.hpp>
+#include <eosio/chain/controller.hpp>
 #include <eosio/chain/transaction_context.hpp>
 
 #include <eosio/chain/block_log.hpp>

@@ -1,4 +1,4 @@
-1#pragma once
+#pragma once
 #include <eosio/chain/block_state.hpp>
 #include <eosio/chain/trace.hpp>
 #include <eosio/chain/genesis_state.hpp>
