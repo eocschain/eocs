@@ -480,10 +480,10 @@ struct state_history_plugin_impl : std::enable_shared_from_this<state_history_pl
       process_table("permission", db.get_index<permission_index>(), pack_row);
       process_table("permission_link", db.get_index<permission_link_index>(), pack_row);
 
-      process_table("resource_limits", db.get_index<resource_limits::resource_limits_index>(), pack_row);
-      process_table("resource_usage", db.get_index<resource_limits::resource_usage_index>(), pack_row);
-      process_table("resource_limits_state", db.get_index<resource_limits::resource_limits_state_index>(), pack_row);
-      process_table("resource_limits_config", db.get_index<resource_limits::resource_limits_config_index>(), pack_row);
+     // process_table("resource_limits", db.get_index<resource_limits::resource_limits_index>(), pack_row);
+     // process_table("resource_usage", db.get_index<resource_limits::resource_usage_index>(), pack_row);
+     // process_table("resource_limits_state", db.get_index<resource_limits::resource_limits_state_index>(), pack_row);
+     // process_table("resource_limits_config", db.get_index<resource_limits::resource_limits_config_index>(), pack_row);
 
       auto deltas_bin = zlib_compress_bytes(fc::raw::pack(deltas));
       EOS_ASSERT(deltas_bin.size() == (uint32_t)deltas_bin.size(), plugin_exception, "deltas is too big");

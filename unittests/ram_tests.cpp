@@ -8,7 +8,7 @@
 #pragma GCC diagnostic pop
 
 #include <eosio/chain/exceptions.hpp>
-#include <eosio/chain/resource_limits.hpp>
+//#include <eosio/chain/resource_limits.hpp>
 #include <eosio/testing/tester.hpp>
 
 #include <fc/exception/exception.hpp>

@@ -4,8 +4,8 @@
 #include <eosio/chain/permission_object.hpp>
 #include <eosio/chain/authorization_manager.hpp>
 
-#include <eosio/chain/resource_limits.hpp>
-#include <eosio/chain/resource_limits_private.hpp>
+//#include <eosio/chain/resource_limits.hpp>
+//#include <eosio/chain/resource_limits_private.hpp>
 
 #include <eosio/testing/tester_network.hpp>
 #include <eosio/chain/producer_object.hpp>
@@ -385,8 +385,8 @@ try {
 
    const chainbase::database &db = chain.control->db();
 
-   using resource_usage_object = eosio::chain::resource_limits::resource_usage_object;
-   using by_owner = eosio::chain::resource_limits::by_owner;
+   //using resource_usage_object = eosio::chain::resource_limits::resource_usage_object;
+   //using by_owner = eosio::chain::resource_limits::by_owner;
 
    auto create_acc = [&](account_name a) {
 
@@ -414,7 +414,7 @@ try {
    };
 
    create_acc(acc2);
-
+   /*
    const auto &usage = db.get<resource_usage_object,by_owner>(acc1);
 
    const auto &usage2 = db.get<resource_usage_object,by_owner>(acc1a);
@@ -423,6 +423,7 @@ try {
    BOOST_TEST(usage.net_usage.average() > 0U);
    BOOST_REQUIRE_EQUAL(usage.cpu_usage.average(), usage2.cpu_usage.average());
    BOOST_REQUIRE_EQUAL(usage.net_usage.average(), usage2.net_usage.average());
+   */
    chain.produce_block();
 
 } FC_LOG_AND_RETHROW() }

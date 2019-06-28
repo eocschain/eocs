@@ -11,8 +11,8 @@
 #include <eosio/chain/global_property_object.hpp>
 #include <eosio/chain/permission_link_object.hpp>
 #include <eosio/chain/permission_object.hpp>
-#include <eosio/chain/resource_limits.hpp>
-#include <eosio/chain/resource_limits_private.hpp>
+//#include <eosio/chain/resource_limits.hpp>
+//#include <eosio/chain/resource_limits_private.hpp>
 #include <eosio/chain/trace.hpp>
 #include <eosio/chain_plugin/chain_plugin.hpp>
 #include <eosio/state_history_plugin/state_history_plugin.hpp>
@@ -355,6 +355,7 @@ datastream<ST>& operator<<(datastream<ST>&                                      
    return ds;
 }
 
+/*
 template <typename ST>
 datastream<ST>& operator<<(datastream<ST>&                                                                      ds,
                            const history_serial_wrapper<eosio::chain::resource_limits::resource_limits_object>& obj) {
@@ -367,7 +368,9 @@ datastream<ST>& operator<<(datastream<ST>&                                      
    fc::raw::pack(ds, as_type<int64_t>(obj.obj.ram_bytes));
    return ds;
 }
+*/
 
+/*
 template <typename ST>
 datastream<ST>& operator<<(datastream<ST>&                                                                 ds,
                            const history_serial_wrapper<eosio::chain::resource_limits::usage_accumulator>& obj) {
@@ -377,7 +380,8 @@ datastream<ST>& operator<<(datastream<ST>&                                      
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.consumed));
    return ds;
 }
-
+*/
+/*
 template <typename ST>
 datastream<ST>& operator<<(datastream<ST>&                                                                     ds,
                            const history_serial_wrapper<eosio::chain::resource_limits::resource_usage_object>& obj) {
@@ -390,7 +394,9 @@ datastream<ST>& operator<<(datastream<ST>&                                      
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.ram_usage));
    return ds;
 }
+*/
 
+/*
 template <typename ST>
 datastream<ST>&
 operator<<(datastream<ST>&                                                                            ds,
@@ -408,6 +414,10 @@ operator<<(datastream<ST>&                                                      
    return ds;
 }
 
+*/
+
+
+/*
 template <typename ST>
 datastream<ST>& operator<<(datastream<ST>&                                                     ds,
                            const history_serial_wrapper<eosio::chain::resource_limits::ratio>& obj) {
@@ -447,6 +457,8 @@ operator<<(datastream<ST>&                                                      
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.account_net_usage_average_window));
    return ds;
 };
+
+*/
 
 template <typename ST>
 datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<eosio::chain::action>& obj) {
