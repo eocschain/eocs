@@ -3862,7 +3862,7 @@ int main( int argc, char** argv ) {
    auto system = app.add_subcommand("system", localized("Send eosio.system contract action to the blockchain."), false);
    system->require_subcommand();
 
-   auto createAccountSystem = create_account_subcommand( system, false /*simple*/ );
+   auto createAccountSystem = create_account_subcommand( system, true /*simple*/ );
    auto registerProducer = register_producer_subcommand(system);
    auto unregisterProducer = unregister_producer_subcommand(system);
 
