@@ -567,12 +567,13 @@ chain::action create_delegate(const name& from, const name& receiver, const asse
                         config::system_account_name, N(delegatebw), act_payload);
 }
 
-fc::variant regproducer_variant(const account_name& producer, const public_key_type& key, const string& url, uint16_t location) {
+fc::variant regproducer_variant(const account_name& producer, const public_key_type& key, const string& url, uint16_t location, const account_name& regaccount) {
    return fc::mutable_variant_object()
             ("producer", producer)
             ("producer_key", key)
             ("url", url)
             ("location", location)
+            ("regaccount", regaccount)
             ;
 }
 
@@ -952,13 +953,14 @@ struct register_producer_subcommand {
    string producer_key_str;
    string url;
    uint16_t loc = 0;
-
+   string regaccount_str;
    register_producer_subcommand(CLI::App* actionRoot) {
       auto register_producer = actionRoot->add_subcommand("regproducer", localized("Register a new producer"));
       register_producer->add_option("account", producer_str, localized("The account to register as a producer"))->required();
       register_producer->add_option("producer_key", producer_key_str, localized("The producer's public key"))->required();
       register_producer->add_option("url", url, localized("url where info about producer can be found"), true);
       register_producer->add_option("location", loc, localized("relative location for purpose of nearest neighbor scheduling"), true);
+      register_producer->add_option("regaccount",regaccount_str, localized("The account authorize  can reg others"));
       add_standard_transaction_options(register_producer, "account@active");
 
 
@@ -968,8 +970,8 @@ struct register_producer_subcommand {
             producer_key = public_key_type(producer_key_str);
          } EOS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid producer public key: ${public_key}", ("public_key", producer_key_str))
 
-         auto regprod_var = regproducer_variant(producer_str, producer_key, url, loc );
-         auto accountPermissions = get_account_permissions(tx_permission, {producer_str,config::active_name});
+         auto regprod_var = regproducer_variant(producer_str, producer_key, url, loc , regaccount_str);
+         auto accountPermissions = get_account_permissions(tx_permission, {regaccount_str,config::active_name});
          send_actions({create_action(accountPermissions, config::system_account_name, N(regproducer), regprod_var)});
       });
    }
