@@ -2659,6 +2659,7 @@ int main( int argc, char** argv ) {
 
    // currency accessors
    // get currency balance
+   /*
    string symbol;
    auto get_currency = get->add_subcommand( "currency", localized("Retrieve information related to standard currencies"), true);
    get_currency->require_subcommand();
@@ -2691,7 +2692,7 @@ int main( int argc, char** argv ) {
 
       std::cout << fc::json::to_pretty_string(result)
                 << std::endl;
-   });
+   });*/
 
    // get accounts
    string public_key_str;
@@ -3055,6 +3056,7 @@ int main( int argc, char** argv ) {
    auto setActionPermission = set_action_permission_subcommand(setAction);
 
    // Transfer subcommand
+   /*
    string con = "eosio.token";
    string sender;
    string recipient;
@@ -3085,7 +3087,7 @@ int main( int argc, char** argv ) {
          auto open_ = create_open(con, recipient, transfer_amount.get_symbol(), sender);
          send_actions( { open_, transfer } );
       }
-   });
+   });*/
 
    // Net subcommand
    string new_host;
@@ -3864,19 +3866,20 @@ int main( int argc, char** argv ) {
    auto system = app.add_subcommand("system", localized("Send eosio.system contract action to the blockchain."), false);
    system->require_subcommand();
 
-   auto createAccountSystem = create_account_subcommand( system, true /*simple*/ );
+   //auto createAccountSystem = create_account_subcommand( system, true /*simple*/ );
    auto registerProducer = register_producer_subcommand(system);
    auto unregisterProducer = unregister_producer_subcommand(system);
 
    auto voteProducer = system->add_subcommand("voteproducer", localized("Vote for a producer"));
    voteProducer->require_subcommand();
-   auto voteProxy = vote_producer_proxy_subcommand(voteProducer);
+   //auto voteProxy = vote_producer_proxy_subcommand(voteProducer);
    auto voteProducers = vote_producers_subcommand(voteProducer);
    auto approveProducer = approve_producer_subcommand(voteProducer);
    auto unapproveProducer = unapprove_producer_subcommand(voteProducer);
 
    auto listProducers = list_producers_subcommand(system);
 
+   /* 
    auto delegateBandWidth = delegate_bandwidth_subcommand(system);
    auto undelegateBandWidth = undelegate_bandwidth_subcommand(system);
    auto listBandWidth = list_bw_subcommand(system);
@@ -3916,7 +3919,7 @@ int main( int argc, char** argv ) {
    auto consolidate    = consolidate_subcommand(rex);
    auto updaterex      = updaterex_subcommand(rex);
    auto rexexec        = rexexec_subcommand(rex);
-   auto closerex       = closerex_subcommand(rex);
+   auto closerex       = closerex_subcommand(rex);*/
 
 
    try {
