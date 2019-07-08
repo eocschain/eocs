@@ -892,7 +892,8 @@ void ensure_keosd_running(CLI::App* app) {
     if (app->get_subcommand("create")->got_subcommand("key")) // create key does not require wallet
        return;
     if (auto* subapp = app->get_subcommand("system")) {
-       if (subapp->got_subcommand("listproducers") || subapp->got_subcommand("listbw") || subapp->got_subcommand("bidnameinfo")) // system list* do not require wallet
+       //if (subapp->got_subcommand("listproducers") || subapp->got_subcommand("listbw") || subapp->got_subcommand("bidnameinfo")) // system list* do not require wallet
+       if (subapp->got_subcommand("listproducers") ) // system list* do not require wallet
          return;
     }
     if (wallet_url != default_wallet_url)
@@ -3880,13 +3881,13 @@ int main( int argc, char** argv ) {
 
    auto listProducers = list_producers_subcommand(system);
 	cout <<"list producers" << endl;
-    
+  /*  
    auto delegateBandWidth = delegate_bandwidth_subcommand(system);
    auto undelegateBandWidth = undelegate_bandwidth_subcommand(system);
    auto listBandWidth = list_bw_subcommand(system);
    auto bidname = bidname_subcommand(system);
    auto bidnameinfo = bidname_info_subcommand(system);
-  /* 
+   
    auto buyram = buyram_subcommand(system);
    auto sellram = sellram_subcommand(system);
 
