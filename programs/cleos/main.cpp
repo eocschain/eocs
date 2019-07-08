@@ -2321,6 +2321,7 @@ CLI::callback_t header_opt_callback = [](CLI::results_t res) {
 };
 
 int main( int argc, char** argv ) {
+   cout <<" main call" << endl;
    setlocale(LC_ALL, "");
    bindtextdomain(locale_domain, locale_path);
    textdomain(locale_domain);
@@ -3878,14 +3879,14 @@ int main( int argc, char** argv ) {
    auto unapproveProducer = unapprove_producer_subcommand(voteProducer);
 
    auto listProducers = list_producers_subcommand(system);
-
-   /* 
+	cout <<"list producers" << endl;
+    
    auto delegateBandWidth = delegate_bandwidth_subcommand(system);
    auto undelegateBandWidth = undelegate_bandwidth_subcommand(system);
    auto listBandWidth = list_bw_subcommand(system);
    auto bidname = bidname_subcommand(system);
    auto bidnameinfo = bidname_info_subcommand(system);
-
+  /* 
    auto buyram = buyram_subcommand(system);
    auto sellram = sellram_subcommand(system);
 
@@ -3898,7 +3899,7 @@ int main( int argc, char** argv ) {
    auto unregProxy = unregproxy_subcommand(system);
 
    auto cancelDelay = canceldelay_subcommand(system);
-
+   
    auto rex = system->add_subcommand("rex", localized("Actions related to REX (the resource exchange)"));
    rex->require_subcommand();
    auto deposit        = deposit_subcommand(rex);
