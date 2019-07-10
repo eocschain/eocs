@@ -2,7 +2,7 @@
 #include <eosio/chain/transaction_context.hpp>
 #include <eosio/chain/authorization_manager.hpp>
 #include <eosio/chain/exceptions.hpp>
-//#include <eosio/chain/resource_limits.hpp>
+#include <eosio/chain/resource_limits.hpp>
 #include <eosio/chain/generated_transaction_object.hpp>
 #include <eosio/chain/transaction_object.hpp>
 #include <eosio/chain/global_property_object.hpp>
@@ -364,8 +364,9 @@ namespace bacc = boost::accumulators;
          }
       }
 
-      /*
+      
       auto& rl = control.get_mutable_resource_limits_manager();
+      /*
       for( auto a : validate_ram_usage ) {
          rl.verify_account_ram_usage( a.first, a.second );
       }
@@ -391,7 +392,7 @@ namespace bacc = boost::accumulators;
          objective_duration_limit = fc::microseconds(account_cpu_limit);
          billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
       }
-
+      */
       net_usage = ((net_usage + 7)/8)*8; // Round up to nearest multiple of word size (8 bytes)
 
       eager_net_limit = net_limit;
@@ -407,7 +408,7 @@ namespace bacc = boost::accumulators;
       rl.add_transaction_usage( bill_to_accounts, static_cast<uint64_t>(billed_cpu_time_us), net_usage,
                                 block_timestamp_type(control.pending_block_time()).slot ); // Should never fail
 
-      */
+      
    }
 
    void transaction_context::squash() {
