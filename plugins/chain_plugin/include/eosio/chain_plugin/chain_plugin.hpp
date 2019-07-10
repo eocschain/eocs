@@ -10,7 +10,7 @@
 #include <eosio/chain/block.hpp>
 #include <eosio/chain/controller.hpp>
 #include <eosio/chain/contract_table_objects.hpp>
-//#include <eosio/chain/resource_limits.hpp>
+#include <eosio/chain/resource_limits.hpp>
 #include <eosio/chain/transaction.hpp>
 #include <eosio/chain/abi_serializer.hpp>
 #include <eosio/chain/plugin_interface.hpp>

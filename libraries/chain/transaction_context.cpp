@@ -175,13 +175,11 @@ namespace bacc = boost::accumulators;
       const static int64_t large_number_no_overflow = std::numeric_limits<int64_t>::max()/2;
 
       const auto& cfg = control.get_global_properties().configuration;
-      /*
+      
       auto& rl = control.get_mutable_resource_limits_manager();
 
       net_limit = rl.get_block_net_limit();
-      */
-
-     /*
+      
       objective_duration_limit = fc::microseconds( rl.get_block_cpu_limit() );
       _deadline = start + objective_duration_limit;
 
@@ -226,34 +224,36 @@ namespace bacc = boost::accumulators;
             bill_to_accounts.insert( auth.actor );
          }
       }
-      validate_ram_usage.reserve( bill_to_accounts.size() );
+      //validate_ram_usage.reserve( bill_to_accounts.size() );
 
       // Update usage values of accounts to reflect new time
-      rl.update_account_usage( bill_to_accounts, block_timestamp_type(control.pending_block_time()).slot );
+      //rl.update_account_usage( bill_to_accounts, block_timestamp_type(control.pending_block_time()).slot );
 
       // Calculate the highest network usage and CPU time that all of the billed accounts can afford to be billed
-      int64_t account_net_limit = 0;
-      int64_t account_cpu_limit = 0;
-      bool greylisted_net = false, greylisted_cpu = false;
-      std::tie( account_net_limit, account_cpu_limit, greylisted_net, greylisted_cpu) = max_bandwidth_billed_accounts_can_pay();
-      net_limit_due_to_greylist |= greylisted_net;
-      cpu_limit_due_to_greylist |= greylisted_cpu;
+      //int64_t account_net_limit = 0;
+      //int64_t account_cpu_limit = 0;
+      //bool greylisted_net = false, greylisted_cpu = false;
+      //std::tie( account_net_limit, account_cpu_limit, greylisted_net, greylisted_cpu) = max_bandwidth_billed_accounts_can_pay();
+      //net_limit_due_to_greylist |= greylisted_net;
+      //cpu_limit_due_to_greylist |= greylisted_cpu;
 
-      eager_net_limit = net_limit;
+      //eager_net_limit = net_limit;
 
       // Possible lower eager_net_limit to what the billed accounts can pay plus some (objective) leeway
+      /*
       auto new_eager_net_limit = std::min( eager_net_limit, static_cast<uint64_t>(account_net_limit + cfg.net_usage_leeway) );
       if( new_eager_net_limit < eager_net_limit ) {
          eager_net_limit = new_eager_net_limit;
          net_limit_due_to_block = false;
       }
-
+      */
       // Possibly limit deadline if the duration accounts can be billed for (+ a subjective leeway) does not exceed current delta
+      /*
       if( (fc::microseconds(account_cpu_limit) + leeway) <= (_deadline - start) ) {
          _deadline = start + fc::microseconds(account_cpu_limit) + leeway;
          billing_timer_exception_code = leeway_deadline_exception::code_value;
       }
-
+      */
       billing_timer_duration_limit = _deadline - start;
 
       // Check if deadline is limited by caller-set deadline (only change deadline if billed_cpu_time_us is not set)
@@ -265,11 +265,11 @@ namespace bacc = boost::accumulators;
       }
 
       eager_net_limit = (eager_net_limit/8)*8; // Round down to nearest multiple of word size (8 bytes) so check_net_usage can be efficient
-
+      
       if( initial_net_usage > 0 )
          add_net_usage( initial_net_usage );  // Fail early if current net usage is already greater than the calculated limit
 
-      */
+      
       checktime(); // Fail early if deadline has already been exceeded
 
       if(control.skip_trx_checks())
