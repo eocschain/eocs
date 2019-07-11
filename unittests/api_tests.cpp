@@ -886,7 +886,7 @@ BOOST_AUTO_TEST_CASE(checktime_fail_tests) { try {
    t.produce_blocks(1);
 
    int64_t x; int64_t net; int64_t cpu;
-  // t.control->get_resource_limits_manager().get_account_limits( N(testapi), x, net, cpu );
+   t.control->get_resource_limits_manager().get_account_limits( N(testapi), x, net, cpu );
    wdump((net)(cpu));
 
 #warning TODO call the contract before testing to cache it, and validate that it was cached

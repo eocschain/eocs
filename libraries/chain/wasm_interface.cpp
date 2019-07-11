@@ -6,7 +6,7 @@
 #include <eosio/chain/exceptions.hpp>
 #include <boost/core/ignore_unused.hpp>
 #include <eosio/chain/authorization_manager.hpp>
-//#include <eosio/chain/resource_limits.hpp>
+#include <eosio/chain/resource_limits.hpp>
 #include <eosio/chain/wasm_interface_private.hpp>
 #include <eosio/chain/wasm_eosio_validation.hpp>
 #include <eosio/chain/wasm_eosio_injection.hpp>

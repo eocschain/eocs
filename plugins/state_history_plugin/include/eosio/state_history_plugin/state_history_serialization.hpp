@@ -11,8 +11,8 @@
 #include <eosio/chain/global_property_object.hpp>
 #include <eosio/chain/permission_link_object.hpp>
 #include <eosio/chain/permission_object.hpp>
-//#include <eosio/chain/resource_limits.hpp>
-//#include <eosio/chain/resource_limits_private.hpp>
+#include <eosio/chain/resource_limits.hpp>
+#include <eosio/chain/resource_limits_private.hpp>
 #include <eosio/chain/trace.hpp>
 #include <eosio/chain_plugin/chain_plugin.hpp>
 #include <eosio/state_history_plugin/state_history_plugin.hpp>
