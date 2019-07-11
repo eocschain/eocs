@@ -4,8 +4,8 @@
 #include <eosio/chain/permission_object.hpp>
 #include <eosio/chain/authorization_manager.hpp>
 
-//#include <eosio/chain/resource_limits.hpp>
-//#include <eosio/chain/resource_limits_private.hpp>
+#include <eosio/chain/resource_limits.hpp>
+#include <eosio/chain/resource_limits_private.hpp>
 
 #include <eosio/testing/tester_network.hpp>
 #include <eosio/chain/producer_object.hpp>

@@ -25,7 +25,7 @@
 #include <eosio/chain/block_summary_object.hpp>
 #include <eosio/chain/global_property_object.hpp>
 #include <eosio/chain/wasm_interface.hpp>
-//#include <eosio/chain/resource_limits.hpp>
+#include <eosio/chain/resource_limits.hpp>
 
 #include <fc/crypto/digest.hpp>
 #include <fc/crypto/sha256.hpp>
