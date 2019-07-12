@@ -108,7 +108,7 @@ namespace eosio { namespace chain {
    void abi_serializer::set_abi(const abi_def& abi, const fc::microseconds& max_serialization_time) {
       impl::abi_traverse_context ctx(max_serialization_time);
 
-      EOS_ASSERT(starts_with(abi.version, "eosio::abi/1."), unsupported_abi_version_exception, "ABI has an unsupported version");
+      EOS_ASSERT(starts_with(abi.version, "lemonc::abi/1."), unsupported_abi_version_exception, "ABI has an unsupported version");
 
       typedefs.clear();
       structs.clear();

@@ -614,7 +614,7 @@ launcher_def::initialize (const variables_map &vmap) {
     }
   }
 
-  config_dir_base = "etc/eosio";
+  config_dir_base = "etc/lemonc";
   data_dir_base = "var/lib";
   next_node = 0;
   ++prod_nodes; // add one for the bios node
@@ -627,7 +627,7 @@ launcher_def::initialize (const variables_map &vmap) {
   if (prod_nodes > total_nodes)
     total_nodes = prod_nodes;
 
-  char* erd_env_var = getenv ("EOSIO_HOME");
+  char* erd_env_var = getenv ("LEMONC_HOME");
   if (erd_env_var == nullptr || std::string(erd_env_var).empty()) {
      erd_env_var = getenv ("PWD");
   }
@@ -640,7 +640,7 @@ launcher_def::initialize (const variables_map &vmap) {
 
   stage = bfs::path(erd);
   if (!bfs::exists(stage)) {
-    cerr << "\"" << erd << "\" is not a valid path. Please ensure environment variable EOSIO_HOME is set to the build path." << endl;
+    cerr << "\"" << erd << "\" is not a valid path. Please ensure environment variable LEMONC_HOME is set to the build path." << endl;
     exit (-1);
   }
   stage /= bfs::path("staging");
@@ -867,7 +867,7 @@ launcher_def::bind_nodes () {
          auto pubkey = kp.get_public_key();
          node.keys.emplace_back (move(kp));
          if (is_bios) {
-            string prodname = "eosio";
+            string prodname = "lemonc";
             node.producers.push_back(prodname);
             producer_set.schedule.push_back({prodname,pubkey});
          }
@@ -1218,7 +1218,7 @@ launcher_def::write_setprods_file() {
   }
    producer_set_def no_bios;
    for (auto &p : producer_set.schedule) {
-      if (p.producer_name != "eosio")
+      if (p.producer_name != "lemonc")
          no_bios.schedule.push_back(p);
    }
   auto str = fc::json::to_pretty_string( no_bios, fc::json::stringify_large_ints_and_doubles );
@@ -1259,7 +1259,7 @@ launcher_def::write_bios_boot () {
          }
          else if (key == "cacmd") {
             for (auto &p : producer_set.schedule) {
-               if (p.producer_name == "eosio") {
+               if (p.producer_name == "lemonc") {
                   continue;
                }
                brb << "cacmd " << p.producer_name
@@ -1725,7 +1725,7 @@ launcher_def::bounce (const string& node_numbers) {
          }
       }
 
-      do_command(host, node.name, { { "EOSIO_HOME", host.eosio_home }, { "EOSIO_NODE", node_num } }, cmd);
+      do_command(host, node.name, { { "LEMONC_HOME", host.eosio_home }, { "LEMONC_NODE", node_num } }, cmd);
    }
 }
 
@@ -1739,7 +1739,7 @@ launcher_def::down (const string& node_numbers) {
       cout << "Taking down " << node.name << endl;
       string cmd = "./scripts/eosio-tn_down.sh ";
       do_command(host, node.name,
-                 { { "EOSIO_HOME", host.eosio_home }, { "EOSIO_NODE", node_num }, { "EOSIO_TN_RESTART_CONFIG_DIR", node.config_dir_name } },
+                 { { "LEMONC_HOME", host.eosio_home }, { "LEMONC_NODE", node_num }, { "EOSIO_TN_RESTART_CONFIG_DIR", node.config_dir_name } },
                  cmd);
    }
 }
@@ -1752,7 +1752,7 @@ launcher_def::roll (const string& host_names) {
       cout << "Rolling " << host_name << endl;
       auto host = find_host_by_name_or_address(host_name);
       string cmd = "./scripts/eosio-tn_roll.sh ";
-      do_command(*host, host_name, { { "EOSIO_HOME", host->eosio_home } }, cmd);
+      do_command(*host, host_name, { { "LEMONC_HOME", host->eosio_home } }, cmd);
    }
 }
 
