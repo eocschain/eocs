@@ -237,23 +237,23 @@ namespace bacc = boost::accumulators;
       //net_limit_due_to_greylist |= greylisted_net;
       //cpu_limit_due_to_greylist |= greylisted_cpu;
 
-      //eager_net_limit = net_limit;
+      eager_net_limit = net_limit;
 
       // Possible lower eager_net_limit to what the billed accounts can pay plus some (objective) leeway
-      /*
-      auto new_eager_net_limit = std::min( eager_net_limit, static_cast<uint64_t>(account_net_limit + cfg.net_usage_leeway) );
-      if( new_eager_net_limit < eager_net_limit ) {
-         eager_net_limit = new_eager_net_limit;
-         net_limit_due_to_block = false;
-      }
-      */
+      
+      // auto new_eager_net_limit = std::min( eager_net_limit, static_cast<uint64_t>(account_net_limit + cfg.net_usage_leeway) );
+      // if( new_eager_net_limit < eager_net_limit ) {
+      //    eager_net_limit = new_eager_net_limit;
+      //    net_limit_due_to_block = false;
+      // }
+      
       // Possibly limit deadline if the duration accounts can be billed for (+ a subjective leeway) does not exceed current delta
-      /*
-      if( (fc::microseconds(account_cpu_limit) + leeway) <= (_deadline - start) ) {
-         _deadline = start + fc::microseconds(account_cpu_limit) + leeway;
-         billing_timer_exception_code = leeway_deadline_exception::code_value;
-      }
-      */
+      
+      // if( (fc::microseconds(account_cpu_limit) + leeway) <= (_deadline - start) ) {
+      //    _deadline = start + fc::microseconds(account_cpu_limit) + leeway;
+      //    billing_timer_exception_code = leeway_deadline_exception::code_value;
+      // }
+      
       billing_timer_duration_limit = _deadline - start;
 
       // Check if deadline is limited by caller-set deadline (only change deadline if billed_cpu_time_us is not set)
