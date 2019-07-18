@@ -1642,6 +1642,7 @@ void read_write::push_transaction(const read_write::push_transaction_params& par
                }
 
                const chain::transaction_id_type& id = trx_trace_ptr->id;
+               std::cout<<"id:" <<id<<std::endl;
                next(read_write::push_transaction_results{id, output});
             } CATCH_AND_CALL(next);
          }
