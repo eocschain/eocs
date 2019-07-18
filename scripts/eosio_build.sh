@@ -1,7 +1,7 @@
 #!/bin/bash
 ##########################################################################
-# This is the EOSIO automated install script for Linux and Mac OS.
-# This file was downloaded from https://github.com/EOSIO/eos
+# This is the LEMON automated install script for Linux and Mac OS.
+# This file was downloaded from https://github.com/LEMON/eos
 #
 # Copyright (c) 2017, Respective Authors all rights reserved.
 #
@@ -27,7 +27,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-# https://github.com/EOSIO/eos/blob/master/LICENSE
+# https://github.com/LEMON/eos/blob/master/LICENSE
 ##########################################################################
 
 VERSION=2.1 # Build script version
@@ -165,8 +165,8 @@ fi
 
 if [ ! -d "${REPO_ROOT}/.git" ]; then
    printf "\\nThis build script only works with sources cloned from git\\n"
-   printf "Please clone a new eos directory with 'git clone https://github.com/EOSIO/eos --recursive'\\n"
-   printf "See the wiki for instructions: https://github.com/EOSIO/eos/wiki\\n"
+   printf "Please clone a new eos directory with 'git clone https://github.com/LEMON/eos --recursive'\\n"
+   printf "See the wiki for instructions: https://github.com/LEMON/eos/wiki\\n"
    exit 1
 fi
 
@@ -254,7 +254,7 @@ if [ "$ARCH" == "Darwin" ]; then
    # Check if cmake is already installed or not and use source install location
    if [ -z $CMAKE ]; then export CMAKE=/usr/local/bin/cmake; fi
    export OS_NAME=MacOSX
-   # opt/gettext: cleos requires Intl, which requires gettext; it's keg only though and we don't want to force linking: https://github.com/EOSIO/eos/issues/2240#issuecomment-396309884
+   # opt/gettext: cleos requires Intl, which requires gettext; it's keg only though and we don't want to force linking: https://github.com/LEMON/eos/issues/2240#issuecomment-396309884
    # HOME/lib/cmake: mongo_db_plugin.cpp:25:10: fatal error: 'bsoncxx/builder/basic/kvp.hpp' file not found
    LOCAL_CMAKE_FLAGS="-DCMAKE_PREFIX_PATH=/usr/local/opt/gettext;$HOME/lib/cmake ${LOCAL_CMAKE_FLAGS}" 
    FILE="${REPO_ROOT}/scripts/eosio_build_darwin.sh"
@@ -272,7 +272,7 @@ pushd $SRC_LOCATION &> /dev/null
 popd &> /dev/null
 
 printf "\\n========================================================================\\n"
-printf "======================= Starting EOSIO Build =======================\\n"
+printf "======================= Starting LEMON Build =======================\\n"
 printf "## CMAKE_BUILD_TYPE=%s\\n" "${CMAKE_BUILD_TYPE}"
 printf "## ENABLE_COVERAGE_TESTING=%s\\n" "${ENABLE_COVERAGE_TESTING}"
 
@@ -309,9 +309,9 @@ printf "${BIN_LOCATION}/mongod --dbpath ${MONGODB_DATA_LOCATION} -f ${MONGODB_CO
 printf "cd ./build && PATH=\$PATH:$HOME/opt/mongodb/bin make test\\n" # PATH is set as currently 'mongo' binary is required for the mongodb test
 printf "${txtrst}==============================================================================================\\n"
 printf "For more information:\\n"
-printf "EOSIO website: https://eos.io\\n"
-printf "EOSIO Telegram channel @ https://t.me/EOSProject\\n"
-printf "EOSIO resources: https://eos.io/resources/\\n"
-printf "EOSIO Stack Exchange: https://eosio.stackexchange.com\\n"
-printf "EOSIO wiki: https://github.com/EOSIO/eos/wiki\\n\\n\\n"
+printf "LEMON website: https://eos.io\\n"
+printf "LEMON Telegram channel @ https://t.me/EOSProject\\n"
+printf "LEMON resources: https://eos.io/resources/\\n"
+printf "LEMON Stack Exchange: https://eosio.stackexchange.com\\n"
+printf "LEMON wiki: https://github.com/LEMON/eos/wiki\\n\\n\\n"
 
