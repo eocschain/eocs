@@ -694,7 +694,7 @@ asset to_asset( account_name code, const string& s ) {
 }
 
 inline asset to_asset( const string& s ) {
-   return to_asset( N(eosio.token), s );
+   return to_asset( N(lemonc.token), s );
 }
 
 struct set_account_permission_subcommand {
@@ -3482,7 +3482,7 @@ int main( int argc, char** argv ) {
          ("requested", requested_perm_var)
          ("trx", trx_var);
 
-      send_actions({chain::action{accountPermissions, "eosio.msig", "propose", variant_to_bin( N(eosio.msig), N(propose), args ) }});
+      send_actions({chain::action{accountPermissions, "lemonc.msig", "propose", variant_to_bin( N(lemonc.msig), N(propose), args ) }});
    });
 
    //multisig propose transaction
@@ -3522,7 +3522,7 @@ int main( int argc, char** argv ) {
          ("requested", requested_perm_var)
          ("trx", trx_var);
 
-      send_actions({chain::action{accountPermissions, "lemonc.msig", "propose", variant_to_bin( N(eosio.msig), N(propose), args ) }});
+      send_actions({chain::action{accountPermissions, "lemonc.msig", "propose", variant_to_bin( N(lemonc.msig), N(propose), args ) }});
    });
 
 
@@ -3742,7 +3742,7 @@ int main( int argc, char** argv ) {
       }
 
       auto accountPermissions = get_account_permissions(tx_permission, {proposer,config::active_name});
-      send_actions({chain::action{accountPermissions, "lemonc.msig", action, variant_to_bin( N(eosio.msig), action, args ) }});
+      send_actions({chain::action{accountPermissions, "lemonc.msig", action, variant_to_bin( N(lemonc.msig), action, args ) }});
    };
 
    // multisig approve
@@ -3772,7 +3772,7 @@ int main( int argc, char** argv ) {
          ("account", invalidator);
 
       auto accountPermissions = get_account_permissions(tx_permission, {invalidator,config::active_name});
-      send_actions({chain::action{accountPermissions, "lemonc.msig", "invalidate", variant_to_bin( N(eosio.msig), "invalidate", args ) }});
+      send_actions({chain::action{accountPermissions, "lemonc.msig", "invalidate", variant_to_bin( N(lemonc.msig), "invalidate", args ) }});
    });
 
    // multisig cancel
@@ -3799,7 +3799,7 @@ int main( int argc, char** argv ) {
          ("proposal_name", proposal_name)
          ("canceler", canceler);
 
-      send_actions({chain::action{accountPermissions, "lemonc.msig", "cancel", variant_to_bin( N(eosio.msig), N(cancel), args ) }});
+      send_actions({chain::action{accountPermissions, "lemonc.msig", "cancel", variant_to_bin( N(lemonc.msig), N(cancel), args ) }});
       }
    );
 
@@ -3828,7 +3828,7 @@ int main( int argc, char** argv ) {
          ("proposal_name", proposal_name)
          ("executer", executer);
 
-      send_actions({chain::action{accountPermissions, "lemonc.msig", "exec", variant_to_bin( N(eosio.msig), N(exec), args ) }});
+      send_actions({chain::action{accountPermissions, "lemonc.msig", "exec", variant_to_bin( N(lemonc.msig), N(exec), args ) }});
       }
    );
 
