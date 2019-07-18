@@ -80,6 +80,8 @@ void apply_eosio_newaccount(apply_context& context) {
    auto& db = context.db;
 
    auto name_str = name(create.name).to_string();
+   cout<<"create.name"<<name_str<<"--------------------------------------------"<<endl;
+   cout<<"create.creator"<<create.creator<<"---------------------------------------"<<endl;
 
    EOS_ASSERT( !create.name.empty(), action_validate_exception, "account name cannot be empty" );
    EOS_ASSERT( name_str.size() <= 12, action_validate_exception, "account names can only be 12 chars long" );
@@ -120,6 +122,8 @@ void apply_eosio_newaccount(apply_context& context) {
    ram_delta += 2*config::billable_size_v<permission_object>;
    ram_delta += owner_permission.auth.get_billable_size();
    ram_delta += active_permission.auth.get_billable_size();
+
+   cout<<"ram_delta"<<ram_delta<<"--------------------------------";
 
    context.add_ram_usage(create.name, ram_delta, false);
 
