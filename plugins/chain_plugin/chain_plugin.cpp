@@ -1617,7 +1617,7 @@ void read_write::push_block(read_write::push_block_params&& params, next_functio
 
 void read_write::push_transaction(const read_write::push_transaction_params& params, next_function<read_write::push_transaction_results> next) {
 
-   std::count<<"----------------catch------" <<std::endl;
+   std::cout<<"----------------catch------" <<std::endl;
    try {
       auto pretty_input = std::make_shared<packed_transaction>();
       auto resolver = make_resolver(this, abi_serializer_max_time);
