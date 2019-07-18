@@ -41,7 +41,7 @@ mkdir -p $LIB_LOCATION
 
 CMAKE_BUILD_TYPE=Release
 TIME_BEGIN=$( date -u +%s )
-INSTALL_PREFIX=$OPT_LOCATION/eosio
+INSTALL_PREFIX=$OPT_LOCATION/lemon
 VERSION=1.2
 
 txtbld=$(tput bold)
@@ -49,7 +49,7 @@ bldred=${txtbld}$(tput setaf 1)
 txtrst=$(tput sgr0)
 
 if [ ! -d $BUILD_DIR ]; then
-   printf "\\nError, eosio_build.sh has not ran.  Please run ./eosio_build.sh first!\\n\\n"
+   printf "\\nError, lemon_build.sh has not ran.  Please run ./lemon_build.sh first!\\n\\n"
    exit -1
 fi
 
@@ -64,17 +64,17 @@ if ! make install; then
 fi
 popd &> /dev/null 
 
-printf "\n${bldred}      ___           ___           ___                       ___\n"
-printf "     /  /\\         /  /\\         /  /\\        ___          /  /\\ \n"
-printf "    /  /:/_       /  /::\\       /  /:/_      /  /\\        /  /::\\ \n"
-printf "   /  /:/ /\\     /  /:/\\:\\     /  /:/ /\\    /  /:/       /  /:/\\:\\ \n"
-printf "  /  /:/ /:/_   /  /:/  \\:\\   /  /:/ /::\\  /__/::\\      /  /:/  \\:\\ \n"
-printf " /__/:/ /:/ /\\ /__/:/ \\__\\:\\ /__/:/ /:/\\:\\ \\__\\/\\:\\__  /__/:/ \\__\\:\\ \n"
-printf " \\  \\:\\/:/ /:/ \\  \\:\\ /  /:/ \\  \\:\\/:/~/:/    \\  \\:\\/\\ \\  \\:\\ /  /:/ \n"
-printf "  \\  \\::/ /:/   \\  \\:\\  /:/   \\  \\::/ /:/      \\__\\::/  \\  \\:\\  /:/ \n"
-printf "   \\  \\:\\/:/     \\  \\:\\/:/     \\__\\/ /:/       /__/:/    \\  \\:\\/:/ \n"
-printf "    \\  \\::/       \\  \\::/        /__/:/        \\__\\/      \\  \\::/ \n"
-printf "     \\__\\/         \\__\\/         \\__\\/                     \\__\\/ \n\n${txtrst}"
+#printf "\n${bldred}      ___           ___           ___                       ___\n"
+#printf "     /  /\\         /  /\\         /  /\\        ___          /  /\\ \n"
+#printf "    /  /:/_       /  /::\\       /  /:/_      /  /\\        /  /::\\ \n"
+#printf "   /  /:/ /\\     /  /:/\\:\\     /  /:/ /\\    /  /:/       /  /:/\\:\\ \n"
+#printf "  /  /:/ /:/_   /  /:/  \\:\\   /  /:/ /::\\  /__/::\\      /  /:/  \\:\\ \n"
+#printf " /__/:/ /:/ /\\ /__/:/ \\__\\:\\ /__/:/ /:/\\:\\ \\__\\/\\:\\__  /__/:/ \\__\\:\\ \n"
+#printf " \\  \\:\\/:/ /:/ \\  \\:\\ /  /:/ \\  \\:\\/:/~/:/    \\  \\:\\/\\ \\  \\:\\ /  /:/ \n"
+#printf "  \\  \\::/ /:/   \\  \\:\\  /:/   \\  \\::/ /:/      \\__\\::/  \\  \\:\\  /:/ \n"
+#printf "   \\  \\:\\/:/     \\  \\:\\/:/     \\__\\/ /:/       /__/:/    \\  \\:\\/:/ \n"
+#printf "    \\  \\::/       \\  \\::/        /__/:/        \\__\\/      \\  \\::/ \n"
+#printf "     \\__\\/         \\__\\/         \\__\\/                     \\__\\/ \n\n${txtrst}"
 
 printf "==============================================================================================\\n"
 printf "LEMON has been installed into ${OPT_LOCATION}/eosio/bin!\\n"

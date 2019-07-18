@@ -197,7 +197,7 @@ if [ "$ARCH" == "Linux" ]; then
    export OS_NAME=$( cat /etc/os-release | grep ^NAME | cut -d'=' -f2 | sed 's/\"//gI' )
    OPENSSL_ROOT_DIR=/usr/include/openssl
    if [ ! -e /etc/os-release ]; then
-      printf "\\nEOSIO currently supports Amazon, Centos, Fedora, Mint & Ubuntu Linux only.\\n"
+      printf "\\nLEMON currently supports Amazon, Centos, Fedora, Mint & Ubuntu Linux only.\\n"
       printf "Please install on the latest version of one of these Linux distributions.\\n"
       printf "https://aws.amazon.com/amazon-linux-ami/\\n"
       printf "https://www.centos.org/\\n"
@@ -283,7 +283,7 @@ $CMAKE -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}" -DCMAKE_CXX_COMPILER="${CXX_COMP
    -DCMAKE_C_COMPILER="${C_COMPILER}" -DCORE_SYMBOL_NAME="${CORE_SYMBOL_NAME}" \
    -DOPENSSL_ROOT_DIR="${OPENSSL_ROOT_DIR}" -DBUILD_MONGO_DB_PLUGIN=true \
    -DENABLE_COVERAGE_TESTING="${ENABLE_COVERAGE_TESTING}" -DBUILD_DOXYGEN="${DOXYGEN}" \
-   -DCMAKE_INSTALL_PREFIX=$OPT_LOCATION/eosio $LOCAL_CMAKE_FLAGS "${REPO_ROOT}"
+   -DCMAKE_INSTALL_PREFIX=$OPT_LOCATION/lemon $LOCAL_CMAKE_FLAGS "${REPO_ROOT}"
 if [ $? -ne 0 ]; then exit -1; fi
 make -j"${JOBS}"
 if [ $? -ne 0 ]; then exit -1; fi
@@ -293,15 +293,10 @@ cd $REPO_ROOT
 TIME_END=$(( $(date -u +%s) - $TIME_BEGIN ))
 
 printf "${bldred}\n\n _______  _______  _______ _________ _______\n"
-printf '(  ____ \(  ___  )(  ____ \\\\__   __/(  ___  )\n'
-printf "| (    \/| (   ) || (    \/   ) (   | (   ) |\n"
-printf "| (__    | |   | || (_____    | |   | |   | |\n"
-printf "|  __)   | |   | |(_____  )   | |   | |   | |\n"
-printf "| (      | |   | |      ) |   | |   | |   | |\n"
-printf "| (____/\| (___) |/\____) |___) (___| (___) |\n"
-printf "(_______/(_______)\_______)\_______/(_______)\n\n${txtrst}"
 
-printf "\\nEOSIO has been successfully built. %02d:%02d:%02d\\n" $(($TIME_END/3600)) $(($TIME_END%3600/60)) $(($TIME_END%60))
+printf "(____L___/(___E____)\__M_____)\___O____/(___N____)\n\n${txtrst}"
+
+printf "\\nLEMON has been successfully built. %02d:%02d:%02d\\n" $(($TIME_END/3600)) $(($TIME_END%3600/60)) $(($TIME_END%60))
 printf "==============================================================================================\\n${bldred}"
 printf "(Optional) Testing Instructions:\\n"
 print_instructions

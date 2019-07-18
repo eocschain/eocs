@@ -14,7 +14,7 @@ binaries=(
    eosio-applesdemo
 )
 
-if [ -d $OPT_LOCATION/eosio ]; then
+if [ -d $OPT_LOCATION/lemon ]; then
    printf "Do you wish to remove this install? (requires sudo)\n"
    select yn in "Yes" "No"; do
       case $yn in
@@ -26,11 +26,11 @@ if [ -d $OPT_LOCATION/eosio ]; then
 
             pushd $HOME &> /dev/null
             pushd opt &> /dev/null
-            rm -rf eosio
+            rm -rf lemon
             # Handle cleanup of directories created from installation
             if [ "$1" == "--full" ]; then
-               if [ -d ~/Library/Application\ Support/eosio ]; then rm -rf ~/Library/Application\ Support/eosio; fi # Mac OS
-               if [ -d ~/.local/share/eosio ]; then rm -rf ~/.local/share/eosio; fi # Linux
+               if [ -d ~/Library/Application\ Support/lemon ]; then rm -rf ~/Library/Application\ Support/lemon; fi # Mac OS
+               if [ -d ~/.local/share/lemon ]; then rm -rf ~/.local/share/lemon; fi # Linux
             fi
             popd &> /dev/null
             pushd bin &> /dev/null
@@ -39,7 +39,7 @@ if [ -d $OPT_LOCATION/eosio ]; then
             done
             popd &> /dev/null
             pushd lib/cmake &> /dev/null
-            rm -rf eosio
+            rm -rf lemon
             popd &> /dev/null
 
             break;;
@@ -50,7 +50,7 @@ if [ -d $OPT_LOCATION/eosio ]; then
    done
 fi
 
-if [ -d "/usr/local/eosio" ]; then
+if [ -d "/usr/local/lemon" ]; then
    printf "Do you wish to remove this install? (requires sudo)\n"
    select yn in "Yes" "No"; do
       case $yn in
@@ -62,11 +62,11 @@ if [ -d "/usr/local/eosio" ]; then
 
             pushd /usr/local &> /dev/null
             pushd opt &> /dev/null
-            rm -rf eosio
+            rm -rf lemon
             # Handle cleanup of directories created from installation
             if [ "$1" == "--full" ]; then
-               if [ -d ~/Library/Application\ Support/eosio ]; then rm -rf ~/Library/Application\ Support/eosio; fi # Mac OS
-               if [ -d ~/.local/share/eosio ]; then rm -rf ~/.local/share/eosio; fi # Linux
+               if [ -d ~/Library/Application\ Support/lemon ]; then rm -rf ~/Library/Application\ Support/lemon; fi # Mac OS
+               if [ -d ~/.local/share/lemon ]; then rm -rf ~/.local/share/lemon; fi # Linux
             fi
             popd &> /dev/null
             pushd bin &> /dev/null
@@ -75,7 +75,7 @@ if [ -d "/usr/local/eosio" ]; then
             done
             popd &> /dev/null
             pushd lib/cmake &> /dev/null
-            rm -rf eosio
+            rm -rf lemon
             popd &> /dev/null
 
             break;;
