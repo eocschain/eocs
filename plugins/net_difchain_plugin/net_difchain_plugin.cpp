@@ -204,7 +204,7 @@ namespace eosio {
      eosio::chain_apis::read_only::get_table_rows_params tableparam;
      //curl  http://127.0.0.1:8888/v1/chain/get_table_rows -X POST -d '{"scope":"inita", "code":"currency", "table":"account", "json": true}'
      try{
-        tableparam.code="lemonc.token";
+        tableparam.code="lemon.token";
          tableparam.table="accounts";
         tableparam.scope="twinkle11111";
         tableparam.json = true;
@@ -228,7 +228,7 @@ namespace eosio {
     //  eosio::chain::plugin_interface::next_function<read_write::push_transaction_results> next;
     //  readwritedata.push_transaction(params, next);
    
-    const std::string fromid="\"lemonc\"";
+    const std::string fromid="\"lemon\"";
     const std::string toid = "\"twinkle11111\"";
     const std::string quantity="\"1.0000 SYS\"";
     const std::string data="{\"from\":"+fromid+","+"\"to\":"+toid+","+
@@ -240,9 +240,9 @@ namespace eosio {
     std::vector<eosio::chain::permission_level> auth;
     eosio::chain::permission_level plv;
     plv.permission= "active";
-    plv.actor = "lemonc";
+    plv.actor = "lemon";
     auth.push_back(plv);
-    eosio::chain::account_name contract_account("lemonc.token");
+    eosio::chain::account_name contract_account("lemon.token");
     eosio::chain::action_name action("transfer");
     eosio::chain::bytes databytes = variant_to_bin( contract_account, action, action_args_var );
     if(databytes.empty())

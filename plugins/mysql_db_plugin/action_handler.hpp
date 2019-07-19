@@ -42,7 +42,7 @@ public:
 private:
     void consume_token_transfers();
 
-    std::unordered_set<chain::account_name> contract_names_{"lemonc.token"};
+    std::unordered_set<chain::account_name> contract_names_{"lemon.token"};
     chain::action_name action_name_{"transfer"};
     fifo<TokenTransferPtr> token_transfer_queue_;
 };

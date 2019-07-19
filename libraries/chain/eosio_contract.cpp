@@ -67,7 +67,7 @@ void validate_authority_precondition( const apply_context& context, const author
 /**
  *  This method is called assuming precondition_system_newaccount succeeds a
  */
-void apply_lemonc_newaccount(apply_context& context) {
+void apply_lemon_newaccount(apply_context& context) {
    auto create = context.act.data_as<newaccount>();
    try {
    context.require_authorization(create.creator);
@@ -89,8 +89,8 @@ void apply_lemonc_newaccount(apply_context& context) {
    // Check if the creator is privileged
    const auto &creator = db.get<account_object, by_name>(create.creator);
    if( !creator.privileged ) {
-      EOS_ASSERT( name_str.find( "lemonc." ) != 0, action_validate_exception,
-                  "only privileged accounts can have names that start with 'lemonc.'" );
+      EOS_ASSERT( name_str.find( "lemon." ) != 0, action_validate_exception,
+                  "only privileged accounts can have names that start with 'lemon.'" );
    }
 
    auto existing_account = db.find<account_object, by_name>(create.name);
@@ -130,7 +130,7 @@ void apply_lemonc_newaccount(apply_context& context) {
 
 } FC_CAPTURE_AND_RETHROW( (create) ) }
 
-void apply_lemonc_setcode(apply_context& context) {
+void apply_lemon_setcode(apply_context& context) {
    const auto& cfg = context.control.get_global_properties().configuration;
 
    auto& db = context.db;
@@ -177,7 +177,7 @@ void apply_lemonc_setcode(apply_context& context) {
    }
 }
 
-void apply_lemonc_setabi(apply_context& context) {
+void apply_lemon_setabi(apply_context& context) {
    auto& db  = context.db;
    auto  act = context.act.data_as<setabi>();
 
@@ -208,7 +208,7 @@ void apply_lemonc_setabi(apply_context& context) {
    }
 }
 
-void apply_lemonc_updateauth(apply_context& context) {
+void apply_lemon_updateauth(apply_context& context) {
 
    auto update = context.act.data_as<updateauth>();
    context.require_authorization(update.account); // only here to mark the single authority on this action as used
@@ -217,8 +217,8 @@ void apply_lemonc_updateauth(apply_context& context) {
    auto& db = context.db;
 
    EOS_ASSERT(!update.permission.empty(), action_validate_exception, "Cannot create authority with empty name");
-   EOS_ASSERT( update.permission.to_string().find( "lemonc." ) != 0, action_validate_exception,
-               "Permission names that start with 'lemonc.' are reserved" );
+   EOS_ASSERT( update.permission.to_string().find( "lemon." ) != 0, action_validate_exception,
+               "Permission names that start with 'lemon.' are reserved" );
    EOS_ASSERT(update.permission != update.parent, action_validate_exception, "Cannot set an authority as its own parent");
    db.get<account_object, by_name>(update.account);
    EOS_ASSERT(validate(update.auth), action_validate_exception,
@@ -272,7 +272,7 @@ void apply_lemonc_updateauth(apply_context& context) {
    }
 }
 
-void apply_lemonc_deleteauth(apply_context& context) {
+void apply_lemon_deleteauth(apply_context& context) {
 //   context.require_write_lock( config::eosio_auth_scope );
 
    auto remove = context.act.data_as<deleteauth>();
@@ -303,7 +303,7 @@ void apply_lemonc_deleteauth(apply_context& context) {
 
 }
 
-void apply_lemonc_linkauth(apply_context& context) {
+void apply_lemon_linkauth(apply_context& context) {
 //   context.require_write_lock( config::eosio_auth_scope );
 
    auto requirement = context.act.data_as<linkauth>();
@@ -351,7 +351,7 @@ void apply_lemonc_linkauth(apply_context& context) {
   } FC_CAPTURE_AND_RETHROW((requirement))
 }
 
-void apply_lemonc_unlinkauth(apply_context& context) {
+void apply_lemon_unlinkauth(apply_context& context) {
 //   context.require_write_lock( config::eosio_auth_scope );
 
    auto& db = context.db;
@@ -370,7 +370,7 @@ void apply_lemonc_unlinkauth(apply_context& context) {
    db.remove(*link);
 }
 
-void apply_lemonc_canceldelay(apply_context& context) {
+void apply_lemon_canceldelay(apply_context& context) {
    auto cancel = context.act.data_as<canceldelay>();
    context.require_authorization(cancel.canceling_auth.actor); // only here to mark the single authority on this action as used
 

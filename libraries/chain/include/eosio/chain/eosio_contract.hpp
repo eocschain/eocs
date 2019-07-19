@@ -17,11 +17,11 @@ namespace eosio { namespace chain {
     * @defgroup native_action_handlers Native Action Handlers
     */
    ///@{
-   void apply_lemonc_newaccount(apply_context&);
-   void apply_lemonc_updateauth(apply_context&);
-   void apply_lemonc_deleteauth(apply_context&);
-   void apply_lemonc_linkauth(apply_context&);
-   void apply_lemonc_unlinkauth(apply_context&);
+   void apply_lemon_newaccount(apply_context&);
+   void apply_lemon_updateauth(apply_context&);
+   void apply_lemon_deleteauth(apply_context&);
+   void apply_lemon_linkauth(apply_context&);
+   void apply_lemon_unlinkauth(apply_context&);
 
    /*
    void apply_eosio_postrecovery(apply_context&);
@@ -29,10 +29,10 @@ namespace eosio { namespace chain {
    void apply_eosio_vetorecovery(apply_context&);
    */
 
-   void apply_lemonc_setcode(apply_context&);
-   void apply_lemonc_setabi(apply_context&);
+   void apply_lemon_setcode(apply_context&);
+   void apply_lemon_setabi(apply_context&);
 
-   void apply_lemonc_canceldelay(apply_context&);
+   void apply_lemon_canceldelay(apply_context&);
    ///@}  end action handlers
 
 } } /// namespace eosio::chain

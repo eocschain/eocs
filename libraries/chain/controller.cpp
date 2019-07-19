@@ -198,20 +198,20 @@ struct controller_impl {
 #define SET_APP_HANDLER( receiver, contract, action) \
    set_apply_handler( #receiver, #contract, #action, &BOOST_PP_CAT(apply_, BOOST_PP_CAT(contract, BOOST_PP_CAT(_,action) ) ) )
 
-   SET_APP_HANDLER( lemonc, lemonc, newaccount );
-   SET_APP_HANDLER( lemonc, lemonc, setcode );
-   SET_APP_HANDLER( lemonc, lemonc, setabi );
-   SET_APP_HANDLER( lemonc, lemonc, updateauth );
-   SET_APP_HANDLER( lemonc, lemonc, deleteauth );
-   SET_APP_HANDLER( lemonc, lemonc, linkauth );
-   SET_APP_HANDLER( lemonc, lemonc, unlinkauth );
+   SET_APP_HANDLER( lemon, lemon, newaccount );
+   SET_APP_HANDLER( lemon, lemon, setcode );
+   SET_APP_HANDLER( lemon, lemon, setabi );
+   SET_APP_HANDLER( lemon, lemon, updateauth );
+   SET_APP_HANDLER( lemon, lemon, deleteauth );
+   SET_APP_HANDLER( lemon, lemon, linkauth );
+   SET_APP_HANDLER( lemon, lemon, unlinkauth );
 /*
    SET_APP_HANDLER( eosio, eosio, postrecovery );
    SET_APP_HANDLER( eosio, eosio, passrecovery );
    SET_APP_HANDLER( eosio, eosio, vetorecovery );
 */
 
-   SET_APP_HANDLER( lemonc, lemonc, canceldelay );
+   SET_APP_HANDLER( lemon, lemon, canceldelay );
 
    fork_db.irreversible.connect( [&]( auto b ) {
                                  on_irreversible(b);
