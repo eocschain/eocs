@@ -205,9 +205,9 @@ namespace eosio { namespace chain {
       FC_DECLARE_DERIVED_EXCEPTION( invalid_action_args_exception, action_validate_exception,
                                     3050002, "Invalid Action Arguments" )
       FC_DECLARE_DERIVED_EXCEPTION( eosio_assert_message_exception, action_validate_exception,
-                                    3050003, "eosio_assert_message assertion failure" )
+                                    3050003, "lemon_assert_message assertion failure" )
       FC_DECLARE_DERIVED_EXCEPTION( eosio_assert_code_exception, action_validate_exception,
-                                    3050004, "eosio_assert_code assertion failure" )
+                                    3050004, "lemon_assert_code assertion failure" )
       FC_DECLARE_DERIVED_EXCEPTION( action_not_found_exception, action_validate_exception,
                                     3050005, "Action can not be found" )
       FC_DECLARE_DERIVED_EXCEPTION( action_data_and_struct_mismatch, action_validate_exception,

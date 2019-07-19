@@ -87,8 +87,8 @@ int main(int argc, char** argv)
       app().set_version(eosio::nodeos::config::version);
 
       auto root = fc::app_path();
-      app().set_default_data_dir(root / "eosio/nodeos/data" );
-      app().set_default_config_dir(root / "eosio/nodeos/config" );
+      app().set_default_data_dir(root / "lemon/nodeos/data" );
+      app().set_default_config_dir(root / "lemon/nodeos/config" );
       http_plugin::set_defaults({
          .default_unix_socket_path = "",
          .default_http_port = 8888
@@ -97,7 +97,7 @@ int main(int argc, char** argv)
          return INITIALIZE_FAIL;
       initialize_logging();
       ilog("nodeos version ${ver}", ("ver", app().version_string()));
-      ilog("eosio root is ${root}", ("root", root.string()));
+      ilog("lemon root is ${root}", ("root", root.string()));
       ilog("nodeos using configuration file ${c}", ("c", app().full_config_file_path().string()));
       ilog("nodeos data directory is ${d}", ("d", app().data_dir().string()));
       app().startup();

@@ -334,15 +334,15 @@ namespace eosio { namespace chain {
                   "the owner of the linked permission needs to be the actor of the declared authorization" );
 
       EOS_ASSERT( link.type != updateauth::get_name(),  action_validate_exception,
-                  "Cannot link eosio::updateauth to a minimum permission" );
+                  "Cannot link lemon::updateauth to a minimum permission" );
       EOS_ASSERT( link.type != deleteauth::get_name(),  action_validate_exception,
-                  "Cannot link eosio::deleteauth to a minimum permission" );
+                  "Cannot link lemon::deleteauth to a minimum permission" );
       EOS_ASSERT( link.type != linkauth::get_name(),    action_validate_exception,
-                  "Cannot link eosio::linkauth to a minimum permission" );
+                  "Cannot link lemon::linkauth to a minimum permission" );
       EOS_ASSERT( link.type != unlinkauth::get_name(),  action_validate_exception,
-                  "Cannot link eosio::unlinkauth to a minimum permission" );
+                  "Cannot link lemon::unlinkauth to a minimum permission" );
       EOS_ASSERT( link.type != canceldelay::get_name(), action_validate_exception,
-                  "Cannot link eosio::canceldelay to a minimum permission" );
+                  "Cannot link lemon::canceldelay to a minimum permission" );
 
       const auto linked_permission_name = lookup_minimum_permission(link.account, link.code, link.type);
 

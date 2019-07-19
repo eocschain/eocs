@@ -7,6 +7,6 @@
 
 namespace eosio { namespace chain {
 
-const string genesis_state::eosio_root_key = "${EOSIO_ROOT_KEY}";
+const string genesis_state::eosio_root_key = "${LEMON_ROOT_KEY}";
 
 } } // namespace eosio::chain
