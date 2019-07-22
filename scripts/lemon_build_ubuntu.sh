@@ -1,73 +1,108 @@
 if [ $1 == 1 ]; then ANSWER=1; else ANSWER=0; fi
 
-OS_VER=$( grep VERSION_ID /etc/os-release | cut -d'=' -f2 | sed 's/[^0-9\.]//gI' | cut -d'.' -f1 )
+OS_VER=$( grep VERSION_ID /etc/os-release | cut -d'=' -f2 | sed 's/[^0-9\.]//gI' )
+OS_MAJ=$(echo "${OS_VER}" | cut -d'.' -f1)
+OS_MIN=$(echo "${OS_VER}" | cut -d'.' -f2)
 
-DISK_INSTALL=$( df -h . | tail -1 | tr -s ' ' | cut -d\  -f1 )
-DISK_TOTAL_KB=$( df . | tail -1 | awk '{print $2}' )
-DISK_AVAIL_KB=$( df . | tail -1 | awk '{print $4}' )
+MEM_MEG=$( free -m | sed -n 2p | tr -s ' ' | cut -d\  -f2 || cut -d' ' -f2 )
+CPU_SPEED=$( lscpu | grep -m1 "MHz" | tr -s ' ' | cut -d\  -f3 || cut -d' ' -f3 | cut -d'.' -f1 )
+CPU_CORE=$( nproc )
+MEM_GIG=$(( ((MEM_MEG / 1000) / 2) ))
+export JOBS=$(( MEM_GIG > CPU_CORE ? CPU_CORE : MEM_GIG ))
+
+DISK_INSTALL=$(df -h . | tail -1 | tr -s ' ' | cut -d\  -f1 || cut -d' ' -f1)
+DISK_TOTAL_KB=$(df . | tail -1 | awk '{print $2}')
+DISK_AVAIL_KB=$(df . | tail -1 | awk '{print $4}')
 DISK_TOTAL=$(( DISK_TOTAL_KB / 1048576 ))
 DISK_AVAIL=$(( DISK_AVAIL_KB / 1048576 ))
 
-if [[ "${OS_NAME}" == "Amazon Linux AMI" ]]; then
-	DEP_ARRAY=( 
-		sudo procps util-linux which gcc72 gcc72-c++ autoconf automake libtool make doxygen graphviz \
-		bzip2 bzip2-devel openssl-devel gmp gmp-devel libstdc++72 python27 python27-devel python34 python34-devel \
-		libedit-devel ncurses-devel swig wget file libcurl-devel libusb1-devel
-	)
-else
-	DEP_ARRAY=( 
-		git procps-ng util-linux gcc gcc-c++ autoconf automake libtool make bzip2 \
-		bzip2-devel openssl-devel gmp-devel libstdc++ libcurl-devel libusbx-devel \
-		python3 python3-devel python-devel libedit-devel doxygen graphviz 
-	)
+printf "\\nOS name: ${OS_NAME}\\n"
+printf "OS Version: ${OS_VER}\\n"
+printf "CPU speed: ${CPU_SPEED}Mhz\\n"
+printf "CPU cores: %s\\n" "${CPU_CORE}"
+printf "Physical Memory: ${MEM_MEG} Mgb\\n"
+printf "Disk install: ${DISK_INSTALL}\\n"
+printf "Disk space total: ${DISK_TOTAL%.*}G\\n"
+printf "Disk space available: ${DISK_AVAIL%.*}G\\n"
+
+if [ "${MEM_MEG}" -lt 7000 ]; then
+	printf "Your system must have 7 or more Gigabytes of physical memory installed.\\n"
+	printf "Exiting now.\\n"
+	exit 1
 fi
 
+case "${OS_NAME}" in
+	"Linux Mint")
+		if [ "${OS_MAJ}" -lt 18 ]; then
+			printf "You must be running Linux Mint 18.x or higher to install LEMON.\\n"
+			printf "Exiting now.\\n"
+			exit 1
+		fi
+	;;
+	"Ubuntu")
+		if [ "${OS_MAJ}" -lt 16 ]; then
+			printf "You must be running Ubuntu 16.04.x or higher to install LEMON.\\n"
+			printf "Exiting now.\\n"
+			exit 1
+		fi
+		# UBUNTU 18 doesn't have MONGODB 3.6.3
+		if [ $OS_MAJ -gt 16 ]; then
+			export MONGODB_VERSION=4.1.1
+		fi
+		# We have to re-set this with the new version
+		export MONGODB_ROOT=${OPT_LOCATION}/mongodb-${MONGODB_VERSION}
+	;;
+	"Debian")
+		if [ $OS_MAJ -lt 10 ]; then
+			printf "You must be running Debian 10 to install LEMON, and resolve missing dependencies from unstable (sid).\n"
+			printf "Exiting now.\n"
+			exit 1
+	fi
+	;;
+esac
+
+if [ "${DISK_AVAIL%.*}" -lt "${DISK_MIN}" ]; then
+	printf "You must have at least %sGB of available storage to install LEMON.\\n" "${DISK_MIN}"
+	printf "Exiting now.\\n"
+	exit 1
+fi
+
+# llvm-4.0 is installed into /usr/lib/llvm-4.0
+# clang is necessary for building on ubuntu
+DEP_ARRAY=(
+	git llvm-4.0 clang-4.0 libclang-4.0-dev make automake libbz2-dev libssl-dev doxygen graphviz \
+	libgmp3-dev autotools-dev build-essential libicu-dev python2.7 python2.7-dev python3 python3-dev \
+	autoconf libtool curl zlib1g-dev sudo ruby libusb-1.0-0-dev libcurl4-gnutls-dev pkg-config
+)
 COUNT=1
 DISPLAY=""
 DEP=""
 
-if [[ "${OS_NAME}" == "Amazon Linux AMI" && "${OS_VER}" -lt 2017 ]]; then
-	printf "You must be running Amazon Linux 2017.09 or higher to install EOSIO.\\n"
-	printf "exiting now.\\n"
-	exit 1
+if [[ "${ENABLE_CODE_COVERAGE}" == true ]]; then
+	DEP_ARRAY+=(lcov)
 fi
 
-if [ "${DISK_AVAIL}" -lt "${DISK_MIN}" ]; then
-	printf "You must have at least %sGB of available storage to install EOSIO.\\n" "${DISK_MIN}"
-	printf "exiting now.\\n"
-	exit 1
-fi
-
-printf "\\nChecking Yum installation.\\n"
-if ! YUM=$( command -v yum 2>/dev/null )
-then
-	printf "\\nYum must be installed to compile EOS.IO.\\n"
-	printf "\\nExiting now.\\n"
-	exit 1
-fi
-printf "Yum installation found at ${YUM}.\\n"
-
-if [ $ANSWER != 1 ]; then read -p "Do you wish to update YUM repositories? (y/n) " ANSWER; fi
+if [ $ANSWER != 1 ]; then read -p "Do you wish to update repositories with apt-get update? (y/n) " ANSWER; fi
 case $ANSWER in
 	1 | [Yy]* )
-		if ! sudo $YUM -y update; then
-			printf " - YUM update failed.\\n"
+		if ! sudo apt-get update; then
+			printf " - APT update failed.\\n"
 			exit 1;
 		else
-			printf " - YUM update complete.\\n"
+			printf " - APT update complete.\\n"
 		fi
 	;;
-	[Nn]* ) echo " - Proceeding without update!";;
+	[Nn]* ) echo "Proceeding without update!";;
 	* ) echo "Please type 'y' for yes or 'n' for no."; exit;;
 esac
 
-printf "Checking RPM for installed dependencies...\\n"
+printf "\\nChecking for installed dependencies...\\n"
 for (( i=0; i<${#DEP_ARRAY[@]}; i++ )); do
-	pkg=$( rpm -qi "${DEP_ARRAY[$i]}" 2>/dev/null | grep Name )
-	if [[ -z $pkg ]]; then
+	pkg=$( dpkg -s "${DEP_ARRAY[$i]}" 2>/dev/null | grep Status | tr -s ' ' | cut -d\  -f4 )
+	if [ -z "$pkg" ]; then
 		DEP=$DEP" ${DEP_ARRAY[$i]} "
 		DISPLAY="${DISPLAY}${COUNT}. ${DEP_ARRAY[$i]}\\n"
-		printf " - Package %s ${bldred} NOT ${txtrst} found!\\n" "${DEP_ARRAY[$i]}"
+		printf " - Package %s${bldred} NOT${txtrst} found!\\n" "${DEP_ARRAY[$i]}"
 		(( COUNT++ ))
 	else
 		printf " - Package %s found.\\n" "${DEP_ARRAY[$i]}"
@@ -75,46 +110,25 @@ for (( i=0; i<${#DEP_ARRAY[@]}; i++ )); do
 	fi
 done
 if [ "${COUNT}" -gt 1 ]; then
-	printf "\\nThe following dependencies are required to install EOSIO:\\n"
-	printf "${DISPLAY}\\n\\n"
-	if [ $ANSWER != 1 ]; then read -p "Do you wish to install these dependencies? (y/n) " ANSWER; fi
+	printf "\\nThe following dependencies are required to install LEMON:\\n"
+	printf "${DISPLAY}\\n\\n" 
+	if [ $ANSWER != 1 ]; then read -p "Do you wish to install these packages? (y/n) " ANSWER; fi
 	case $ANSWER in
 		1 | [Yy]* )
-			if ! sudo $YUM -y install ${DEP}; then
-				printf " - YUM dependency installation failed!\\n"
-				exit 1;
+			if ! sudo apt-get -y install ${DEP}; then
+				printf " - APT dependency failed.\\n"
+				exit 1
 			else
-				printf " - YUM dependencies installed successfully.\\n"
+				printf " - APT dependencies installed successfully.\\n"
 			fi
 		;;
 		[Nn]* ) echo "User aborting installation of required dependencies, Exiting now."; exit;;
 		* ) echo "Please type 'y' for yes or 'n' for no."; exit;;
 	esac
-else
-	printf " - No required YUM dependencies to install.\\n"
+else 
+	printf " - No required APT dependencies to install."
 fi
 
-# util-linux includes lscpu
-# procps includes free -m
-MEM_MEG=$( free -m | sed -n 2p | tr -s ' ' | cut -d\  -f2 )
-CPU_SPEED=$( lscpu | grep "MHz" | tr -s ' ' | cut -d\  -f3 | cut -d'.' -f1 )
-CPU_CORE=$( nproc )
-MEM_GIG=$(( ((MEM_MEG / 1000) / 2) ))
-export JOBS=$(( MEM_GIG > CPU_CORE ? CPU_CORE : MEM_GIG ))
-
-printf "\\nOS name: %s\\n" "${OS_NAME}"
-printf "OS Version: %s\\n" "${OS_VER}"
-printf "CPU speed: %sMhz\\n" "${CPU_SPEED}"
-printf "CPU cores: %s\\n" "${CPU_CORE}"
-printf "Physical Memory: %sMgb\\n" "${MEM_MEG}"
-printf "Disk space total: %sGb\\n" "${DISK_TOTAL}"
-printf "Disk space available: %sG\\n" "${DISK_AVAIL}"
-
-if [ "${MEM_MEG}" -lt 7000 ]; then
-	printf "Your system must have 7 or more Gigabytes of physical memory installed.\\n"
-	printf "exiting now.\\n"
-	exit 1
-fi
 
 printf "\\n"
 
@@ -136,7 +150,6 @@ else
 	printf " - CMAKE found @ ${CMAKE}.\\n"
 fi
 if [ $? -ne 0 ]; then exit -1; fi
-
 
 printf "\\n"
 
@@ -168,11 +181,11 @@ printf "\\n"
 printf "Checking MongoDB installation...\\n"
 if [ ! -d $MONGODB_ROOT ]; then
 	printf "Installing MongoDB into ${MONGODB_ROOT}...\\n"
-	curl -OL https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-amazon-$MONGODB_VERSION.tgz \
-	&& tar -xzf mongodb-linux-x86_64-amazon-$MONGODB_VERSION.tgz \
-	&& mv $SRC_LOCATION/mongodb-linux-x86_64-amazon-$MONGODB_VERSION $MONGODB_ROOT \
+	curl -OL http://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu$OS_MAJ$OS_MIN-$MONGODB_VERSION.tgz \
+	&& tar -xzf mongodb-linux-x86_64-ubuntu$OS_MAJ$OS_MIN-$MONGODB_VERSION.tgz \
+	&& mv $SRC_LOCATION/mongodb-linux-x86_64-ubuntu$OS_MAJ$OS_MIN-$MONGODB_VERSION $MONGODB_ROOT \
 	&& touch $MONGODB_LOG_LOCATION/mongod.log \
-	&& rm -f mongodb-linux-x86_64-amazon-$MONGODB_VERSION.tgz \
+	&& rm -f mongodb-linux-x86_64-ubuntu$OS_MAJ$OS_MIN-$MONGODB_VERSION.tgz \
 	&& cp -f $REPO_ROOT/scripts/mongod.conf $MONGODB_CONF \
 	&& mkdir -p $MONGODB_DATA_LOCATION \
 	&& rm -rf $MONGODB_LINK_LOCATION \
@@ -228,17 +241,9 @@ printf "\\n"
 
 printf "Checking LLVM 4 support...\\n"
 if [ ! -d $LLVM_ROOT ]; then
-	printf "Installing LLVM 4...\\n"
-	cd ../opt \
-	&& git clone --depth 1 --single-branch --branch $LLVM_VERSION https://github.com/llvm-mirror/llvm.git llvm && cd llvm \
-	&& mkdir build \
-	&& cd build \
-	&& $CMAKE -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="${LLVM_ROOT}" -DLLVM_TARGETS_TO_BUILD="host" -DLLVM_BUILD_TOOLS=false -DLLVM_ENABLE_RTTI=1 -DCMAKE_BUILD_TYPE="Release" .. \
-	&& make -j"${JOBS}" \
-	&& make install \
-	&& cd ../.. \
+	ln -s /usr/lib/llvm-4.0 $LLVM_ROOT \
 	|| exit 1
-	printf " - LLVM successfully installed @ ${LLVM_ROOT}\\n"
+	printf " - LLVM successfully linked from /usr/lib/llvm-4.0 to ${LLVM_ROOT}\\n"
 else
 	printf " - LLVM found @ ${LLVM_ROOT}.\\n"
 fi

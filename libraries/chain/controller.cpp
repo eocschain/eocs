@@ -18,7 +18,7 @@
 #include <eosio/chain/blackwhitelist_object.hpp>
 
 #include <eosio/chain/authorization_manager.hpp>
-//#include <eosio/chain/resource_limits.hpp>
+#include <eosio/chain/resource_limits.hpp>
 #include <eosio/chain/chain_snapshot.hpp>
 #include <eosio/chain/thread_utils.hpp>
 
@@ -29,7 +29,7 @@
 
 namespace eosio { namespace chain {
 
-//using resource_limits::resource_limits_manager;
+using resource_limits::resource_limits_manager;
 
 using controller_index_set = index_set<
    account_index,
@@ -129,7 +129,7 @@ struct controller_impl {
    block_state_ptr                head;
    fork_database                  fork_db;
    wasm_interface                 wasmif;
-   //resource_limits_manager        resource_limits;
+   resource_limits_manager        resource_limits;
    authorization_manager          authorization;
    controller::config             conf;
    chain_id_type                  chain_id;
@@ -187,7 +187,7 @@ struct controller_impl {
     blog( cfg.blocks_dir ),
     fork_db( cfg.state_dir ),
     wasmif( cfg.wasm_runtime ),
-    //resource_limits( db ),
+    resource_limits( db ),
     authorization( s, db ),
     conf( cfg ),
     chain_id( cfg.genesis.compute_chain_id() ),
@@ -424,7 +424,7 @@ struct controller_impl {
       contract_database_index_set::add_indices(db);
 
       authorization.add_indices();
-     // resource_limits.add_indices();
+      resource_limits.add_indices();
    }
 
    void clear_all_undo() {
@@ -525,7 +525,7 @@ struct controller_impl {
       add_contract_tables_to_snapshot(snapshot);
 
       authorization.add_to_snapshot(snapshot);
-      //resource_limits.add_to_snapshot(snapshot);
+      resource_limits.add_to_snapshot(snapshot);
    }
 
    void read_from_snapshot( const snapshot_reader_ptr& snapshot ) {
@@ -569,7 +569,7 @@ struct controller_impl {
       read_contract_tables_from_snapshot(snapshot);
 
       authorization.read_from_snapshot(snapshot);
-     // resource_limits.read_from_snapshot(snapshot);
+      resource_limits.read_from_snapshot(snapshot);
 
       db.set_revision( head->block_num );
    }
@@ -627,7 +627,7 @@ struct controller_impl {
       const auto& active_permission = authorization.create_permission(name, config::active_name, owner_permission.id,
                                                                       active, conf.genesis.initial_timestamp );
 
-    //  resource_limits.initialize_account(name);
+     // resource_limits.initialize_account(name);
 
       int64_t ram_delta = config::overhead_per_account_ram_bytes;
       ram_delta += 2*config::billable_size_v<permission_object>;
@@ -657,7 +657,7 @@ struct controller_impl {
       db.create<blackwhitelist_object>([](auto&){});
 
       authorization.initialize_database();
-    //  resource_limits.initialize_database();
+      resource_limits.initialize_database();
 
       authority system_auth(conf.genesis.initial_key);
       create_native_account( config::system_account_name, system_auth, system_auth, true );
@@ -786,10 +786,10 @@ struct controller_impl {
    }
 
    void remove_scheduled_transaction( const generated_transaction_object& gto ) {
-    /*  resource_limits.add_pending_ram_usage(
+     resource_limits.add_pending_ram_usage(
          gto.payer,
          -(config::billable_size_v<generated_transaction_object> + gto.packed_trx.size())
-      );*/
+      );
       // No need to verify_account_ram_usage since we are only reducing memory
 
       db.remove( gto );
@@ -950,24 +950,23 @@ struct controller_impl {
          // hard failure logic
 
          if( !explicit_billed_cpu_time ) {
-            /*
+            
             auto& rl = self.get_mutable_resource_limits_manager();
-            rl.update_account_usage( trx_context.bill_to_accounts, block_timestamp_type(self.pending_block_time()).slot );
-            */
-           /*
-            int64_t account_cpu_limit = 0;
-            std::tie( std::ignore, account_cpu_limit, std::ignore, std::ignore ) = trx_context.max_bandwidth_billed_accounts_can_pay( true );
+            //rl.update_account_usage( trx_context.bill_to_accounts, block_timestamp_type(self.pending_block_time()).slot );
+            
+           
+            //int64_t account_cpu_limit = 0;
+           // std::tie( std::ignore, account_cpu_limit, std::ignore, std::ignore ) = trx_context.max_bandwidth_billed_accounts_can_pay( true );
 
-            cpu_time_to_bill_us = static_cast<uint32_t>( std::min( std::min( static_cast<int64_t>(cpu_time_to_bill_us),
-                                                                             account_cpu_limit                          ),
+            cpu_time_to_bill_us = static_cast<uint32_t>( std::min(  static_cast<int64_t>(cpu_time_to_bill_us) ,
                                                                    trx_context.initial_objective_duration_limit.count()    ) );
 
-            */
+            
          }
-         /*
+         
          resource_limits.add_transaction_usage( trx_context.bill_to_accounts, cpu_time_to_bill_us, 0,
                                                 block_timestamp_type(self.pending_block_time()).slot ); // Should never fail
-         */
+         
          trace->receipt = push_receipt(gtrx.trx_id, transaction_receipt::hard_fail, cpu_time_to_bill_us, 0);
 
          emit( self.accepted_transaction, trx );
@@ -1490,12 +1489,12 @@ struct controller_impl {
       const auto& chain_config = self.get_global_properties().configuration;
       uint32_t max_virtual_mult = 1000;
       uint64_t CPU_TARGET = EOS_PERCENT(chain_config.max_block_cpu_usage, chain_config.target_block_cpu_usage_pct);
-      /*resource_limits.set_block_parameters(
+      resource_limits.set_block_parameters(
          { CPU_TARGET, chain_config.max_block_cpu_usage, config::block_cpu_usage_average_window_ms / config::block_interval_ms, max_virtual_mult, {99, 100}, {1000, 999}},
          {EOS_PERCENT(chain_config.max_block_net_usage, chain_config.target_block_net_usage_pct), chain_config.max_block_net_usage, config::block_size_average_window_ms / config::block_interval_ms, max_virtual_mult, {99, 100}, {1000, 999}}
       );
       resource_limits.process_block_usage(pending->_pending_block_state->block_num);
-      */
+      
       set_action_merkle();
       set_trx_merkle();
       set_block_extensions_hash();
@@ -1724,7 +1723,7 @@ struct controller_impl {
    }
 
 }; /// controller_impl
-/*
+
 const resource_limits_manager&   controller::get_resource_limits_manager()const
 {
    return my->resource_limits;
@@ -1733,7 +1732,7 @@ resource_limits_manager&         controller::get_mutable_resource_limits_manager
 {
    return my->resource_limits;
 }
-*/
+
 const authorization_manager&   controller::get_authorization_manager()const
 {
    return my->authorization;

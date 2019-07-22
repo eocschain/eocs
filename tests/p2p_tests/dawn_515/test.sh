@@ -244,25 +244,25 @@ read -d '' logging01 << EOF
 EOF
 
 rm -rf staging
-rm -rf etc/eosio/node_*
+rm -rf etc/lemon/node_*
 rm -rf var/lib
 cName=config.ini
 lName=logging.json
 gName=genesis.json
 
-path=staging/etc/eosio/node_bios
+path=staging/etc/lemon/node_bios
 mkdir -p $path
 echo "$configbios" > $path/$cName
 echo "$loggingbios" > $path/$lName
 echo "$genesis" > $path/$gName
 
-path=staging/etc/eosio/node_00
+path=staging/etc/lemon/node_00
 mkdir -p $path
 echo "$config00" > $path/$cName
 echo "$logging00" > $path/$lName
 echo "$genesis" > $path/$gName
 
-path=staging/etc/eosio/node_01
+path=staging/etc/lemon/node_01
 mkdir -p $path
 echo "$config01" > $path/$cName
 echo "$logging01" > $path/$lName
@@ -301,5 +301,5 @@ fi
 programs/eosio-launcher/eosio-launcher -k 15
 rm -rf staging
 rm -rf var/lib/node_*
-rm -rf etc/eosio/node_*
+rm -rf etc/lemon/node_*
 exit $ret

@@ -140,7 +140,7 @@ void resource_limits_manager::update_account_usage(const flat_set<account_name>&
 void resource_limits_manager::add_transaction_usage(const flat_set<account_name>& accounts, uint64_t cpu_usage, uint64_t net_usage, uint32_t time_slot ) {
    const auto& state = _db.get<resource_limits_state_object>();
    const auto& config = _db.get<resource_limits_config_object>();
-
+   /*
    for( const auto& a : accounts ) {
 
       const auto& usage = _db.get<resource_usage_object,by_owner>( a );
@@ -195,7 +195,7 @@ void resource_limits_manager::add_transaction_usage(const flat_set<account_name>
                      ("max_user_use_in_window",max_user_use_in_window) );
 
       }
-   }
+   }  */
 
    // account for this transaction in the block and do not exceed those limits either
    _db.modify(state, [&](resource_limits_state_object& rls){

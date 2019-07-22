@@ -962,7 +962,7 @@ struct register_producer_subcommand {
       register_producer->add_option("url", url, localized("url where info about producer can be found"), true);
       register_producer->add_option("location", loc, localized("relative location for purpose of nearest neighbor scheduling"), true);
       register_producer->add_option("regaccount",regaccount_str, localized("The account authorize  can reg others"));
-      add_standard_transaction_options(register_producer, "account@active");
+      add_standard_transaction_options(register_producer, "regaccount@active");
 
 
       register_producer->set_callback([this] {
@@ -1067,17 +1067,18 @@ struct create_account_subcommand {
 
 struct unregister_producer_subcommand {
    string producer_str;
-
+   string unregproducer_str;
    unregister_producer_subcommand(CLI::App* actionRoot) {
       auto unregister_producer = actionRoot->add_subcommand("unregprod", localized("Unregister an existing producer"));
       unregister_producer->add_option("account", producer_str, localized("The account to unregister as a producer"))->required();
-      add_standard_transaction_options(unregister_producer, "account@active");
+      unregister_producer->add_option("unregaccount", unregproducer_str, localized("The account to unregister as a producer"))->required();
+      add_standard_transaction_options(unregister_producer, "unregaccount@active");
 
       unregister_producer->set_callback([this] {
          fc::variant act_payload = fc::mutable_variant_object()
                   ("producer", producer_str);
 
-         auto accountPermissions = get_account_permissions(tx_permission, {producer_str,config::active_name});
+         auto accountPermissions = get_account_permissions(tx_permission, {unregproducer_str,config::active_name});
          send_actions({create_action(accountPermissions, config::system_account_name, N(unregprod), act_payload)});
       });
    }
@@ -2322,7 +2323,7 @@ CLI::callback_t header_opt_callback = [](CLI::results_t res) {
 };
 
 int main( int argc, char** argv ) {
-   cout <<" main call" << endl;
+   //cout <<" main call" << endl;
    setlocale(LC_ALL, "");
    bindtextdomain(locale_domain, locale_path);
    textdomain(locale_domain);
@@ -3868,7 +3869,7 @@ int main( int argc, char** argv ) {
    auto system = app.add_subcommand("system", localized("Send lemon.system contract action to the blockchain."), false);
    system->require_subcommand();
 
-   //auto createAccountSystem = create_account_subcommand( system, true /*simple*/ );
+  // auto createAccountSystem = create_account_subcommand( system, true /*simple*/ );
    auto registerProducer = register_producer_subcommand(system);
    auto unregisterProducer = unregister_producer_subcommand(system);
 
@@ -3880,7 +3881,7 @@ int main( int argc, char** argv ) {
    auto unapproveProducer = unapprove_producer_subcommand(voteProducer);
 
    auto listProducers = list_producers_subcommand(system);
-	cout <<"list producers" << endl;
+	//cout <<"list producers" << endl;
   /*  
    auto delegateBandWidth = delegate_bandwidth_subcommand(system);
    auto undelegateBandWidth = undelegate_bandwidth_subcommand(system);

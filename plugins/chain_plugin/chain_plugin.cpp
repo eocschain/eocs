@@ -10,7 +10,7 @@
 #include <eosio/chain/producer_object.hpp>
 #include <eosio/chain/config.hpp>
 #include <eosio/chain/wasm_interface.hpp>
-//#include <eosio/chain/resource_limits.hpp>
+#include <eosio/chain/resource_limits.hpp>
 #include <eosio/chain/reversible_block_object.hpp>
 #include <eosio/chain/controller.hpp>
 #include <eosio/chain/generated_transaction_object.hpp>
@@ -1039,7 +1039,7 @@ std::string itoh(I n, size_t hlen = sizeof(I)<<1) {
 }
 
 read_only::get_info_results read_only::get_info(const read_only::get_info_params&) const {
-  // const auto& rm = db.get_resource_limits_manager();
+   const auto& rm = db.get_resource_limits_manager();
   uint64_t temp = 1;
    return {
       itoh(static_cast<uint32_t>(app().version())),
@@ -1764,7 +1764,7 @@ read_only::get_account_results read_only::get_account( const get_account_params&
    result.account_name = params.account_name;
 
    const auto& d = db.db();
-   //const auto& rm = db.get_resource_limits_manager();
+   const auto& rm = db.get_resource_limits_manager();
 
    result.head_block_num  = db.head_block_num();
    result.head_block_time = db.head_block_time();
